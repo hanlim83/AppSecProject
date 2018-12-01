@@ -1,5 +1,5 @@
-# ASPJ - NYP eCTF
-
+# ASPJ - eCTF Platform
+A Project for Application Security & Project (ITP292) Module 
 ## Team Members
 * Evelyn Lim
 * [Hansen Lim](https://github.com/hanlim83)
