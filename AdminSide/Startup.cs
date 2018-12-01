@@ -17,9 +17,51 @@ namespace AdminSide
 {
     public class Startup
     {
-        public Startup(IConfiguration configuration)
+        /*
+       public Startup(IConfiguration configuration)
+       {
+           Configuration = configuration;
+       }
+       */
+
+        //Custom Startup Scripts for EBS and RDS
+
+        public Startup(IHostingEnvironment env)
         {
-            Configuration = configuration;
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddJsonFile(@"C:\Program Files\Amazon\ElasticBeanstalk\config\containerconfiguration", optional: true, reloadOnChange: true)
+                .AddEnvironmentVariables();
+            // This adds EB environment variables.
+            builder.AddInMemoryCollection(GetAwsDbConfig(builder.Build()));
+            Configuration = builder.Build();
+        }
+
+        private Dictionary<string, string> GetAwsDbConfig(IConfiguration configuration)
+        {
+            Dictionary<string, string> dict = new Dictionary<string, string>();
+
+            foreach (IConfigurationSection pair in configuration.GetSection("iis:env").GetChildren())
+            {
+                string[] keypair = pair.Value.Split(new[] { '=' }, 2);
+                dict.Add(keypair[0], keypair[1]);
+            }
+
+            return dict;
+        }
+
+        //For ASP.NET Identity Only | You can reuse this but replace dbname with your own database name
+        private string GetRdsConnectionString()
+        {
+            string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
+            string port = Configuration.GetValue<string>("RDS_PORT");
+            string dbname = "ASPNETIdentityAdmin";
+            string username = Configuration.GetValue<string>("RDS_USERNAME");
+            string password = Configuration.GetValue<string>("RDS_PASSWORD");
+
+            return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
         }
 
         public IConfiguration Configuration { get; }
@@ -34,13 +76,18 @@ namespace AdminSide
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            //Using RDS
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(
+            GetRdsConnectionString()));
+
             services.AddDefaultIdentity<IdentityUser>()
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            //Add Default AWS Services
+            services.AddDefaultAWSOptions(Configuration.GetAWSOptions());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
