@@ -1,4 +1,4 @@
-# ASPJ - eCTF Platform
+# ASPJ
 A Project for Application Security & Project (ITP292) Module 
 ## Team Members
 * Evelyn Lim
