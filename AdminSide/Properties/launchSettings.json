@@ -14,7 +14,10 @@
       "environmentVariables": {
         "RDS_HOSTNAME": "aspjdevelopmentdb.cveglglrcyfg.ap-southeast-1.rds.amazonaws.com",
         "RDS_PORT": "1433",
+        "AWS_REGION": "ap-southeast-1",
         "RDS_USERNAME": "aspjUser",
+        "AWS_SECRET_ACCESS_KEY": "ahvOWKLZcupwrs1YtqFPEtdQeIO8C9dzmrwww809",
+        "AWS_ACCESS_KEY_ID": "AKIAIAPPLQ2ZBAVTOVJA",
         "RDS_PASSWORD": "LJ1ynhlXuu4N4Cmm8KoJ",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
