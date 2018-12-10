@@ -18,6 +18,8 @@ using Amazon.EC2;
 using Amazon.CloudWatch;
 using Amazon.SimpleNotificationService;
 using Amazon.CloudWatchLogs;
+using Amazon.CloudWatchEvents;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace AdminSide
 {
@@ -87,28 +89,41 @@ namespace AdminSide
             options.UseSqlServer(
             GetRdsConnectionString()));
 
-            services.AddDefaultIdentity<IdentityUser>()
-                .AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+        .AddRazorPagesOptions(options =>
+        {
+            options.AllowAreas = true;
+            options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+            options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+        });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/Identity/Account/Login";
+                options.LogoutPath = $"/Identity/Account/Logout";
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
+            });
+
+            // using Microsoft.AspNetCore.Identity.UI.Services;
+            services.AddSingleton<IEmailSender, EmailSender>();
 
             //Core AWS Initialization
             var awsOptions = Configuration.GetAWSOptions();
             awsOptions.Credentials = new EnvironmentVariablesAWSCredentials();
             services.AddDefaultAWSOptions(awsOptions);
             //S3 Initialization
-            IAmazonS3 s3Client = awsOptions.CreateServiceClient<IAmazonS3>();
             services.AddAWSService<IAmazonS3>();
             //EC2 and VPC Initialization
-            IAmazonEC2 ec2Client = awsOptions.CreateServiceClient<IAmazonEC2>();
             services.AddAWSService<IAmazonEC2>();
             //Cloudwatch Initialization
-            IAmazonCloudWatch cloudwatchClient = awsOptions.CreateServiceClient<IAmazonCloudWatch>();
             services.AddAWSService<IAmazonCloudWatch>();
-            IAmazonCloudWatchLogs cloudwatchLogsClient = awsOptions.CreateServiceClient<IAmazonCloudWatchLogs>();
             services.AddAWSService<IAmazonCloudWatchLogs>();
+            services.AddAWSService<IAmazonCloudWatchEvents>();
             //SNS Initialization
-            IAmazonSimpleNotificationService snsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
             services.AddAWSService<IAmazonSimpleNotificationService>();
         }
 
@@ -138,6 +153,14 @@ namespace AdminSide
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+    }
+
+    public class EmailSender : IEmailSender
+    {
+        public Task SendEmailAsync(string email, string subject, string message)
+        {
+            return Task.CompletedTask;
         }
     }
 }
