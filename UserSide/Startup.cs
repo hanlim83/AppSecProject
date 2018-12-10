@@ -19,6 +19,7 @@ using Amazon.EC2;
 using Amazon.CloudWatch;
 using Amazon.CloudWatchLogs;
 using Amazon.SimpleNotificationService;
+using Amazon.CloudWatchEvents;
 
 namespace UserSide
 {
@@ -115,18 +116,14 @@ namespace UserSide
             awsOptions.Credentials = new EnvironmentVariablesAWSCredentials();
             services.AddDefaultAWSOptions(awsOptions);
             //S3 Initialization
-            IAmazonS3 s3Client = awsOptions.CreateServiceClient<IAmazonS3>();
             services.AddAWSService<IAmazonS3>();
             //EC2 and VPC Initialization
-            IAmazonEC2 ec2Client = awsOptions.CreateServiceClient<IAmazonEC2>();
             services.AddAWSService<IAmazonEC2>();
             //Cloudwatch Initialization
-            IAmazonCloudWatch cloudwatchClient = awsOptions.CreateServiceClient<IAmazonCloudWatch>();
             services.AddAWSService<IAmazonCloudWatch>();
-            IAmazonCloudWatchLogs cloudwatchLogsClient = awsOptions.CreateServiceClient<IAmazonCloudWatchLogs>();
             services.AddAWSService<IAmazonCloudWatchLogs>();
+            services.AddAWSService<IAmazonCloudWatchEvents>();
             //SNS Initialization
-            IAmazonSimpleNotificationService snsClient = awsOptions.CreateServiceClient<IAmazonSimpleNotificationService>();
             services.AddAWSService<IAmazonSimpleNotificationService>();
         }
 
