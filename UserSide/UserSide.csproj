@@ -6,16 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.10" />
-    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.7" />
-    <PackageReference Include="AWSSDK.Core" Version="3.3.29.12" />
-    <PackageReference Include="AWSSDK.EC2" Version="3.3.75" />
-    <PackageReference Include="AWSSDK.ElasticBeanstalk" Version="3.3.11.14" />
-    <PackageReference Include="AWSSDK.ElasticLoadBalancingV2" Version="3.3.11" />
+    <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.10.1" />
+    <PackageReference Include="AWSSDK.CloudWatchEvents" Version="3.3.8.1" />
+    <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.7.1" />
+    <PackageReference Include="AWSSDK.Core" Version="3.3.29.13" />
+    <PackageReference Include="AWSSDK.EC2" Version="3.3.76" />
+    <PackageReference Include="AWSSDK.ElasticBeanstalk" Version="3.3.11.15" />
+    <PackageReference Include="AWSSDK.ElasticLoadBalancingV2" Version="3.3.12" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.6" />
-    <PackageReference Include="AWSSDK.RDS" Version="3.3.37" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.30" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.3.2" />
+    <PackageReference Include="AWSSDK.RDS" Version="3.3.37.2" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.31" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.3.3" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />

@@ -1,0 +1,53 @@
+﻿@model Amazon.EC2.Model.DescribeVpcsResponse;
+@{
+    ViewData["Title"] = "Testing Page";
+}
+
+<div class="row">
+    <div class="col-lg-3">
+        <div class="list-group">
+            <a asp-area="" asp-controller="AWSTesting" asp-action="S3" class="list-group-item">S3</a>
+            <a asp-area="" asp-controller="AWSTesting" asp-action="EC2VPC" class="list-group-item active">EC2 and VPC</a>
+            <a asp-area="" asp-controller="AWSTesting" asp-action="Cloudwatch" class="list-group-item">Cloudwatch</a>
+            <a asp-area="" asp-controller="AWSTesting" asp-action="SNS" class="list-group-item">SNS</a>
+        </div>
+    </div>
+    <div class="col-lg-9">
+        <h4>Content</h4>
+        <div class="row">
+            <div class="col-lg-6">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                CIDR Block
+                            </th>
+                            <th>
+                                VPC State
+                            </th>
+                            <th>
+                                VPC ID
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var VPC in Model.Vpcs)
+                        {
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => VPC.CidrBlock)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => VPC.State)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => VPC.VpcId)
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
