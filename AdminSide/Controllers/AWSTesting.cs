@@ -15,6 +15,7 @@ using ASPJ_MVC.Models;
 using Amazon.S3.Model;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using Amazon.EC2.Model;
 
 namespace ASPJ_MVC.Controllers
 {
@@ -28,7 +29,7 @@ namespace ASPJ_MVC.Controllers
 
         IAmazonSimpleNotificationService SNSClient { get; set; }
 
-        public AWSTestingController (IAmazonS3 s3Client, IAmazonEC2 ec2Client, IAmazonCloudWatchLogs cloudWatchLogsClient, IAmazonSimpleNotificationService snsClient)
+        public AWSTestingController(IAmazonS3 s3Client, IAmazonEC2 ec2Client, IAmazonCloudWatchLogs cloudWatchLogsClient, IAmazonSimpleNotificationService snsClient)
         {
             this.S3Client = s3Client;
             this.EC2Client = ec2Client;
@@ -52,6 +53,7 @@ namespace ASPJ_MVC.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> S3Create([Bind("BucketName")] AWSTestingS3FormModel data)
         {
             if (ModelState.IsValid)
@@ -62,12 +64,14 @@ namespace ASPJ_MVC.Controllers
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
                         return RedirectToAction("S3List");
-                    } else
+                    }
+                    else
                     {
                         return RedirectToAction("S3List");
                     }
 
-                } catch (AmazonS3Exception e)
+                }
+                catch (AmazonS3Exception e)
                 {
                     ViewData["Exception"] = e.Message;
                     return View();
@@ -79,10 +83,157 @@ namespace ASPJ_MVC.Controllers
             }
         }
 
-            public async Task<IActionResult> VPCList()
+        public async Task<IActionResult> VPCList()
         {
             return View(await EC2Client.DescribeVpcsAsync());
         }
+
+        public async Task<IActionResult> SubnetList()
+        {
+            return View(await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+            {
+                Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                }
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubnetList(string subnetId)
+        {
+            DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+            {
+                Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                }
+            });
+            Boolean flag = false;
+            for (int i = 0; i < response.Subnets.Count; i++)
+            {
+                Subnet subnet = response.Subnets[i];
+                String retrievedID = subnet.SubnetId;
+                if (subnetId.Equals(retrievedID))
+                {
+                    flag = true;
+                    break;
+                }
+            }
+            if (flag == false)
+            {
+                return View();
+            }
+            else
+            {
+                try
+                {
+                    DeleteSubnetRequest request = new DeleteSubnetRequest(subnetId);
+                    DeleteSubnetResponse responseEC2 = await EC2Client.DeleteSubnetAsync(request);
+                    if (responseEC2.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        ViewData["Result"] = "Successfully Deleted!";
+                        return View(await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+                        {
+                            Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                }
+                        }));
+                    }
+                    else
+                    {
+                        ViewData["Result"] = "Failed!";
+                        return View();
+                    }
+                }
+                catch (AmazonEC2Exception e)
+                {
+                    ViewData["Result"] = e.Message;
+                    return View();
+                }
+            }
+        }
+
+        public IActionResult SubnetCreate()
+        {
+            return View();
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubnetCreate([Bind("IPCIDR")] AWSTestingSubnetFormModel data)
+        {
+            if (ModelState.IsValid)
+            {
+                CreateSubnetRequest request = new CreateSubnetRequest("vpc-097a8c101382a6b0f", data.IPCIDR+"/24");
+                DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+                {
+                    Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                }
+                });
+                List<int> ipv6CIDR = new List<int>();
+                List<Subnet> subnets = response.Subnets;
+                int ipv6Subnet = 0;
+                string[] ipv6CIDRstr = new string[6];
+                for (int i = 0; i < subnets.Count; i++)
+                {
+                    List<SubnetIpv6CidrBlockAssociation> ipv6 = subnets[i].Ipv6CidrBlockAssociationSet;
+                    ipv6CIDRstr = ipv6[0].Ipv6CidrBlock.Split(":");
+                    ipv6Subnet = int.Parse(ipv6CIDRstr[3].Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                    ipv6CIDR.Add(ipv6Subnet);
+                }
+                Boolean flag = false;
+                while (flag != true)
+                {
+                    Console.WriteLine("Doing while loop");
+                    Console.WriteLine(ipv6Subnet);
+                    Boolean passed = false;
+                    ++ipv6Subnet;
+                    for (int j = 0; j < ipv6CIDR.Count; j++)
+                    {
+                        
+                        if (ipv6Subnet == ipv6CIDR[j])
+                            passed = false;
+                        else
+                            passed = true;
+                    }
+                    if (passed == true)
+                        flag = true;
+                }
+                if (ipv6Subnet < 9)
+                    request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0,2) + "0" + ipv6Subnet.ToString() + "::"+ ipv6CIDRstr[5];
+                else
+                    request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + Convert.ToInt32(ipv6Subnet).ToString() + "::" + ipv6CIDRstr[5];
+                try
+                {
+                    CreateSubnetResponse responseS = await EC2Client.CreateSubnetAsync(request);
+                    if (responseS.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        ViewData["Result"] = "Successfully Created!";
+                        return RedirectToAction("SubnetList");
+                    }
+                    else
+                    {
+                        ViewData["Exception"] = "Failed to Create!";
+                        return View();
+                    }
+                } catch (Amazon.EC2.AmazonEC2Exception e)
+                {
+                    ViewData["Exception"] = e.Message;
+                    return View();
+                }
+            }
+            else
+            {
+                return StatusCode(500);
+            }
+        }
+
 
         public async Task<IActionResult> CloudwatchView()
         {
@@ -99,7 +250,8 @@ namespace ASPJ_MVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SNSSend([Bind("DisplayID","Number","Message")] AWSTestingSNSFormModel data)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SNSSend([Bind("DisplayID", "Number", "Message")] AWSTestingSNSFormModel data)
         {
             if (ModelState.IsValid)
             {
