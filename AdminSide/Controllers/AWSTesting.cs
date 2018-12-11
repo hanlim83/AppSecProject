@@ -16,6 +16,11 @@ using Amazon.S3.Model;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Amazon.EC2.Model;
+using Amazon.CloudWatch;
+using Amazon.CloudWatchEvents;
+using Amazon.RDS;
+using Amazon.ElasticLoadBalancingV2;
+using Amazon.ElasticBeanstalk;
 
 namespace ASPJ_MVC.Controllers
 {
@@ -25,16 +30,31 @@ namespace ASPJ_MVC.Controllers
 
         IAmazonEC2 EC2Client { get; set; }
 
-        IAmazonCloudWatchLogs SentryClient { get; set; }
+        IAmazonCloudWatch CloudwatchClient { get; set; }
+
+        IAmazonCloudWatchEvents CloudwatchEventsClient { get; set; }
+
+        IAmazonCloudWatchLogs CloudwatchLogsClient { get; set; }
 
         IAmazonSimpleNotificationService SNSClient { get; set; }
 
-        public AWSTestingController(IAmazonS3 s3Client, IAmazonEC2 ec2Client, IAmazonCloudWatchLogs cloudWatchLogsClient, IAmazonSimpleNotificationService snsClient)
+        IAmazonRDS RDSClient { get; set; }
+
+        IAmazonElasticLoadBalancingV2 ELBClient { get; set; }
+
+        IAmazonElasticBeanstalk EBSClient { get; set; }
+
+        public AWSTestingController(IAmazonS3 s3Client, IAmazonEC2 ec2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchLogsClient, IAmazonSimpleNotificationService snsClient, IAmazonRDS rdsClient, IAmazonElasticLoadBalancingV2 elbClient, IAmazonElasticBeanstalk ebsClient)
         {
             this.S3Client = s3Client;
             this.EC2Client = ec2Client;
-            this.SentryClient = cloudWatchLogsClient;
+            this.CloudwatchClient = cloudwatchClient;
+            this.CloudwatchEventsClient = cloudwatcheventsClient;
+            this.CloudwatchLogsClient = cloudwatchLogsClient;
             this.SNSClient = snsClient;
+            this.RDSClient = rdsClient;
+            this.ELBClient = elbClient;
+            this.EBSClient = ebsClient;
         }
 
         public IActionResult Index()
@@ -241,7 +261,7 @@ namespace ASPJ_MVC.Controllers
             {
                 Limit = 15
             };
-            return View(await SentryClient.GetLogEventsAsync(Crequest));
+            return View(await CloudwatchLogsClient.GetLogEventsAsync(Crequest));
         }
 
         public IActionResult SNSSend()

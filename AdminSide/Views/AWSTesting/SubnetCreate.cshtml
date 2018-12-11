@@ -21,15 +21,15 @@
             <div class="col-lg-6">
                 @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])))
                 {
-                <div class="alert alert-danger" role="alert">
-                    @ViewData["Exception"]
-                </div>
+                    <div class="alert alert-danger" role="alert">
+                        @ViewData["Exception"]
+                    </div>
                 }
                 <form method="post">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
                         <label asp-for="IPCIDR"></label>
-                        <input asp-for="IPCIDR" placeholder="Enter IP CIDR" class="form-control" pattern="172.29.[0-9]{1,3}.[0-9]{1,3}" required />
+                        <input asp-for="IPCIDR" placeholder="Enter IP CIDR" class="form-control" pattern="172.29.[0-9]{1,3}.[0-9]{1,3}"/>
                         <span asp-validation-for="IPCIDR" class="text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-primary">Create Subnet</button>
@@ -38,3 +38,6 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

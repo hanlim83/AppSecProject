@@ -31,26 +31,29 @@
                         @ViewData["Result"]
                     </div>
                 }
-                    <form method="post">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                        <div class="form-group">
-                            <label asp-for="DisplayID"></label>
-                            <input asp-for="DisplayID" placeholder="Enter Display ID" class="form-control" />
-                            <span asp-validation-for="DisplayID" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Number"></label>
-                            <input asp-for="Number" placeholder="Enter Phone Number to Send to (Include Country Code)" class="form-control" />
-                            <span asp-validation-for="Number" class="text-danger"></span>
-                        </div>
-                        <div class="form-group">
-                            <label asp-for="Message"></label>
-                            <textarea asp-for="Message" placeholder="Enter Message" class="form-control"></textarea>
-                            <span asp-validation-for="Message" class="text-danger"></span>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Send Message</button>
-                    </form>
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="DisplayID"></label>
+                        <input asp-for="DisplayID" placeholder="Enter Display ID" class="form-control" />
+                        <span asp-validation-for="DisplayID" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Number"></label>
+                        <input asp-for="Number" placeholder="Enter Phone Number to Send to (Include Country Code)" class="form-control" />
+                        <span asp-validation-for="Number" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="Message"></label>
+                        <textarea asp-for="Message" placeholder="Enter Message" class="form-control"></textarea>
+                        <span asp-validation-for="Message" class="text-danger"></span>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Message</button>
+                </form>
             </div>
         </div>
     </div>
 </div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

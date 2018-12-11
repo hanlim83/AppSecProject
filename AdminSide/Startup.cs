@@ -20,6 +20,9 @@ using Amazon.SimpleNotificationService;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchEvents;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Amazon.RDS;
+using Amazon.ElasticLoadBalancingV2;
+using Amazon.ElasticBeanstalk;
 
 namespace AdminSide
 {
@@ -125,6 +128,12 @@ namespace AdminSide
             services.AddAWSService<IAmazonCloudWatchEvents>();
             //SNS Initialization
             services.AddAWSService<IAmazonSimpleNotificationService>();
+            //RDS Initialization
+            services.AddAWSService<IAmazonRDS>();
+            //ELB Initialization
+            services.AddAWSService<IAmazonElasticLoadBalancingV2>();
+            //EBS Initialization
+            services.AddAWSService<IAmazonElasticBeanstalk>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
