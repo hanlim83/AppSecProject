@@ -22,17 +22,20 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="Views\AWSTesting\SNS.cshtml">
+ <ItemGroup>
+    <Content Update="Views\AWSTesting\S3Create.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\Cloudwatch.cshtml">
+    <Content Update="Views\AWSTesting\SNSSend.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\EC2VPC.cshtml">
+    <Content Update="Views\AWSTesting\CloudwatchView.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\S3.cshtml">
+    <Content Update="Views\AWSTesting\VPCList.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\AWSTesting\S3List.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\AWSTesting\Index.cshtml">
@@ -81,6 +84,10 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\Identity\Services\" />
   </ItemGroup>
 
 </Project>

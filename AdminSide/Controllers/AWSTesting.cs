@@ -12,6 +12,9 @@ using Amazon.CloudWatchLogs.Model;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
 using ASPJ_MVC.Models;
+using Amazon.S3.Model;
+using System.Net;
+using Microsoft.AspNetCore.Http;
 
 namespace ASPJ_MVC.Controllers
 {
@@ -38,30 +41,65 @@ namespace ASPJ_MVC.Controllers
             return View();
         }
 
-        public async Task<IActionResult> S3()
+        public async Task<IActionResult> S3List()
         {
             return View(await S3Client.ListBucketsAsync());
         }
 
-        public async Task<IActionResult> EC2VPC()
-        {
-            return View(await EC2Client.DescribeVpcsAsync());
-        }
-
-        public async Task<IActionResult> Cloudwatch()
-        {
-            GetLogEventsRequest Crequest = new GetLogEventsRequest("RDSOSMetrics", "db-74DSOXWDBQWHTVNTY7RFXWRZYE");
-            Crequest.Limit = 15;
-            return View(await SentryClient.GetLogEventsAsync(Crequest));
-        }
-
-        public IActionResult SNS()
+        public IActionResult S3Create()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> SNS([Bind("DisplayID","Number","Message")] AWSTestingSNSFormModel data)
+        public async Task<IActionResult> S3Create([Bind("BucketName")] AWSTestingS3FormModel data)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    PutBucketResponse response = await S3Client.PutBucketAsync(data.BucketName);
+                    if (response.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        return RedirectToAction("S3List");
+                    } else
+                    {
+                        return RedirectToAction("S3List");
+                    }
+
+                } catch (AmazonS3Exception e)
+                {
+                    ViewData["Exception"] = e.Message;
+                    return View();
+                }
+            }
+            else
+            {
+                return StatusCode(500);
+            }
+        }
+
+            public async Task<IActionResult> VPCList()
+        {
+            return View(await EC2Client.DescribeVpcsAsync());
+        }
+
+        public async Task<IActionResult> CloudwatchView()
+        {
+            GetLogEventsRequest Crequest = new GetLogEventsRequest("RDSOSMetrics", "db-74DSOXWDBQWHTVNTY7RFXWRZYE")
+            {
+                Limit = 15
+            };
+            return View(await SentryClient.GetLogEventsAsync(Crequest));
+        }
+
+        public IActionResult SNSSend()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SNSSend([Bind("DisplayID","Number","Message")] AWSTestingSNSFormModel data)
         {
             if (ModelState.IsValid)
             {
