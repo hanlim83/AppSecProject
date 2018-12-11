@@ -23,6 +23,12 @@
   </ItemGroup>
 
  <ItemGroup>
+    <Content Update="Views\AWSTesting\EC2List.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\AWSTesting\EC2Create.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\AWSTesting\SubnetCreate.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

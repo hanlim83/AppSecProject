@@ -5,22 +5,27 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using AdminSide.Models;
+using ASPJ_MVC.Models;
 using Amazon.S3;
+using Amazon.S3.Model;
 using Amazon.EC2;
+using Amazon.EC2.Model;
+using Amazon.CloudWatch;
+using Amazon.CloudWatch.Model;
+using Amazon.CloudWatchEvents;
+using Amazon.CloudWatchEvents.Model;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using Amazon.SimpleNotificationService;
 using Amazon.SimpleNotificationService.Model;
-using ASPJ_MVC.Models;
-using Amazon.S3.Model;
+using Amazon.RDS;
+using Amazon.RDS.Model;
+using Amazon.ElasticLoadBalancingV2;
+using Amazon.ElasticLoadBalancingV2.Model;
+using Amazon.ElasticBeanstalk;
+using Amazon.ElasticBeanstalk.Model;
 using System.Net;
 using Microsoft.AspNetCore.Http;
-using Amazon.EC2.Model;
-using Amazon.CloudWatch;
-using Amazon.CloudWatchEvents;
-using Amazon.RDS;
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticBeanstalk;
 
 namespace ASPJ_MVC.Controllers
 {
@@ -103,6 +108,130 @@ namespace ASPJ_MVC.Controllers
             }
         }
 
+        public async Task<IActionResult> EC2List()
+        {
+            return View(await EC2Client.DescribeInstancesAsync(new DescribeInstancesRequest
+            {
+                Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                }
+            }));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EC2List(string instanceID)
+        {
+            DescribeInstancesResponse response = await EC2Client.DescribeInstancesAsync(new DescribeInstancesRequest
+            {
+                Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                }
+            });
+            Boolean flag = false;
+            foreach(Amazon.EC2.Model.Reservation r in response.Reservations)
+            {
+                foreach(Amazon.EC2.Model.Instance i in r.Instances)
+                {
+                    if (instanceID.Equals(i.InstanceId))
+                    {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag == true)
+                    break;
+            }
+            if (flag == true)
+            {
+                TerminateInstancesRequest request = new TerminateInstancesRequest
+                {
+                    InstanceIds = new List<string>
+                    {
+                        instanceID
+                    }
+                };
+                try
+                {
+                    TerminateInstancesResponse responseT = await EC2Client.TerminateInstancesAsync(request);
+                    if (responseT.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        ViewData["Result"] = "Successfully Terminated!";
+                        return View();
+                    }
+                    else
+                    {
+                        ViewData["Result"] = "Something happened";
+                        return View();
+                    }
+                } catch (AmazonEC2Exception e)
+                {
+                    ViewData["Result"] = e.Message;
+                    return View();
+                }
+            } else
+            {
+                return StatusCode(500);
+            }
+        }
+
+        public async Task<IActionResult> EC2Create()
+        {
+            return View(await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+            {
+                Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                }
+            }));
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EC2Create(string imageID, string subnetID)
+        {
+            DescribeSecurityGroupsResponse response = await EC2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
+            {
+                Filters = new List<Amazon.EC2.Model.Filter>
+                        {
+                            new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                        }
+            });
+            SecurityGroup securityGroup = response.SecurityGroups[0];
+            RunInstancesRequest request = new RunInstancesRequest
+            {
+                ImageId = imageID,
+                InstanceType = InstanceType.T1Micro,
+                MinCount = 1,
+                MaxCount = 1,
+                KeyName = "ASPJ Instances Master Key Pair",
+                SubnetId = subnetID
+            };
+            try
+            {
+                RunInstancesResponse responseI = await EC2Client.RunInstancesAsync(request);
+                if (responseI.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    ViewData["Result"] = "Successfully Created and Running!";
+                    return RedirectToAction("EC2List");
+                }
+                else
+                {
+                    ViewData["Exception"] = "Somthing went wrong";
+                    return View();
+                }
+            }
+            catch (AmazonEC2Exception e)
+            {
+                ViewData["Exception"] = e.Message;
+                return View();
+            }
+
+        }
+
         public async Task<IActionResult> VPCList()
         {
             return View(await EC2Client.DescribeVpcsAsync());
@@ -114,7 +243,7 @@ namespace ASPJ_MVC.Controllers
             {
                 Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
                 }
             }));
         }
@@ -127,13 +256,13 @@ namespace ASPJ_MVC.Controllers
             {
                 Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
                 }
             });
             Boolean flag = false;
             for (int i = 0; i < response.Subnets.Count; i++)
             {
-                Subnet subnet = response.Subnets[i];
+                Amazon.EC2.Model.Subnet subnet = response.Subnets[i];
                 String retrievedID = subnet.SubnetId;
                 if (subnetId.Equals(retrievedID))
                 {
@@ -143,7 +272,7 @@ namespace ASPJ_MVC.Controllers
             }
             if (flag == false)
             {
-                return View();
+                return StatusCode(500);
             }
             else
             {
@@ -158,7 +287,7 @@ namespace ASPJ_MVC.Controllers
                         {
                             Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
                 }
                         }));
                     }
@@ -188,47 +317,73 @@ namespace ASPJ_MVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                CreateSubnetRequest request = new CreateSubnetRequest("vpc-097a8c101382a6b0f", data.IPCIDR+"/24");
+                CreateSubnetRequest request = new CreateSubnetRequest("vpc-09cd2d2019d9ac437", data.IPCIDR + "/24");
                 DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                 {
                     Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-097a8c101382a6b0f"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
                 }
                 });
                 List<int> ipv6CIDR = new List<int>();
-                List<Subnet> subnets = response.Subnets;
+                List<Amazon.EC2.Model.Subnet> subnets = response.Subnets;
                 int ipv6Subnet = 0;
                 string[] ipv6CIDRstr = new string[6];
-                for (int i = 0; i < subnets.Count; i++)
+                if (subnets.Count == 0)
                 {
-                    List<SubnetIpv6CidrBlockAssociation> ipv6 = subnets[i].Ipv6CidrBlockAssociationSet;
-                    ipv6CIDRstr = ipv6[0].Ipv6CidrBlock.Split(":");
-                    ipv6Subnet = int.Parse(ipv6CIDRstr[3].Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-                    ipv6CIDR.Add(ipv6Subnet);
-                }
-                Boolean flag = false;
-                while (flag != true)
-                {
-                    Console.WriteLine("Doing while loop");
-                    Console.WriteLine(ipv6Subnet);
-                    Boolean passed = false;
-                    ++ipv6Subnet;
-                    for (int j = 0; j < ipv6CIDR.Count; j++)
+                    DescribeVpcsResponse responseV = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                     {
-                        
-                        if (ipv6Subnet == ipv6CIDR[j])
-                            passed = false;
-                        else
-                            passed = true;
-                    }
-                    if (passed == true)
-                        flag = true;
+                        Filters = new List<Amazon.EC2.Model.Filter>
+                        {
+                            new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                        }
+                    });
+                    Vpc vpc = responseV.Vpcs[0];
+                    VpcIpv6CidrBlockAssociation ipv6CidrBlockAssociation = vpc.Ipv6CidrBlockAssociationSet[0];
+                    ipv6CIDRstr = ipv6CidrBlockAssociation.Ipv6CidrBlock.Split(":");
                 }
-                if (ipv6Subnet < 9)
-                    request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0,2) + "0" + ipv6Subnet.ToString() + "::"+ ipv6CIDRstr[5];
                 else
-                    request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + Convert.ToInt32(ipv6Subnet).ToString() + "::" + ipv6CIDRstr[5];
+                {
+                    foreach (Amazon.EC2.Model.Subnet s in subnets)
+                    {
+                        List<SubnetIpv6CidrBlockAssociation> ipv6 = s.Ipv6CidrBlockAssociationSet;
+                        ipv6CIDRstr = ipv6[0].Ipv6CidrBlock.Split(":");
+                        ipv6Subnet = int.Parse(ipv6CIDRstr[3].Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                        ipv6CIDR.Add(ipv6Subnet);
+                    }
+                    Boolean flag = false;
+                    while (flag != true)
+                    {
+                        Console.WriteLine("Doing while loop");
+                        Console.WriteLine(ipv6Subnet);
+                        Boolean passed = false;
+                        ++ipv6Subnet;
+                        foreach (int i in ipv6CIDR)
+                        {
+
+                            if (ipv6Subnet == ipv6CIDR[i])
+                                passed = false;
+                            else
+                                passed = true;
+                        }
+                        if (passed == true)
+                            flag = true;
+                    }
+                }
+                if (ipv6CIDRstr[5] == "/56")
+                {
+                    if (ipv6Subnet < 9)
+                        request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + "0" + ipv6Subnet.ToString() + "::/64";
+                    else
+                        request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + Convert.ToInt32(ipv6Subnet).ToString() + "::/64";
+                }
+                else
+                {
+                    if (ipv6Subnet < 9)
+                        request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + "0" + ipv6Subnet.ToString() + "::" + ipv6CIDRstr[5];
+                    else
+                        request.Ipv6CidrBlock = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + Convert.ToInt32(ipv6Subnet).ToString() + "::" + ipv6CIDRstr[5];
+                }
                 try
                 {
                     CreateSubnetResponse responseS = await EC2Client.CreateSubnetAsync(request);
@@ -242,7 +397,8 @@ namespace ASPJ_MVC.Controllers
                         ViewData["Exception"] = "Failed to Create!";
                         return View();
                     }
-                } catch (Amazon.EC2.AmazonEC2Exception e)
+                }
+                catch (Amazon.EC2.AmazonEC2Exception e)
                 {
                     ViewData["Exception"] = e.Message;
                     return View();
