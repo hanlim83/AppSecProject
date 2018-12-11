@@ -2,17 +2,39 @@
 
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
+@{bool showAll = true;}
 
-@if (SignInManager.IsSignedIn(User))
+@if (SignInManager.IsSignedIn(User) && showAll == true)
+{
+    <ul class="nav navbar-nav mr-auto">
+        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
+        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
+        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>
+
+        <li class="nav-item"><a asp-area="" asp-controller="Teams" asp-action="Index" class="nav-link">Teams</a></li>
+        <li class="nav-item"><a asp-area="" asp-controller="Scoreboard" asp-action="Index" class="nav-link">Scoreboards</a></li>
+        <li class="nav-item"><a asp-area="" asp-controller="Challenges" asp-action="Index" class="nav-link">Challenges</a></li>
+        <li class="nav-item"><a asp-area="" asp-controller="Forum" asp-action="Index" class="nav-link">Forum</a></li>
+        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Live Chat</a></li>
+    </ul>
+    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm" class="navbar-right">
+        <ul class="nav navbar-nav navbar-right">
+            <li class="nav-item">
+                <a asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage" class="nav-link">Hello @UserManager.GetUserName(User)!</a>
+            </li>
+            <li class="nav-item">
+                <button type="submit" class="btn btn-link navbar-btn navbar-link">Logout</button>
+            </li>
+        </ul>
+    </form>
+}
+else if (SignInManager.IsSignedIn(User) && showAll == false)
 {
     <ul class="nav navbar-nav mr-auto">
         <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
         <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
         <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>
         
-        <li class="nav-item"><a asp-area="" asp-controller="Teams" asp-action="Index" class="nav-link">Teams</a></li>
-        <li class="nav-item"><a asp-area="" asp-controller="Scoreboard" asp-action="Index" class="nav-link">Scoreboards</a></li>
-        <li class="nav-item"><a asp-area="" asp-controller="Challenges" asp-action="Index" class="nav-link">Challenges</a></li>
         <li class="nav-item"><a asp-area="" asp-controller="Forum" asp-action="Index" class="nav-link">Forum</a></li>
         <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Live Chat</a></li>
     </ul>
