@@ -1,7 +1,7 @@
 # ASPJ
 A Project for Application Security & Project (ITP292) Module 
 ## Team Members
-* Evelyn Lim
+* [Evelyn Lim](https://github.com/elxwy)
 * [Hansen Lim](https://github.com/hanlim83)
 * [Hugo Chia](https://github.com/Kool-Koder)
 * [Karen Ong](https://github.com/karen620)
@@ -40,6 +40,8 @@ However, it is gaining more popularity in recent years, and we hope to make it e
 ## External Resources Used
 - Bootstrap (Local JS/CSS when in Development, CDN when in Production)
 - jQuery (Local JS when in Development, CDN when in Production)
+- jQuery Vaildation (Local JS when in Development, CDN when in Production)
+- jQuery Vaildation Unobtrusive (Local JS when in Development, CDN when in Production)
 - Popper (Local JS when in Development, CDN when in Production)
 - Google Material Icons (CDN regardless of Development or Production)
 - TurboLinksJS (Local JS when in Development, CDN when in Production)
@@ -47,4 +49,4 @@ However, it is gaining more popularity in recent years, and we hope to make it e
 ## Tools Used
 - Visual Studio 2017
 - ASP.NET Core 2.1 Framework
-- Amazon Web Services (S3, RDS, EC2, EBS, VPC)
+- Amazon Web Services (S3, RDS, EC2, EBS, VPC, SNS, ELB)
