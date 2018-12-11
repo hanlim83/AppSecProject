@@ -1,44 +1,47 @@
 ﻿@{
     ViewData["Title"] = "New Topic";
 }
-
-<!DOCTYPE html>
-<html>
-<head>
-    <link rel="stylesheet" href="Forum/StyleSheet.css">
-    <title>Page Title</title>
-</head>
 <br />
-<body>
-    <div class="container">
-        <h2> Create New Topic </h2>
-        <form>
-            <br />
-            <div class="form-group">
-                <select class="form-control">
-                    <option> Category </option>
-                    <option> A </option>
-                    <option> B </option>
-                    <option> C </option>
-                    <option> D </option>
-                </select>
-                <br />
-                <label for="Title"> Title </label>
-                <input type="title" class="form-control" placeholder="Enter Title Here">
-            </div>
-
-            <div class="form-group">
-                <label for="content"> Content </label>
-                <textarea class="form-control" id="Content1" placeholder="" rows="5"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for=""></label>
-                <input type="file" class="form-control-file" id="File">
-            </div>
-
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+<h2> Create New Topic </h2>
+<form>
+    <br>
+    <div class="form-group">
+        <select class="form-control" id="category1">
+            <option>Category</option>
+            <option>A</option>
+            <option>B</option>
+            <option>C</option>
+            <option>D</option>
+        </select>
+        <br>
+        <label for="Title">Title</label>
+        <input class="form-control" id="Title1" placeholder="Enter Title Here">
     </div>
-</body>
-</html>
+    <div class="form-group">
+        <label for="content">Content</label>
+        <textarea class="form-control" id="Content1" placeholder="" rows="5"></textarea>
+    </div>
+    <div class="form-group">
+        <label for=""></label>
+        <input type="file" class="form-control-file" id="File1">
+    </div>
+    <button type="submit" class="btn btn-primary" onclick="checked()">Submit</button>
+    <p id="submitlo"></p>
+    <button class="btn btn-primary" onclick="cancel()">Cancel</button>
+    <p id="cancel"></p>
+</form>
+
+<div class="fb-comments" data-numposts="5"></div>/* facebook comment */
+<div id="fb-root">
+
+</div>
+<script>
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2';
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+</script>
+
