@@ -51,7 +51,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @if (Model.Reservations.Count != 0)
+                        @if (Model != null)
                         {
                             @foreach (var reservation in Model.Reservations)
                             {

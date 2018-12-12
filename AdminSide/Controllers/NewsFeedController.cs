@@ -12,5 +12,10 @@ namespace AdminSide.Controllers
         {
             return View();
         }
+
+        public IActionResult SearchPage()
+        {
+            return View();
+        }
     }
 }
