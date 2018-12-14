@@ -63,12 +63,24 @@ namespace AdminSide
             return dict;
         }
 
-        //For ASP.NET Identity Only | You can reuse this but replace dbname with your own database name
-        private string GetRdsConnectionString()
+        //For ASP.NET Identity Only | You can reuse this but replace dbname with your own database name and change method name
+        private string GetRdsConnectionStringIdentity()
         {
             string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
             string port = Configuration.GetValue<string>("RDS_PORT");
             string dbname = "ASPNETIdentityAdmin";
+            string username = Configuration.GetValue<string>("RDS_USERNAME");
+            string password = Configuration.GetValue<string>("RDS_PASSWORD");
+
+            return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
+        }
+
+        //For Platform Resources Only
+        private string GetRdsConnectionStringPlatformResources()
+        {
+            string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
+            string port = Configuration.GetValue<string>("RDS_PORT");
+            string dbname = "PlatformResources";
             string username = Configuration.GetValue<string>("RDS_USERNAME");
             string password = Configuration.GetValue<string>("RDS_PASSWORD");
 
@@ -87,14 +99,19 @@ namespace AdminSide
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            //Using RDS
+            //Identity Db Context
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
-            GetRdsConnectionString()));
+            GetRdsConnectionStringIdentity()));
 
             services.AddIdentity<IdentityUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+
+            //Platform Resources Db Context
+            services.AddDbContext<PlatformResourcesContext>(options =>
+        options.UseSqlServer(
+            GetRdsConnectionStringPlatformResources()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
         .AddRazorPagesOptions(options =>
