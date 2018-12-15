@@ -1,0 +1,69 @@
+﻿@model AdminSide.Areas.PlatformManagement.Models.Subnet
+
+@{
+    ViewData["Title"] = "Create";
+}
+<h2>Create</h2>
+
+<h4>Subnet</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])))
+        {
+            <div class="alert alert-danger" role="alert">
+                @ViewData["Exception"]
+            </div>
+        }
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control">
+                    <option value="Internet">Internet</option>
+                    <option value="Extranet">Extranet</option>
+                    <option value="Intranet">Intranet</option>
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IPv4CIDR" class="control-label"></label>
+                <input asp-for="IPv4CIDR" class="form-control" value="@ViewData["IPCIDR"]" />
+                <span asp-validation-for="IPv4CIDR" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubnetSize" class="control-label"></label>
+                <select asp-for="SubnetSize" class="form-control" name="SubnetSize" required>
+                    <option value="32766">32766 Hosts</option>
+                    <option value="16382">16382 Hosts</option>
+                    <option value="8190">8190 Hosts</option>
+                    <option value="4094">4094 Hosts</option>
+                    <option value="2046">2046 Hosts</option>
+                    <option value="1022">1022 Hosts</option>
+                    <option value="510">510 Hosts</option>
+                    <option value="254">254 Hosts</option>
+                    <option value="126">126 Hosts</option>
+                    <option value="62">62 Hosts</option>
+                    <option value="30">30 Hosts</option>
+                    <option value="14">14 Hosts</option>
+                    <option value="6">6 Hosts</option>
+                    <option value="2">2 Hosts</option>
+                </select>
+                <span asp-validation-for="SubnetSize" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+                <a asp-action="Index" class="btn btn-danger" style="margin-left:10px;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+

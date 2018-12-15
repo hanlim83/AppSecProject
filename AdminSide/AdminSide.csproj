@@ -56,6 +56,9 @@
     <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkRoutes\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Create.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Edit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Subnet>
+﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Route>
 
 @{
     ViewData["Title"] = "Index";
@@ -13,22 +13,22 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Type)
+                @Html.DisplayNameFor(model => model.RouteType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IPv4CIDR)
+                @Html.DisplayNameFor(model => model.Destination)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SubnetSize)
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IPv6CIDR)
+                @Html.DisplayNameFor(model => model.IPCIDR)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AWSVPCSubnetReference)
+                @Html.DisplayNameFor(model => model.RouteTableID)
             </th>
             <th></th>
         </tr>
@@ -37,22 +37,22 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Type)
+                @Html.DisplayFor(modelItem => item.RouteType)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IPv4CIDR)
+                @Html.DisplayFor(modelItem => item.Destination)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.SubnetSize)
+                @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IPv6CIDR)
+                @Html.DisplayFor(modelItem => item.IPCIDR)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AWSVPCSubnetReference)
+                @Html.DisplayFor(modelItem => item.RouteTableID)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |

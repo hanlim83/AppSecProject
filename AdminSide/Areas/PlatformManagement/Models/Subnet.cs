@@ -24,7 +24,10 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public SubnetType Type { get; set; }
         [Display(Name = "IPv4 CIDR")]
         [Required]
+        [RegularExpression(@"172.30.[0-9]{1,3}.[0-9]{1,3}", ErrorMessage = "Please Enter IP CIDR Correctly")]
         public string IPv4CIDR { get; set; }
+        [Display(Name = "Subnet Size")]
+        public string SubnetSize { get; set; }
         [Display(Name = "IPv6 CIDR")]
         public string IPv6CIDR { get; set; }
         public string AWSVPCSubnetReference { get; set; }

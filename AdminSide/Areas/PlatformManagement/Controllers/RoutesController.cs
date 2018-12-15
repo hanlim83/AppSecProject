@@ -11,22 +11,22 @@ using AdminSide.Areas.PlatformManagement.Models;
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
-    public class SubnetsController : Controller
+    public class RoutesController : Controller
     {
         private readonly PlatformResourcesContext _context;
 
-        public SubnetsController(PlatformResourcesContext context)
+        public RoutesController(PlatformResourcesContext context)
         {
             _context = context;
         }
 
-        // GET: PlatformManagement/Subnets
+        // GET: PlatformManagement/Routes
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Subnets.ToListAsync());
+            return View(await _context.Routes.ToListAsync());
         }
 
-        // GET: PlatformManagement/Subnets/Details/5
+        // GET: PlatformManagement/Routes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,39 +34,39 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
             }
 
-            var subnet = await _context.Subnets
+            var route = await _context.Routes
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (subnet == null)
+            if (route == null)
             {
                 return NotFound();
             }
 
-            return View(subnet);
+            return View(route);
         }
 
-        // GET: PlatformManagement/Subnets/Create
+        // GET: PlatformManagement/Routes/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: PlatformManagement/Subnets/Create
+        // POST: PlatformManagement/Routes/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Type,IPv4CIDR,SubnetSize,IPv6CIDR,AWSVPCSubnetReference")] Subnet subnet)
+        public async Task<IActionResult> Create([Bind("ID,Description,RouteType,Destination,Status,IPCIDR,RouteTableID")] Route route)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(subnet);
+                _context.Add(route);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(subnet);
+            return View(route);
         }
 
-        // GET: PlatformManagement/Subnets/Edit/5
+        // GET: PlatformManagement/Routes/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -74,22 +74,22 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
             }
 
-            var subnet = await _context.Subnets.FindAsync(id);
-            if (subnet == null)
+            var route = await _context.Routes.FindAsync(id);
+            if (route == null)
             {
                 return NotFound();
             }
-            return View(subnet);
+            return View(route);
         }
 
-        // POST: PlatformManagement/Subnets/Edit/5
+        // POST: PlatformManagement/Routes/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Type,IPv4CIDR,SubnetSize,IPv6CIDR,AWSVPCSubnetReference")] Subnet subnet)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Description,RouteType,Destination,Status,IPCIDR,RouteTableID")] Route route)
         {
-            if (id != subnet.ID)
+            if (id != route.ID)
             {
                 return NotFound();
             }
@@ -98,12 +98,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 try
                 {
-                    _context.Update(subnet);
+                    _context.Update(route);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!SubnetExists(subnet.ID))
+                    if (!RouteExists(route.ID))
                     {
                         return NotFound();
                     }
@@ -114,10 +114,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(subnet);
+            return View(route);
         }
 
-        // GET: PlatformManagement/Subnets/Delete/5
+        // GET: PlatformManagement/Routes/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -125,30 +125,30 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
             }
 
-            var subnet = await _context.Subnets
+            var route = await _context.Routes
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (subnet == null)
+            if (route == null)
             {
                 return NotFound();
             }
 
-            return View(subnet);
+            return View(route);
         }
 
-        // POST: PlatformManagement/Subnets/Delete/5
+        // POST: PlatformManagement/Routes/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var subnet = await _context.Subnets.FindAsync(id);
-            _context.Subnets.Remove(subnet);
+            var route = await _context.Routes.FindAsync(id);
+            _context.Routes.Remove(route);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool SubnetExists(int id)
+        private bool RouteExists(int id)
         {
-            return _context.Subnets.Any(e => e.ID == id);
+            return _context.Routes.Any(e => e.ID == id);
         }
     }
 }

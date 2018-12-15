@@ -28,6 +28,11 @@
                 <span asp-validation-for="IPv4CIDR" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="SubnetSize" class="control-label"></label>
+                <input asp-for="SubnetSize" class="form-control" />
+                <span asp-validation-for="SubnetSize" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="IPv6CIDR" class="control-label"></label>
                 <input asp-for="IPv6CIDR" class="form-control" />
                 <span asp-validation-for="IPv6CIDR" class="text-danger"></span>

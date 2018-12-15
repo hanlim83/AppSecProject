@@ -21,7 +21,7 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="form-group">
                         <label asp-for="IPCIDR"></label>
-                        <input asp-for="IPCIDR" placeholder="Enter IP CIDR" class="form-control" pattern="172.30.[0-9]{1,3}.[0-9]{1,3}" />
+                        <input asp-for="IPCIDR" placeholder="Enter IP CIDR" class="form-control" pattern="" />
                         <span asp-validation-for="IPCIDR" class="text-danger"></span>
                     </div>
                     <button type="submit" class="btn btn-primary">Create Subnet</button>
