@@ -21,9 +21,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string Description { get; set; }
         [Required]
         public RouteType RouteType { get; set; }
-        [Required]
         public DestinationType DestinationType { get; set; }
-        [Required]
         public string AWSVPCRouteReference { get; set; }
 
         public ICollection<Subnet> LinkedSubnets { get; set; }

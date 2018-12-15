@@ -22,7 +22,6 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [Required]
         [Display(Name = "Subnet Type")]
         public SubnetType Type { get; set; }
-        [Required]
         public string AWSVPCSubnetReference { get; set; }
 
         public ICollection<Server>LinkedServers { get; set; }

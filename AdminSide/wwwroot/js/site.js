@@ -6,4 +6,9 @@
             $(this).parent().addClass('active');
         }
     });
+    $('a.list-group-item').each(function () {
+        if (this.href == url) {
+            $(this).addClass('active');
+        }
+    });
 });

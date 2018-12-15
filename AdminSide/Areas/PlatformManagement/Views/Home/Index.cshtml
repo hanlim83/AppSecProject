@@ -4,14 +4,7 @@
 
 <div class="row">
     <div class="col-lg-3">
-        <div class="list-group" style="padding-top: 50%;">
-            <a asp-area="PlatformManagement" asp-controller="Home" asp-action="Index" class="list-group-item active">Dashboard</a>
-            <a asp-area="PlatformManagement" asp-controller="" asp-action="" class="list-group-item">Challenge Servers</a>
-            <a asp-area="PlatformManagement" asp-controller="" asp-action="" class="list-group-item">Server Templates</a>
-            <a asp-area="PlatformManagement" asp-controller="" asp-action="" class="list-group-item">Challenge Network</a>
-            <a asp-area="PlatformManagement" asp-controller="" asp-action="" class="list-group-item">Platform Logs</a>
-            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="Index" class="list-group-item list-group-item-danger">AWS Testing Pages</a>
-        </div>
+        <partial name="../_MainNav.cshtml" />
     </div>
     <div class="col-lg-9">
         <div class="card" style="margin-top: 25px; margin-bottom: 10%;">

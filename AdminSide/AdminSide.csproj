@@ -53,7 +53,16 @@
     <Content Update="Areas\PlatformManagement\Views\AWSTesting\VPCList.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeServers\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Areas\PlatformManagement\Views\Home\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\PlatformLogs\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\ServerTemplates\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Areas\PlatformManagement\Views\_ViewImports.cshtml">

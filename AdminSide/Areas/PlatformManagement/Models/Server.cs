@@ -13,18 +13,13 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [StringLength(50, ErrorMessage = "A Server must have a name")]
         [Display(Name = "Server Name")]
         public string Name { get; set; }
-        [Required]
         [Display(Name = "Date Created")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime DateCreated { get; set; }
-        [Required]
-        [StringLength(50)]
         [Display(Name = "Operating System")]
         public string OperatingSystem { get; set; }
-        [Required]
         public string AWSEC2Reference { get; set; }
-        [Required]
         public Subnet LinkedSubnet { get; set; }
     }
 }
