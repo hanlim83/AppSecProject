@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UserSide.Controllers
 {
-    public class Scoreboard : Controller
+    public class ScoreboardController : Controller
     {
         // GET: /<controller>/
         public IActionResult Index()
