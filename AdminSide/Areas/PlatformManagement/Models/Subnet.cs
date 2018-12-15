@@ -22,6 +22,11 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [Required]
         [Display(Name = "Subnet Type")]
         public SubnetType Type { get; set; }
+        [Display(Name = "IPv4 CIDR")]
+        [Required]
+        public string IPv4CIDR { get; set; }
+        [Display(Name = "IPv6 CIDR")]
+        public string IPv6CIDR { get; set; }
         public string AWSVPCSubnetReference { get; set; }
 
         public ICollection<Server>LinkedServers { get; set; }

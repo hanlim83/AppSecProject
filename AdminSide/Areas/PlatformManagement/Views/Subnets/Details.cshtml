@@ -1,4 +1,4 @@
-﻿@model AdminSide.Areas.PlatformManagement.Models.Template
+﻿@model AdminSide.Areas.PlatformManagement.Models.Subnet
 
 @{
     ViewData["Title"] = "Details";
@@ -7,7 +7,7 @@
 <h2>Details</h2>
 
 <div>
-    <h4>Template</h4>
+    <h4>Subnet</h4>
     <hr />
     <dl class="dl-horizontal">
         <dt>
@@ -23,22 +23,22 @@
             @Html.DisplayFor(model => model.Type)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.DateCreated)
+            @Html.DisplayNameFor(model => model.IPv4CIDR)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.DateCreated)
+            @Html.DisplayFor(model => model.IPv4CIDR)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.OperatingSystem)
+            @Html.DisplayNameFor(model => model.IPv6CIDR)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.OperatingSystem)
+            @Html.DisplayFor(model => model.IPv6CIDR)
         </dd>
         <dt>
-            @Html.DisplayNameFor(model => model.AWSAMIReference)
+            @Html.DisplayNameFor(model => model.AWSVPCSubnetReference)
         </dt>
         <dd>
-            @Html.DisplayFor(model => model.AWSAMIReference)
+            @Html.DisplayFor(model => model.AWSVPCSubnetReference)
         </dd>
     </dl>
 </div>

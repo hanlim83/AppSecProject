@@ -6,17 +6,19 @@ using AdminSide.Areas.PlatformManagement.Data;
 using Microsoft.AspNetCore.Mvc;
 using Amazon.EC2;
 using Amazon.EC2.Model;
+using ASPJ_MVC.Models;
+using System.Diagnostics;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
-    public class ChallengeNetworkController : Controller
+    public class ChallengeNetworkRoutesController : Controller
     {
         private readonly PlatformResourcesContext _context;
 
         IAmazonEC2 EC2Client { get; set; }
 
-        public ChallengeNetworkController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
+        public ChallengeNetworkRoutesController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
         {
             this._context = context;
             this.EC2Client = ec2Client;
@@ -25,6 +27,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

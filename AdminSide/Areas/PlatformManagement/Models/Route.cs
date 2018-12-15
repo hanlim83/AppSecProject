@@ -10,19 +10,19 @@ namespace AdminSide.Areas.PlatformManagement.Models
     {
         Mandatory,Optional
     }
-    public enum DestinationType
-    {
-        VPC,Subnet
-    }
     public class Route
     {
         public int ID { get; set; }
         [Required]
         public string Description { get; set; }
         [Required]
+        [Display(Name = "Route Type")]
         public RouteType RouteType { get; set; }
-        public DestinationType DestinationType { get; set; }
-        public string AWSVPCRouteReference { get; set; }
+        public string Destination { get; set; }
+        public string Status { get; set; }
+        [Display(Name = "IP CIDR")]
+        public string IPCIDR { get; set; }
+        public string RouteTableID { get; set; }
 
         public ICollection<Subnet> LinkedSubnets { get; set; }
     }

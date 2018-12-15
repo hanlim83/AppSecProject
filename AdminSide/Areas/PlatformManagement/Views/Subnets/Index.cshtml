@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Template>
+﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Subnet>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,13 +19,13 @@
                 @Html.DisplayNameFor(model => model.Type)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DateCreated)
+                @Html.DisplayNameFor(model => model.IPv4CIDR)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OperatingSystem)
+                @Html.DisplayNameFor(model => model.IPv6CIDR)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AWSAMIReference)
+                @Html.DisplayNameFor(model => model.AWSVPCSubnetReference)
             </th>
             <th></th>
         </tr>
@@ -40,13 +40,13 @@
                 @Html.DisplayFor(modelItem => item.Type)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.DateCreated)
+                @Html.DisplayFor(modelItem => item.IPv4CIDR)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.OperatingSystem)
+                @Html.DisplayFor(modelItem => item.IPv6CIDR)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AWSAMIReference)
+                @Html.DisplayFor(modelItem => item.AWSVPCSubnetReference)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |

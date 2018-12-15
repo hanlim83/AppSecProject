@@ -12,3 +12,7 @@
         }
     });
 });
+function deleteSubnetInput(ID) {
+    $('#subnetDeletionInput').val(ID);
+    $('#deleteSubnet').modal()
+}

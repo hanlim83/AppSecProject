@@ -11,22 +11,22 @@ using AdminSide.Areas.PlatformManagement.Models;
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
-    public class TemplatesController : Controller
+    public class SubnetsController : Controller
     {
         private readonly PlatformResourcesContext _context;
 
-        public TemplatesController(PlatformResourcesContext context)
+        public SubnetsController(PlatformResourcesContext context)
         {
             _context = context;
         }
 
-        // GET: PlatformManagement/Templates
+        // GET: PlatformManagement/Subnets
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Templates.ToListAsync());
+            return View(await _context.Subnets.ToListAsync());
         }
 
-        // GET: PlatformManagement/Templates/Details/5
+        // GET: PlatformManagement/Subnets/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,39 +34,39 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
             }
 
-            var template = await _context.Templates
+            var subnet = await _context.Subnets
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (template == null)
+            if (subnet == null)
             {
                 return NotFound();
             }
 
-            return View(template);
+            return View(subnet);
         }
 
-        // GET: PlatformManagement/Templates/Create
+        // GET: PlatformManagement/Subnets/Create
         public IActionResult Create()
         {
             return View();
         }
 
-        // POST: PlatformManagement/Templates/Create
+        // POST: PlatformManagement/Subnets/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Type,DateCreated,OperatingSystem,AWSAMIReference")] Template template)
+        public async Task<IActionResult> Create([Bind("ID,Name,Type,IPv4CIDR,IPv6CIDR,AWSVPCSubnetReference")] Subnet subnet)
         {
             if (ModelState.IsValid)
             {
-                _context.Add(template);
+                _context.Add(subnet);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(template);
+            return View(subnet);
         }
 
-        // GET: PlatformManagement/Templates/Edit/5
+        // GET: PlatformManagement/Subnets/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -74,22 +74,22 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
             }
 
-            var template = await _context.Templates.FindAsync(id);
-            if (template == null)
+            var subnet = await _context.Subnets.FindAsync(id);
+            if (subnet == null)
             {
                 return NotFound();
             }
-            return View(template);
+            return View(subnet);
         }
 
-        // POST: PlatformManagement/Templates/Edit/5
+        // POST: PlatformManagement/Subnets/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Type,DateCreated,OperatingSystem,AWSAMIReference")] Template template)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Type,IPv4CIDR,IPv6CIDR,AWSVPCSubnetReference")] Subnet subnet)
         {
-            if (id != template.ID)
+            if (id != subnet.ID)
             {
                 return NotFound();
             }
@@ -98,12 +98,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 try
                 {
-                    _context.Update(template);
+                    _context.Update(subnet);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!TemplateExists(template.ID))
+                    if (!SubnetExists(subnet.ID))
                     {
                         return NotFound();
                     }
@@ -114,10 +114,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(template);
+            return View(subnet);
         }
 
-        // GET: PlatformManagement/Templates/Delete/5
+        // GET: PlatformManagement/Subnets/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -125,30 +125,30 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
             }
 
-            var template = await _context.Templates
+            var subnet = await _context.Subnets
                 .FirstOrDefaultAsync(m => m.ID == id);
-            if (template == null)
+            if (subnet == null)
             {
                 return NotFound();
             }
 
-            return View(template);
+            return View(subnet);
         }
 
-        // POST: PlatformManagement/Templates/Delete/5
+        // POST: PlatformManagement/Subnets/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var template = await _context.Templates.FindAsync(id);
-            _context.Templates.Remove(template);
+            var subnet = await _context.Subnets.FindAsync(id);
+            _context.Subnets.Remove(subnet);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool TemplateExists(int id)
+        private bool SubnetExists(int id)
         {
-            return _context.Templates.Any(e => e.ID == id);
+            return _context.Subnets.Any(e => e.ID == id);
         }
     }
 }

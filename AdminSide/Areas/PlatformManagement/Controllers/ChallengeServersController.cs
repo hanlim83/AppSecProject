@@ -6,6 +6,8 @@ using AdminSide.Areas.PlatformManagement.Data;
 using Microsoft.AspNetCore.Mvc;
 using Amazon.EC2;
 using Amazon.EC2.Model;
+using ASPJ_MVC.Models;
+using System.Diagnostics;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -25,6 +27,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

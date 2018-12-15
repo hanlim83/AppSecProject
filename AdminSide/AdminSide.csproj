@@ -53,6 +53,12 @@
     <Content Update="Areas\PlatformManagement\Views\AWSTesting\VPCList.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkRoutes\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Edit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Areas\PlatformManagement\Views\ChallengeServers\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

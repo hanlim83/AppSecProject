@@ -1,0 +1,110 @@
+﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Subnet>
+@{
+    ViewData["Title"] = "Challenge Network - Subnets";
+}
+<div class="row">
+    <div class="col-lg-3">
+        <partial name="../_MainNav.cshtml" />
+    </div>
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-lg-6">
+                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!" && Convert.ToString(ViewData["Result"]) != "Successfully Created!")
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @ViewData["Result"]
+                    </div>
+                    <br />
+                }
+                @if (Convert.ToString(ViewData["Result"]) == "Successfully Created!" || Convert.ToString(ViewData["Result"]) == "Successfully Deleted!")
+                {
+                    <div class="alert alert-success" role="alert">
+                        @ViewData["Result"]
+                    </div>
+                    <br />
+                }
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                Subnet Name
+                            </th>
+                            <th>
+                                Subnet Type
+                            </th>
+                            <th>
+                                IPv4 CIDR
+                            </th>
+                            <th>
+                                IPv6 CIDR
+                            </th>
+                            <th>
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Count() == 0)
+                        {
+                            <tr>
+                                <td colspan="4"><i class="material-icons">info</i> There are currently no subnets created</td>
+                            </tr>
+                        }
+                        @if (Model != null)
+                        {
+                            @foreach (var subnet in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => subnet.Name)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => subnet.Type)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => subnet.IPv4CIDR)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => subnet.IPv6CIDR)
+                                    </td>
+                                    <td>
+                                        <form method="post">
+                                            <input type="hidden" name="action" value="Modify" />
+                                            <input type="hidden" name="subnetID" value="@subnet.ID" />
+                                            <button type="submit" class="btn btn-info">Modify Subnet</button>
+                                        </form>
+                                        <button type="button" class="btn btn-danger" onclick="deleteSubnetInput(@subnet.ID)">
+                                            Delete Subnet
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteSubnet" tabindex="-1" role="dialog" aria-labelledby="DeleteSubnetConfirmation" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteSubnetConfirmation">Delete Subnet Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete Subnet?
+            </div>
+            <div class="modal-footer">
+                <form method="post">
+                    <input type="hidden" name="action" value="Delete" />
+                    <input type="hidden" id="subnetDeletionInput" name="subnetID" value="" />
+                    <button type="submit" class="btn btn-danger">Delete Subnet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
