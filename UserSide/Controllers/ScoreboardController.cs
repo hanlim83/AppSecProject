@@ -8,16 +8,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UserSide.Controllers
 {
-    public class Competition : Controller
+    public class ScoreboardController : Controller
     {
         // GET: /<controller>/
         public IActionResult Index()
-        {
-            
-            return View();
-        }
-
-        public IActionResult SignUp()
         {
             return View();
         }
