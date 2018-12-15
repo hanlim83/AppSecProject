@@ -4,8 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using AdminSide.Models;
-using ASPJ_MVC.Models;
+using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.EC2;
@@ -26,9 +25,11 @@ using Amazon.ElasticBeanstalk;
 using Amazon.ElasticBeanstalk.Model;
 using System.Net;
 using Microsoft.AspNetCore.Http;
+using ASPJ_MVC.Models;
 
-namespace ASPJ_MVC.Controllers
+namespace AdminSide.Areas.PlatformManagement.Controllers
 {
+    [Area("PlatformManagement")]
     public class AWSTestingController : Controller
     {
         IAmazonS3 S3Client { get; set; }

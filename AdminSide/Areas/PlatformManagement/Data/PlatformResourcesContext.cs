@@ -1,11 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AdminSide.Models;
+using AdminSide.Areas.PlatformManagement.Models;
 
-namespace AdminSide.Data
+namespace AdminSide.Areas.PlatformManagement.Data
 {
     public class PlatformResourcesContext : DbContext
     {

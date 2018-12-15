@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdminSide.Models
+namespace AdminSide.Areas.PlatformManagement.Models
 {
     public enum SubnetType
     {
@@ -20,6 +20,7 @@ namespace AdminSide.Models
         [Display(Name = "Subnet Name")]
         public string Name { get; set; }
         [Required]
+        [Display(Name = "Subnet Type")]
         public SubnetType Type { get; set; }
         [Required]
         public string AWSVPCSubnetReference { get; set; }

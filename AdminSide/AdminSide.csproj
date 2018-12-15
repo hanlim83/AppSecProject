@@ -23,34 +23,43 @@
   </ItemGroup>
 
  <ItemGroup>
-    <Content Update="Views\AWSTesting\EC2List.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\CloudwatchView.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\EC2Create.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\EC2Create.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\SubnetCreate.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\EC2List.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\S3Create.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\SNSSend.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\S3Create.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\CloudwatchView.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\S3List.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\SubnetList.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SNSSend.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\VPCList.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SubnetCreate.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\S3List.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SubnetList.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\AWSTesting\Index.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\AWSTesting\VPCList.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\Home\Index.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\_ViewImports.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\_ViewStart.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Home\About.cshtml">
@@ -67,9 +76,6 @@
     </Content>
     <Content Update="Views\Home\Privacy.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Views\PlatformManagement\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Shared\Error.cshtml">
@@ -100,6 +106,7 @@
 
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
 </Project>

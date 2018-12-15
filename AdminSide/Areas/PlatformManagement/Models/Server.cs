@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdminSide.Models
+namespace AdminSide.Areas.PlatformManagement.Models
 {
     public class Server
     {
@@ -24,5 +24,7 @@ namespace AdminSide.Models
         public string OperatingSystem { get; set; }
         [Required]
         public string AWSEC2Reference { get; set; }
+        [Required]
+        public Subnet LinkedSubnet { get; set; }
     }
 }

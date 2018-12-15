@@ -4,8 +4,12 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdminSide.Models
+namespace AdminSide.Areas.PlatformManagement.Models
 {
+    public enum TemplateType
+    {
+        Default,Custom
+    }
     public class Template
     {
         public int ID { get; set; }
@@ -13,6 +17,9 @@ namespace AdminSide.Models
         [StringLength(50, ErrorMessage = "A template must have a name")]
         [Display(Name = "Template Name")]
         public string Name { get; set; }
+        [Required]
+        [Display(Name = "Template Type")]
+        public string Type { get; set; }
         [Required]
         [Display(Name = "Date Created")]
         [DataType(DataType.Date)]

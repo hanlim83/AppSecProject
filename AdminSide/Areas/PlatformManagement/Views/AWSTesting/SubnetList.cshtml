@@ -1,0 +1,87 @@
+﻿@model Amazon.EC2.Model.DescribeSubnetsResponse;
+@{
+    ViewData["Title"] = "Testing Page";
+}
+
+<div class="row">
+    <div class="col-lg-3">
+        <div class="list-group" style="padding-top: 50%;">
+            <a asp-area="PlatformManagement" asp-controller="Home" asp-action="Index" class="list-group-item">Return to main page</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="S3List" class="list-group-item">S3 - List Buckets</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="S3Create" class="list-group-item">S3 - Create Bucket</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="EC2List" class="list-group-item">EC2 - List Instances</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="EC2Create" class="list-group-item">EC2 - Create Instance</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="VPCList" class="list-group-item">VPC - List VPC</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="SubnetList" class="list-group-item active">VPC - List Subnets</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="SubnetCreate" class="list-group-item">VPC - Create Subnet</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="CloudwatchView" class="list-group-item">Cloudwatch - View Events</a>
+            <a asp-area="PlatformManagement" asp-controller="AWSTesting" asp-action="SNSSend" class="list-group-item">SNS - Send SMS</a>
+        </div>
+    </div>
+    <div class="col-lg-9" style="margin-top: 25px; margin-bottom: 10%;">
+        <h4>Content</h4>
+        <div class="row">
+            <div class="col-lg-6">
+                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!" && Convert.ToString(ViewData["Result"]) != "Successfully Created!")
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @ViewData["Result"]
+                    </div>
+                }
+                @if (Convert.ToString(ViewData["Result"]) == "Successfully Created!" || Convert.ToString(ViewData["Result"]) == "Successfully Deleted!")
+                {
+                    <div class="alert alert-success" role="alert">
+                        @ViewData["Result"]
+                    </div>
+                }
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                IPv4 CIDR Block
+                            </th>
+                            <th>
+                                IPv6 CIDR Block
+                            </th>
+                            <th>
+                                Subnet State
+                            </th>
+                            <th>
+                                Subnet ID
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var subnet in Model.Subnets)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => subnet.CidrBlock)
+                                </td>
+                                @foreach (var ipv6CIDR in subnet.Ipv6CidrBlockAssociationSet)
+                                {
+                                    <td>
+                                        @Html.DisplayFor(modelItem => ipv6CIDR.Ipv6CidrBlock)
+                                    </td>
+                                }
+                                <td>
+                                    @Html.DisplayFor(modelItem => subnet.State)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => subnet.SubnetId)
+                                </td>
+                                <td>
+                                    <form method="post">
+                                        <input type="hidden" name="subnetId" value="@subnet.SubnetId" />
+                                        <button type="submit" class="btn btn-danger">Delete Subnet</button>
+                                    </form>
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

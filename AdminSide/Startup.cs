@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Amazon.RDS;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticBeanstalk;
+using AdminSide.Areas.PlatformManagement.Data;
 
 namespace AdminSide
 {
@@ -175,6 +176,10 @@ namespace AdminSide
 
             app.UseMvc(routes =>
             {
+                routes.MapRoute(
+                    name: "areaRoute",
+                    template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+
                 routes.MapRoute(
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
