@@ -39,16 +39,68 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                      new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
                 }
                 });
+                _context.Database.OpenConnection();
+                int incrementer = 4;
                 foreach (var subnet in response.Subnets)
                 {
-                    Subnet newSubnet = new Subnet();
-                    newSubnet.Name = subnet.SubnetId;
-                    newSubnet.IPv4CIDR = subnet.CidrBlock;
-                    newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                    newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                    _context.Add(newSubnet);
-                    await _context.SaveChangesAsync();
+                    Subnet newSubnet = new Subnet();               
+                    if (subnet.CidrBlock == "172.30.0.0/24")
+                    {
+                        newSubnet.ID = 1;
+                        newSubnet.Name = "Default Internet Subnet";
+                        newSubnet.IPv4CIDR = subnet.CidrBlock;
+                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                        newSubnet.Type = SubnetType.Internet;
+                        newSubnet.SubnetSize = "254";
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
+                        _context.Add(newSubnet);
+                        await _context.SaveChangesAsync();
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
+                    }
+                    else if (subnet.CidrBlock == "172.30.1.0/24")
+                    {
+                        newSubnet.ID = 2;
+                        newSubnet.Name = "Default Extranet Subnet";
+                        newSubnet.IPv4CIDR = subnet.CidrBlock;
+                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                        newSubnet.Type = SubnetType.Extranet;
+                        newSubnet.SubnetSize = "254";
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
+                        _context.Add(newSubnet);
+                        await _context.SaveChangesAsync();
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
+                    }
+                    else if (subnet.CidrBlock == "172.30.2.0/24")
+                    {
+                        newSubnet.ID = 3;
+                        newSubnet.Name = "Default Intranet Subnet";
+                        newSubnet.IPv4CIDR = subnet.CidrBlock;
+                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                        newSubnet.Type = SubnetType.Intranet;
+                        newSubnet.SubnetSize = "254";
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
+                        _context.Add(newSubnet);
+                        await _context.SaveChangesAsync();
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
+                    }
+                    else
+                    {
+                        newSubnet.ID = incrementer;
+                        newSubnet.Name = subnet.SubnetId;
+                        newSubnet.IPv4CIDR = subnet.CidrBlock;
+                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
+                        _context.Add(newSubnet);
+                        await _context.SaveChangesAsync();
+                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
+                        ++incrementer;
+                    }
                 }
+                _context.Database.CloseConnection();
                 return View(await _context.Subnets.ToListAsync());
             }
             else
@@ -67,6 +119,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 if (Deletesubnet == null)
                 {
                     ViewData["Result"] = "Invaild Subnet!";
+                    return View(await _context.Subnets.ToListAsync());
+                }
+                else if (subnetID == "1" || subnetID == "2" || subnetID == "3")
+                {
+                    ViewData["Result"] = "You cannot delete a default subnet!";
                     return View(await _context.Subnets.ToListAsync());
                 }
                 else
@@ -122,6 +179,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else if (action.Equals("Modify") && !String.IsNullOrEmpty(subnetID))
             {
+                if (subnetID == "1" || subnetID == "2" || subnetID == "3")
+                {
+                    ViewData["Result"] = "You cannot modify a default subnet!";
+                    return View(await _context.Subnets.ToListAsync());
+                }
                 return RedirectToAction("Edit", new { id = subnetID });
             }
             else
@@ -160,6 +222,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             else if (!subnet.ID.Equals(Newsubnet.ID) || !subnet.IPv4CIDR.Equals(Newsubnet.IPv4CIDR) || !subnet.IPv6CIDR.Equals(Newsubnet.IPv6CIDR))
             {
                 return StatusCode(500);
+            }
+            else if (subnet.ID == 1 || subnet.ID == 2 || subnet.ID == 3)
+            {
+                ViewData["Exception"] = "You cannot edit a default subnet!";
+                return View(subnet);
             }
             else
             {

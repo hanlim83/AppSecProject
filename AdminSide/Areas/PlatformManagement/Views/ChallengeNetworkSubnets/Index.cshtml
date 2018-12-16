@@ -90,14 +90,17 @@
                                         @Html.DisplayFor(modelItem => subnet.IPv6CIDR)
                                     </td>
                                     <td>
-                                        <form method="post">
-                                            <input type="hidden" name="action" value="Modify" />
-                                            <input type="hidden" name="subnetID" value="@subnet.ID" />
-                                            <button type="submit" class="btn btn-info">Modify Subnet</button>
-                                        </form>
-                                        <button type="button" class="btn btn-danger" onclick="deleteSubnetInput(@subnet.ID)">
-                                            Delete Subnet
-                                        </button>
+                                        @if (!subnet.ID.Equals(1) && !subnet.ID.Equals(2) && !subnet.ID.Equals(3))
+                                        {
+                                            <form method="post">
+                                                <input type="hidden" name="action" value="Modify" />
+                                                <input type="hidden" name="subnetID" value="@subnet.ID" />
+                                                <button type="submit" class="btn btn-info">Modify Subnet</button>
+                                            </form>
+                                            <button type="button" class="btn btn-danger" onclick="deleteSubnetInput(@subnet.ID)">
+                                                Delete Subnet
+                                            </button>
+                                        }
                                     </td>
                                 </tr>
                             }
@@ -118,7 +121,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete Subnet?
+                Are you sure you want to delete the subnet?
             </div>
             <div class="modal-footer">
                 <form method="post">
