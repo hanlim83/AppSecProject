@@ -39,67 +39,120 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                      new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
                 }
                 });
-                _context.Database.OpenConnection();
                 int incrementer = 4;
+                _context.Database.OpenConnection();
+                _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
                 foreach (var subnet in response.Subnets)
                 {
-                    Subnet newSubnet = new Subnet();               
-                    if (subnet.CidrBlock == "172.30.0.0/24")
+                    try
                     {
-                        newSubnet.ID = 1;
-                        newSubnet.Name = "Default Internet Subnet";
-                        newSubnet.IPv4CIDR = subnet.CidrBlock;
-                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                        newSubnet.Type = SubnetType.Internet;
-                        newSubnet.SubnetSize = "254";
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
-                        _context.Add(newSubnet);
-                        await _context.SaveChangesAsync();
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
+                        Subnet newSubnet = new Subnet();
+                        if (subnet.CidrBlock.Equals("172.30.0.0/24"))
+                        {
+                            newSubnet.ID = 1;
+                            newSubnet.Name = "Default Internet Subnet";
+                            newSubnet.IPv4CIDR = subnet.CidrBlock;
+                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                            newSubnet.Type = SubnetType.Internet;
+                            newSubnet.SubnetSize = "254";
+                            _context.Subnets.Add(newSubnet);
+                            await _context.SaveChangesAsync();
+                        }
+                        else if (subnet.CidrBlock.Equals("172.30.1.0/24"))
+                        {
+                            newSubnet.ID = 2;
+                            newSubnet.Name = "Default Extranet Subnet";
+                            newSubnet.IPv4CIDR = subnet.CidrBlock;
+                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                            newSubnet.Type = SubnetType.Extranet;
+                            newSubnet.SubnetSize = "254";
+                            _context.Subnets.Add(newSubnet);
+                            await _context.SaveChangesAsync();
+                        }
+                        else if (subnet.CidrBlock.Equals("172.30.2.0/24"))
+                        {
+                            newSubnet.ID = 3;
+                            newSubnet.Name = "Default Intranet Subnet";
+                            newSubnet.IPv4CIDR = subnet.CidrBlock;
+                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                            newSubnet.Type = SubnetType.Intranet;
+                            newSubnet.SubnetSize = "254";
+                            _context.Subnets.Add(newSubnet);
+                            await _context.SaveChangesAsync();
+                        }
+                        else
+                        {
+                            newSubnet.ID = incrementer;
+                            newSubnet.Name = subnet.SubnetId;
+                            newSubnet.IPv4CIDR = subnet.CidrBlock;
+                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
+                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
+                            newSubnet.Type = SubnetType.Extranet;
+                            string subnetPrefix = subnet.CidrBlock.Substring(subnet.CidrBlock.Length - 3);
+                            switch (subnetPrefix)
+                            {
+                                case "/17":
+                                    newSubnet.SubnetSize = Convert.ToString(32766);
+                                    break;
+                                case "/18":
+                                    newSubnet.SubnetSize = Convert.ToString(16382);
+                                    break;
+                                case "/19":
+                                    newSubnet.SubnetSize = Convert.ToString(8190);
+                                    break;
+                                case "/20":
+                                    newSubnet.SubnetSize = Convert.ToString(4094);
+                                    break;
+                                case "/21":
+                                    newSubnet.SubnetSize = Convert.ToString(2046);
+                                    break;
+                                case "/22":
+                                    newSubnet.SubnetSize = Convert.ToString(1022);
+                                    break;
+                                case "/23":
+                                    newSubnet.SubnetSize = Convert.ToString(510);
+                                    break;
+                                case "/24":
+                                    newSubnet.SubnetSize = Convert.ToString(254);
+                                    break;
+                                case "/25":
+                                    newSubnet.SubnetSize = Convert.ToString(126);
+                                    break;
+                                case "/26":
+                                    newSubnet.SubnetSize = Convert.ToString(62);
+                                    break;
+                                case "/27":
+                                    newSubnet.SubnetSize = Convert.ToString(30);
+                                    break;
+                                case "/28":
+                                    newSubnet.SubnetSize = Convert.ToString(14);
+                                    break;
+                                case "/29":
+                                    newSubnet.SubnetSize = Convert.ToString(6);
+                                    break;
+                                case "/30":
+                                    newSubnet.SubnetSize = Convert.ToString(2);
+                                    break;
+                                default:
+                                    break;
+                            }
+                            _context.Subnets.Add(newSubnet);
+                            await _context.SaveChangesAsync();
+                            ++incrementer;
+                        }
                     }
-                    else if (subnet.CidrBlock == "172.30.1.0/24")
+                    catch (Exception)
                     {
-                        newSubnet.ID = 2;
-                        newSubnet.Name = "Default Extranet Subnet";
-                        newSubnet.IPv4CIDR = subnet.CidrBlock;
-                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                        newSubnet.Type = SubnetType.Extranet;
-                        newSubnet.SubnetSize = "254";
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
-                        _context.Add(newSubnet);
-                        await _context.SaveChangesAsync();
                         _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
-                    }
-                    else if (subnet.CidrBlock == "172.30.2.0/24")
-                    {
-                        newSubnet.ID = 3;
-                        newSubnet.Name = "Default Intranet Subnet";
-                        newSubnet.IPv4CIDR = subnet.CidrBlock;
-                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                        newSubnet.Type = SubnetType.Intranet;
-                        newSubnet.SubnetSize = "254";
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
-                        _context.Add(newSubnet);
-                        await _context.SaveChangesAsync();
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
-                    }
-                    else
-                    {
-                        newSubnet.ID = incrementer;
-                        newSubnet.Name = subnet.SubnetId;
-                        newSubnet.IPv4CIDR = subnet.CidrBlock;
-                        newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                        newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
-                        _context.Add(newSubnet);
-                        await _context.SaveChangesAsync();
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
-                        ++incrementer;
+                        _context.Database.CloseConnection();
+                        ViewData["Result"] = "An error occured when quering AWS for Subnet information!";
+                        return View(await _context.Subnets.ToListAsync());
                     }
                 }
+                _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
                 _context.Database.CloseConnection();
                 return View(await _context.Subnets.ToListAsync());
             }
@@ -395,7 +448,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     if (responseS.HttpStatusCode == HttpStatusCode.OK)
                     {
                         subnet.AWSVPCSubnetReference = responseS.Subnet.SubnetId;
-                        _context.Add(subnet);
+                        _context.Subnets.Add(subnet);
                         await _context.SaveChangesAsync();
                         TempData["Result"] = "Successfully Created!";
                         return RedirectToAction("Index");
