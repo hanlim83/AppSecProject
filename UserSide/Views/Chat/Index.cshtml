@@ -1,14 +1,73 @@
-﻿@page
-       
+﻿
 @{
-    ViewData["Title"] = "Chat";
+    ViewData["Title"] = "LIVE CHAT";
 }
 
-<h3>Live Chat</h3>
+<!DOCTYPE html>
+<html>
+<head>
 
-<div>
-    width: 400px
-    border: 25px solid green;
-    padding: 25px;
-    margin: 25px;
-</div>
+    <style>
+        h2 {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+      
+    </style>
+
+</head>
+
+<body>
+
+    <h2>@ViewData["Title"]</h2>
+
+    <!--Individual-->
+    <div class="table-responsive table table-hover">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">Mark</th>
+                    <td>Online</td>
+                    <td>1</td>
+                </tr>
+                <tr>
+                    <th scope="row">Tom</th>
+                    <td>Offline</td>
+                    <td>0</td>
+
+                </tr>
+                <tr>
+                    <th scope="row">GOD</th>
+                    <td colspan="2">Larry the Bird</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!--Team-->
+    <div class="table-responsive table table-hover">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>Mark</td>
+                    <td>Otto</td>
+                </tr>
+                <tr>
+                    <th scope="row">2</th>
+                    <td>Jacob</td>
+                    <td>Thornton</td>
+
+                </tr>
+                <tr>
+                    <th scope="row">3</th>
+                    <td colspan="2">Larry the Bird</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+
+</body>
+</html>
