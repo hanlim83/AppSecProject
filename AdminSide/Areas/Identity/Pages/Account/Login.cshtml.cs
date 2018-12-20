@@ -77,7 +77,10 @@ namespace AdminSide.Areas.Identity.Pages.Account
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
-                    return LocalRedirect(returnUrl);
+                    //commented out original redirect
+                    //return LocalRedirect(returnUrl);
+                    //Check the difference why need new area in Admin side
+                    return RedirectToAction("Index", "Competitions", new { area = "" });
                 }
                 if (result.RequiresTwoFactor)
                 {
