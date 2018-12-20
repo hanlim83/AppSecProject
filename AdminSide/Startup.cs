@@ -76,6 +76,18 @@ namespace AdminSide
             return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
         }
 
+        //For Competition Only
+        private string GetRdsConnectionStringCompetition()
+        {
+            string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
+            string port = Configuration.GetValue<string>("RDS_PORT");
+            string dbname = "Competition";
+            string username = Configuration.GetValue<string>("RDS_USERNAME");
+            string password = Configuration.GetValue<string>("RDS_PASSWORD");
+
+            return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
+        }
+
         //For Platform Resources Only
         private string GetRdsConnectionStringPlatformResources()
         {
@@ -109,9 +121,14 @@ namespace AdminSide
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            //Competition Db Context
+            services.AddDbContext<CompetitionContext>(options =>
+            options.UseSqlServer(
+            GetRdsConnectionStringCompetition()));
+
             //Platform Resources Db Context
             services.AddDbContext<PlatformResourcesContext>(options =>
-        options.UseSqlServer(
+            options.UseSqlServer(
             GetRdsConnectionStringPlatformResources()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
