@@ -9,7 +9,7 @@ namespace UserSide.Models
     public class Competition
     {
         public int ID { get; set; }
-        //[Display(Name = "Competition Name")]
+        [Display(Name = "Competition Name")]
         public string CompetitionName { get; set; }
         public string Status { get; set; }
 
