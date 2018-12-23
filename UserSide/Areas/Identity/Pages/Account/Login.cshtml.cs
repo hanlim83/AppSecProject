@@ -79,7 +79,7 @@ namespace UserSide.Areas.Identity.Pages.Account
                     _logger.LogInformation("User logged in.");
                     //commented out original redirect
                     //return LocalRedirect(returnUrl);
-                    return RedirectToAction("Index", "Competition");
+                    return RedirectToAction("Index", "Competitions");
                 }
                 if (result.RequiresTwoFactor)
                 {

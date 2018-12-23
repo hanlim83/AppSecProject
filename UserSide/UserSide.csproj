@@ -25,6 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Update="Views\Competitions\SignUp.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Forum\NewTopicF.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

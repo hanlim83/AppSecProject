@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -143,6 +144,11 @@ namespace UserSide.Controllers
             _context.Competitions.Remove(competition);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public IActionResult SignUp()
+        {
+            return View();
         }
 
         private bool CompetitionExists(int id)
