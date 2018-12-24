@@ -23,6 +23,7 @@ using Amazon.CloudWatchEvents;
 using Amazon.RDS;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticBeanstalk;
+using Amazon.SimpleSystemsManagement;
 
 namespace UserSide
 {
@@ -150,6 +151,8 @@ namespace UserSide
             services.AddAWSService<IAmazonElasticLoadBalancingV2>();
             //EBS Initialization
             services.AddAWSService<IAmazonElasticBeanstalk>();
+            //SSM Initialization
+            services.AddAWSService<IAmazonSimpleSystemsManagement>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
