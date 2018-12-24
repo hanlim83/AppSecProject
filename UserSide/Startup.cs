@@ -23,6 +23,7 @@ using Amazon.CloudWatchEvents;
 using Amazon.RDS;
 using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticBeanstalk;
+using UserSide.Areas.Identity.Services;
 
 namespace UserSide
 {
@@ -103,9 +104,9 @@ namespace UserSide
             options.UseSqlServer(
             GetRdsConnectionString()));
             
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            //services.AddIdentity<IdentityUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>()
+            //    .AddDefaultTokenProviders();
 
             //Competition Db Context
             services.AddDbContext<CompetitionContext>(options =>
@@ -127,8 +128,13 @@ namespace UserSide
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             });
 
+            //moved codes below
             // using Microsoft.AspNetCore.Identity.UI.Services;
+            //services.AddSingleton<IEmailSender, EmailSender>();
+
+            // requires
             services.AddSingleton<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             //Core AWS Initialization
             var awsOptions = Configuration.GetAWSOptions();
@@ -155,6 +161,7 @@ namespace UserSide
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -165,7 +172,7 @@ namespace UserSide
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-
+            
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -180,12 +187,12 @@ namespace UserSide
             });
         }
     }
-
+    /*
     public class EmailSender : IEmailSender
     {
         public Task SendEmailAsync(string email, string subject, string message)
         {
             return Task.CompletedTask;
         }
-    }
+    }*/
 }

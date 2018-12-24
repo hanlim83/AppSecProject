@@ -193,6 +193,7 @@ namespace AdminSide
 
             app.UseMvc(routes =>
             {
+                //Investigate need for this extra configuration
                 routes.MapRoute(
                     name: "areaRoute",
                     template: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
