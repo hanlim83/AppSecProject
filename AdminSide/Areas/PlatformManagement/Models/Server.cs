@@ -20,6 +20,8 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [Display(Name = "Operating System")]
         public string OperatingSystem { get; set; }
         public string AWSEC2Reference { get; set; }
+
+        public int SubnetID { get; set; }
         public Subnet LinkedSubnet { get; set; }
     }
 }
