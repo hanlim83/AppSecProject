@@ -147,6 +147,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     catch (Exception)
                     {
                         _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
+                        if (_context.Subnets.Any())
+                        {
+                            foreach(Subnet failed in _context.Subnets)
+                            {
+                                _context.Subnets.Remove(failed);
+                            }
+                            _context.SaveChanges();
+                        }
                         _context.Database.CloseConnection();
                         ViewData["Result"] = "An error occured when quering AWS for Subnet information!";
                         return View(await _context.Subnets.ToListAsync());
@@ -201,7 +209,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     }
                     if (flag == false)
                     {
-                        return StatusCode(500);
+                        ViewData["Result"] = "Subnet not found! The subnet may have been modified by another user";
+                        return View(await _context.Subnets.ToListAsync());
                     }
                     else
                     {
@@ -296,11 +305,13 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     if (await _context.Subnets.FindAsync(subnet.ID) == null)
                     {
-                        return NotFound();
+                        TempData["Result"] = "Subnet is gone! The subnet may have been modifed by another user";
+                        return RedirectToAction("Index");
                     }
                     else
                     {
-                        return StatusCode(501);
+                        TempData["Result"] = "Subnet has been updated since you last clicked! No modification has been made";
+                        return RedirectToAction("Index");
                     }
                 }
             }

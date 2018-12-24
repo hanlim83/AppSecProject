@@ -23,6 +23,8 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticLoadBalancingV2.Model;
 using Amazon.ElasticBeanstalk;
 using Amazon.ElasticBeanstalk.Model;
+using Amazon.SimpleSystemsManagement;
+using Amazon.SimpleSystemsManagement.Model;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using ASPJ_MVC.Models;
@@ -50,7 +52,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         IAmazonElasticBeanstalk EBSClient { get; set; }
 
-        public AWSTestingController(IAmazonS3 s3Client, IAmazonEC2 ec2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchLogsClient, IAmazonSimpleNotificationService snsClient, IAmazonRDS rdsClient, IAmazonElasticLoadBalancingV2 elbClient, IAmazonElasticBeanstalk ebsClient)
+        IAmazonSimpleSystemsManagement SSMClient { get; set; }
+
+        public AWSTestingController(IAmazonS3 s3Client, IAmazonEC2 ec2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchLogsClient, IAmazonSimpleNotificationService snsClient, IAmazonRDS rdsClient, IAmazonElasticLoadBalancingV2 elbClient, IAmazonElasticBeanstalk ebsClient, IAmazonSimpleSystemsManagement ssmClient)
         {
             this.S3Client = s3Client;
             this.EC2Client = ec2Client;
@@ -61,6 +65,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             this.RDSClient = rdsClient;
             this.ELBClient = elbClient;
             this.EBSClient = ebsClient;
+            this.SSMClient = ssmClient;
         }
 
         public IActionResult Index()
