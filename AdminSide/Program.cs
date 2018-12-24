@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Data;
+using AdminSide.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +25,7 @@ namespace AdminSide
                 var services = scope.ServiceProvider;
                 try
                 {
-                    var context = services.GetRequiredService<PlatformResourcesContext>();
+                    var context = services.GetRequiredService<CompetitionContext>();
                     DbInitializer.InitializePlatformResources(context);
                 }
                 catch (Exception ex)

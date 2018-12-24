@@ -9,6 +9,9 @@ using Microsoft.EntityFrameworkCore;
 using UserSide.Data;
 using UserSide.Models;
 
+using System.Net.Http;
+using System.Net.Mail;
+
 namespace UserSide.Controllers
 {
     public class CompetitionsController : Controller
@@ -23,6 +26,15 @@ namespace UserSide.Controllers
         // GET: Competitions
         public async Task<IActionResult> Index()
         {
+            /*
+            var myMessage = new SendGrid.SendGridMessage();
+            myMessage.AddTo("test@sendgrid.com");
+            myMessage.From = new EmailAddress("you@youremail.com", "First Last");
+            myMessage.Subject = "Sending with SendGrid is Fun";
+            myMessage.PlainTextContent = "and easy to do anywhere, even with C#";
+
+            var transportWeb = new SendGrid.Web("SENDGRID_APIKEY");
+            transportWeb.DeliverAsync(myMessage);*/
             return View(await _context.Competitions.ToListAsync());
         }
 
