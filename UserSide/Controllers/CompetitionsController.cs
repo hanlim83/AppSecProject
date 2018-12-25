@@ -9,11 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using UserSide.Data;
 using UserSide.Models;
 
-using System.Net.Http;
-using System.Net.Mail;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserSide.Controllers
 {
+    [Authorize]
+    //the line above makes a page protected and will redirect user back to login
     public class CompetitionsController : Controller
     {
         private readonly CompetitionContext _context;
@@ -26,15 +27,6 @@ namespace UserSide.Controllers
         // GET: Competitions
         public async Task<IActionResult> Index()
         {
-            /*
-            var myMessage = new SendGrid.SendGridMessage();
-            myMessage.AddTo("test@sendgrid.com");
-            myMessage.From = new EmailAddress("you@youremail.com", "First Last");
-            myMessage.Subject = "Sending with SendGrid is Fun";
-            myMessage.PlainTextContent = "and easy to do anywhere, even with C#";
-
-            var transportWeb = new SendGrid.Web("SENDGRID_APIKEY");
-            transportWeb.DeliverAsync(myMessage);*/
             return View(await _context.Competitions.ToListAsync());
         }
 
