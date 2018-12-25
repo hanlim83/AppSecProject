@@ -14,9 +14,10 @@
     <PackageReference Include="AWSSDK.ElasticBeanstalk" Version="3.3.12.2" />
     <PackageReference Include="AWSSDK.ElasticLoadBalancingV2" Version="3.3.12.5" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.6" />
-    <PackageReference Include="AWSSDK.RDS" Version="3.3.37.5" />
-    <PackageReference Include="AWSSDK.S3" Version="3.3.31.3" />
-    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.3.6" />
+    <PackageReference Include="AWSSDK.RDS" Version="3.3.37.7" />
+    <PackageReference Include="AWSSDK.S3" Version="3.3.31.5" />
+    <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.3.8" />
+    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.3.37.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
