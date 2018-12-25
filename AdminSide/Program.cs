@@ -5,10 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Data;
-using AdminSide.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -25,13 +23,15 @@ namespace AdminSide
                 var services = scope.ServiceProvider;
                 try
                 {
-                    var context = services.GetRequiredService<CompetitionContext>();
-                    DbInitializer.InitializePlatformResources(context);
+                    var contextPR = services.GetRequiredService<PlatformResourcesContext>();
+                    var contextC = services.GetRequiredService<CompetitionContext>();
+                    DbInitializer.InitializePlatformResources(contextPR);
+                    DbInitializer.InitializeCompeitions(contextC);
                 }
                 catch (Exception ex)
                 {
                     var logger = services.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(ex, "An error occurred creating the DB for Platform Resources");
+                    logger.LogError(ex, "An error occurred creating the DB for one or more services!");
                 }
             }
             host.Run();

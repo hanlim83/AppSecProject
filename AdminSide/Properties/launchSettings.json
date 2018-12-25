@@ -16,9 +16,9 @@
         "RDS_PORT": "1433",
         "AWS_REGION": "ap-southeast-1",
         "RDS_USERNAME": "aspjUser",
-        "AWS_SECRET_ACCESS_KEY": "ahvOWKLZcupwrs1YtqFPEtdQeIO8C9dzmrwww809",
-        "AWS_ACCESS_KEY_ID": "AKIAIAPPLQ2ZBAVTOVJA",
-        "RDS_PASSWORD": "LJ1ynhlXuu4N4Cmm8KoJ",
+        "AWS_SECRET_ACCESS_KEY": "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",
+        "AWS_ACCESS_KEY_ID": "AKIAI76RANBT2SMKNGTA",
+        "RDS_PASSWORD": "SnVwXA8Uu69ecXGX2wuj",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
