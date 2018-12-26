@@ -16,11 +16,11 @@ namespace UserSide.Areas.Identity.Services
 
         public AuthMessageSenderOptions Options { get; } //set only via Secret Manager
 
-        public async Task SendEmailAsync(string email, string subject, string message)
+        public Task SendEmailAsync(string email, string subject, string message)
         {
-            var apiKey = "SG.FrVJESKYRDibvQzII3Fng.o4UA5tsXZg3nCSirwKmEoYgHr2iZeurG_GD0gChBiq0";
-            //return Execute(Options.SendGridKey, subject, message, email);
-            await testFunctionAsync();
+            //var apiKey = "SG.FrVJESKYRDibvQzII3Fng.o4UA5tsXZg3nCSirwKmEoYgHr2iZeurG_GD0gChBiq0";
+            return Execute(Options.SendGridKey, subject, message, email);
+            //await testFunctionAsync();
             //return Execute(apiKey, subject, message, email);
         }
 
