@@ -17,6 +17,8 @@
         "AWS_REGION": "ap-southeast-1",
         "RDS_USERNAME": "aspjUser",
         "AWS_SECRET_ACCESS_KEY": "FuuP+JZS8eWk70C7MKEpd704p6R9xRLa9q1Q3J4P",
+        "SendGridUser": "ZZZ",
+        "SendGridKey": "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",
         "AWS_ACCESS_KEY_ID": "AKIAI76RANBT2SMKNGTA",
         "RDS_PASSWORD": "SnVwXA8Uu69ecXGX2wuj",
         "ASPNETCORE_ENVIRONMENT": "Development"
