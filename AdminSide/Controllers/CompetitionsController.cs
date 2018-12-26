@@ -28,6 +28,7 @@ namespace AdminSide.Controllers
         // GET: Competitions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            ViewData["NavigationShowAll"] = true;
             if (id == null)
             {
                 return NotFound();
