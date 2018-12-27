@@ -1,0 +1,88 @@
+﻿@model UserSide.Models.Competition
+
+@{
+    ViewData["Title"] = "Testing";
+}
+
+<h2>Testing</h2>
+
+<br>
+<div class="col-md-8 offset-md-3">
+    <h4>Competition</h4>
+    <hr>
+    @foreach (var item in Model.CompetitionCategories)
+    {
+        <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
+        <hr>
+        <p>Challenges here</p>
+        <row>
+            <div>
+                <button type="button" class="btn btn-light">
+                    Challenge 1
+                    <br>
+                    30
+                </button>
+                <button type="button" class="btn btn-light">
+                    Challenge 2
+                    <br>
+                    50
+                </button>
+                <button type="button" class="btn btn-light">
+                    Challenge 3
+                    <br>
+                    100
+                </button>
+                <button type="button" class="btn btn-light">
+                    Challenge 4
+                    <br>
+                    150
+                </button>
+                <button type="button" class="btn btn-light">
+                    Challenge 5
+                    <br>
+                    200
+                </button>
+            </div>
+            </row>
+            }
+            <!--
+            <dl class="dl-horizontal">
+                <dt>
+                    @Html.DisplayNameFor(model => model.CompetitionName)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.CompetitionName)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Status)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Status)
+                </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.CompetitionCategories)
+                </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.CompetitionCategories)
+                </dd>
+                <dd>
+                    <table class="table">
+                        <tr>
+                            <th>Testing</th>
+                            <th>Testing</th>
+                        </tr>
+                        @foreach (var item in Model.CompetitionCategories)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CategoryName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CategoryName)
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </dd>
+            </dl>-->
+    </div>

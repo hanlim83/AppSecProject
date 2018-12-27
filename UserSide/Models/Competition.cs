@@ -14,5 +14,6 @@ namespace UserSide.Models
         public string Status { get; set; }
 
         //public ICollection<Competition> Competitions { get; set; }
+        public ICollection<CompetitionCategory> CompetitionCategories { get; set; }
     }
 }

@@ -30,9 +30,13 @@
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                    <!--Collect data and determine if user has joined or not and route differently-->
+                    <!--<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
                     <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
+
+                    <!--Assuming user already join and has team-->
+                    <a asp-controller="Challenges" asp-action="Testing" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Enter</button></a>
                 </td>
             </tr>
         }
