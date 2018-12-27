@@ -35,6 +35,8 @@ namespace AdminSide.Controllers
             }
 
             var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
             {

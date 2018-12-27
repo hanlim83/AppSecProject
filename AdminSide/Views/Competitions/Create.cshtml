@@ -4,8 +4,7 @@
     ViewData["Title"] = "Create";
 }
 
-<h2>Create</h2>
-
+<br>
 <h4>Competition</h4>
 <hr />
 <div class="row">
@@ -22,6 +21,8 @@
                 <input asp-for="Status" class="form-control" />
                 <span asp-validation-for="Status" class="text-danger"></span>
             </div>
+            <!--Add more fields below on adding different categories
+            <partial name="CategoriesCreate" />-->
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>
@@ -29,9 +30,9 @@
     </div>
 </div>
 
-<div>
+<!--<div>
     <a asp-action="Index">Back to List</a>
-</div>
+</div>-->
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
