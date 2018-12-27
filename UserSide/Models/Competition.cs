@@ -13,6 +13,6 @@ namespace UserSide.Models
         public string CompetitionName { get; set; }
         public string Status { get; set; }
 
-        public ICollection<Competition> Competitions { get; set; }
+        //public ICollection<Competition> Competitions { get; set; }
     }
 }

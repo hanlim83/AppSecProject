@@ -20,12 +20,26 @@ namespace UserSide.Data
 
             var competition = new Competition[]
             {
-            new Competition{ID=1, CompetitionName="NYP Global CTF", Status="Active"}
+            new Competition{CompetitionName="NYP Global CTF", Status="Active"}
             };
 
             foreach (Competition c in competition)
             {
                 context.Competitions.Add(c);
+            }
+            context.SaveChanges();
+
+            var competitionCategory = new CompetitionCategory[]
+            {
+            new CompetitionCategory{ CategoryName="Web" },
+            new CompetitionCategory{ CategoryName="Crypto" },
+            new CompetitionCategory{ CategoryName="Forensics" },
+            new CompetitionCategory{ CategoryName="Misc" }
+            };
+
+            foreach (CompetitionCategory cc in competitionCategory)
+            {
+                context.CompetitionCategories.Add(cc);
             }
             context.SaveChanges();
         }
