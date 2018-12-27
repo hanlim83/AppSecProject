@@ -147,7 +147,7 @@ namespace AdminSide.Data
 
             var competition = new Competition[]
             {
-            new Competition{CompetitionName="NYP Global CTF", Status="Active"}
+            new Competition{CompetitionName="NYP Global CTF", Status="Active", BucketName="NYP Global CTF"}
             };
 
             foreach (Competition c in competition)

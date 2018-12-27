@@ -18,6 +18,9 @@ namespace AdminSide.Models
         [Display(Name = "Competition Name")]
         public string CompetitionName { get; set; }
         public string Status { get; set; }
+        //May store 1 extra information: Bucket Name
+        [Display(Name = "Bucket Name")]
+        public string BucketName { get; set; }
 
         public ICollection<CompetitionCategory> CompetitionCategories { get; set; }
     }
