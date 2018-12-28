@@ -45,6 +45,9 @@
                         <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
                         <a asp-action="Details" asp-route-id="@item.ID"><button type="button" class="btn btn-default">View Details</button></a>
+                        <!--To shift 2 buttons below inside Details page next time-->
+                        <a asp-action="Edit" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Edit</button></a>
+                        <a asp-action="Delete" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Delete</button></a>
                     </td>
                 </tr>
             }
