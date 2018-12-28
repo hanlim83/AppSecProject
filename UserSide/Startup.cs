@@ -30,39 +30,33 @@ namespace UserSide
 {
     public class Startup
     {
-        /*
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
-        */
 
-        //Custom Startup Scripts for EBS and RDS
-
-        public Startup(IHostingEnvironment env)
+        private static void SetEbConfig()
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddJsonFile(@"C:\Program Files\Amazon\ElasticBeanstalk\config\containerconfiguration", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables();
-            // This adds EB environment variables.
-            builder.AddInMemoryCollection(GetAwsDbConfig(builder.Build()));
-            Configuration = builder.Build();
-        }
+            var tempConfigBuilder = new ConfigurationBuilder();
 
-        private Dictionary<string, string> GetAwsDbConfig(IConfiguration configuration)
-        {
-            Dictionary<string, string> dict = new Dictionary<string, string>();
+            tempConfigBuilder.AddJsonFile(
+                @"C:\Program Files\Amazon\ElasticBeanstalk\config\containerconfiguration",
+                optional: true,
+                reloadOnChange: true
+            );
 
-            foreach (IConfigurationSection pair in configuration.GetSection("iis:env").GetChildren())
+            var configuration = tempConfigBuilder.Build();
+
+            var ebEnv =
+                configuration.GetSection("iis:env")
+                    .GetChildren()
+                    .Select(pair => pair.Value.Split(new[] { '=' }, 2))
+                    .ToDictionary(keypair => keypair[0], keypair => keypair[1]);
+
+            foreach (var keyVal in ebEnv)
             {
-                string[] keypair = pair.Value.Split(new[] { '=' }, 2);
-                dict.Add(keypair[0], keypair[1]);
+                Environment.SetEnvironmentVariable(keyVal.Key, keyVal.Value);
             }
-
-            return dict;
         }
 
         //For ASP.NET Identity Only | You can reuse this but replace dbname with your own database name
@@ -99,6 +93,8 @@ namespace UserSide
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
+
+            SetEbConfig();
 
             //Using RDS
             services.AddDbContext<ApplicationDbContext>(options =>
