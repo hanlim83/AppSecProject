@@ -158,10 +158,10 @@ namespace AdminSide.Data
 
             var competitionCategory = new CompetitionCategory[]
             {
-            new CompetitionCategory{ CategoryName="Web" },
-            new CompetitionCategory{ CategoryName="Crypto" },
-            new CompetitionCategory{ CategoryName="Forensics" },
-            new CompetitionCategory{ CategoryName="Misc" }
+            new CompetitionCategory{ CategoryName="Web", competitionID=1 },
+            new CompetitionCategory{ CategoryName="Crypto", competitionID=1 },
+            new CompetitionCategory{ CategoryName="Forensics", competitionID=1 },
+            new CompetitionCategory{ CategoryName="Misc", competitionID=1 }
             };
 
             foreach (CompetitionCategory cc in competitionCategory)

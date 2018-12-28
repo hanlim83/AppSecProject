@@ -7,16 +7,22 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AdminSide.Data;
 using AdminSide.Models;
+using Amazon.S3.Model;
+using Amazon.S3;
+using System.Net;
 
 namespace AdminSide.Controllers
 {
     public class CompetitionsController : Controller
     {
+        IAmazonS3 S3Client { get; set; }
+
         private readonly CompetitionContext _context;
 
-        public CompetitionsController(CompetitionContext context)
+        public CompetitionsController(CompetitionContext context, IAmazonS3 s3Client)
         {
             _context = context;
+            this.S3Client = s3Client;
         }
 
         // GET: Competitions
@@ -57,13 +63,40 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,CompetitionName,Status")] Competition competition)
+        public async Task<IActionResult> Create([Bind("ID,CompetitionName,Status,BucketName")] Competition competition, [Bind("CategoryName")] CompetitionCategory competitionCategory)
         {
             if (ModelState.IsValid)
             {
+                //_context.Add(competition);
+                //await _context.SaveChangesAsync();
                 _context.Add(competition);
+                competitionCategory.competitionID = competition.ID;
+                _context.Add(competitionCategory);
                 await _context.SaveChangesAsync();
+                try
+                {
+                    PutBucketResponse response = await S3Client.PutBucketAsync(competition.BucketName);
+                    if (response.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        //return RedirectToAction("");
+                    }
+                    else
+                    {
+                        //return RedirectToAction("");
+                        //return RedirectToAction(nameof(Index));
+                    }
+
+                }
+                catch (AmazonS3Exception e)
+                {
+                    ViewData["Exception"] = e.Message;
+                    //return View();
+                }
                 return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+
             }
             return View(competition);
         }

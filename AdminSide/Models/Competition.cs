@@ -15,10 +15,13 @@ namespace AdminSide.Models
     public class Competition
     {
         public int ID { get; set; }
+        [Required]
         [Display(Name = "Competition Name")]
         public string CompetitionName { get; set; }
+        [Required]
         public string Status { get; set; }
-        //May store 1 extra information: Bucket Name
+        //May change BucketName to be dynamic next time
+        [Required]
         [Display(Name = "Bucket Name")]
         public string BucketName { get; set; }
 

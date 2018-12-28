@@ -1,0 +1,11 @@
+﻿@model AdminSide.Models.CompetitionCategory
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+<!--To change this to better UI-->
+<!--Maybe button to add new field-->
+<div class="form-group">
+    <label asp-for="CategoryName" class="control-label"></label>
+    <input asp-for="CategoryName" class="form-control" />
+    <span asp-validation-for="CategoryName" class="text-danger"></span>
+</div>
