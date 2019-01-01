@@ -1,0 +1,112 @@
+﻿@model AdminSide.Areas.PlatformManagement.Models.Server
+
+@{
+    ViewData["Title"] = "SpecifySettings";
+}
+
+<ul class="progress-tracker progress-tracker--text progress-tracker--center">
+    <li class="progress-step is-complete">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 1</h4>
+            Choose Server Template
+        </span>
+    </li>
+    <li class="progress-step is-active">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 2</h4>
+            Specify Server Settings
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 3</h4>
+            Verify Settings
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 4</h4>
+            Launch Server
+        </span>
+    </li>
+</ul>
+<div class="row">
+    <form asp-action="SpecifySettings">
+        <div class="col-lg-6 border-right">
+            <h3>Server Settings</h3>
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-lg-6 border-left">
+            <h3>Network Settings</h3>
+            <partial name="" />
+        </div>
+    </form>
+
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SpecifySettings2">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Visibility" class="control-label"></label>
+                <input asp-for="Visibility" class="form-control" />
+                <span asp-validation-for="Visibility" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateCreated" class="control-label"></label>
+                <input asp-for="DateCreated" class="form-control" />
+                <span asp-validation-for="DateCreated" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="OperatingSystem" class="control-label"></label>
+                <input asp-for="OperatingSystem" class="form-control" />
+                <span asp-validation-for="OperatingSystem" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IPAddress" class="control-label"></label>
+                <input asp-for="IPAddress" class="form-control" />
+                <span asp-validation-for="IPAddress" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DNSHostname" class="control-label"></label>
+                <input asp-for="DNSHostname" class="form-control" />
+                <span asp-validation-for="DNSHostname" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="AWSEC2Reference" class="control-label"></label>
+                <input asp-for="AWSEC2Reference" class="form-control" />
+                <span asp-validation-for="AWSEC2Reference" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SubnetID" class="control-label"></label>
+                <select asp-for="SubnetID" class="form-control" asp-items="ViewBag.SubnetID"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+

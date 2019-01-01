@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewData["Title"] = "Create Server - Select Template";
+}
+<ul class="progress-tracker progress-tracker--text progress-tracker--center">
+    <li class="progress-step is-active">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 1</h4>
+            Choose Server Template
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 2</h4>
+            Specify Server Settings
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 3</h4>
+            Verify Settings
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 4</h4>
+            Launch Server
+        </span>
+    </li>
+</ul>
+<div class="row">
+    <div class="col-lg-6 border-right">
+        <h3>Pre-Defined Templates</h3>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url('http://placehold.it/100x100');">
+                        </div>
+                        <h5 class="card-title" style="position: relative; left: 10px;">OS Name</h5>
+                        <p class="card-text" style="position: relative; left: 10px;">OS Version</p>
+                        <form method="post">
+                            <input type="hidden" name="selectedTemplate" value="" />
+                            <button type="submit" class="btn btn-primary float-right">Select This Template</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-6 border-left">
+        <h3>Custom Templates</h3>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url('http://placehold.it/100x100');">
+                        </div>
+                        <h5 class="card-title" style="position: relative; left: 10px;">OS Name</h5>
+                        <p class="card-text" style="position: relative; left: 10px;">OS Version</p>
+                        <form method="post">
+                            <input type="hidden" name="selectedTemplate" value="" />
+                            <button type="submit" class="btn btn-primary float-right">Select This Template</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
