@@ -67,6 +67,12 @@
     <Content Update="Areas\PlatformManagement\Views\ChallengeServers\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeServers\VerifySettings.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeServers\VerifySettings - Old.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Areas\PlatformManagement\Views\Home\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

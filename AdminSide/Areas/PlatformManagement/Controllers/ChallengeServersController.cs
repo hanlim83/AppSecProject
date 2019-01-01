@@ -31,14 +31,22 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             return View(await _context.Servers.ToListAsync());
         }
 
-        public IActionResult SelectTemplate()
+        public async Task<IActionResult> SelectTemplate()
         {
-            return View();
+            return View(await _context.Templates.ToListAsync());
         }
 
-        public IActionResult SpecifySettings()
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SelectTemplate(String selectedTemplate)
         {
-            return View();
+            TempData["selectedTemplate"] = selectedTemplate;
+            return RedirectToAction("SpecifySettings");
+        }
+
+        public async Task<IActionResult> SpecifySettings()
+        {
+            return View(await _context.Subnets.ToListAsync());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

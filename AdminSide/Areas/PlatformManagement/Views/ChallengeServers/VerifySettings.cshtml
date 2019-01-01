@@ -1,0 +1,107 @@
+﻿@model AdminSide.Areas.PlatformManagement.Models.ChallengeServersCreationFormModel
+
+@{
+    ViewData["Title"] = "Create Server - Verify Settings";
+}
+
+<ul class="progress-tracker progress-tracker--text progress-tracker--center">
+    <li class="progress-step is-complete">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 1</h4>
+            Choose Server Template
+        </span>
+    </li>
+    <li class="progress-step is-complete">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 2</h4>
+            Specify Server Settings
+        </span>
+    </li>
+    <li class="progress-step is-active">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 3</h4>
+            Verify Settings
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 4</h4>
+            Launch Server
+        </span>
+    </li>
+</ul>
+<form method="post">
+    <div class="row">
+        <div class="col-lg-6 border-right">
+            <h3>Server Settings</h3>
+            <div class="form-group">
+                <label for="TemplateName">Template Name:</label>
+                <input type="text" readonly class="form-control-plaintext" id="TemplateName" name="TemplateName" value="@Html.ValueForModel(Model.TemplateName)" />
+            </div>
+            <div class="form-group">
+                <label for="OperatingSystem">Operating System:</label>
+                <input type="text" readonly class="form-control-plaintext" id="OperatingSystem" name="OperatingSystem" value="@Html.ValueForModel(Model.OperatingSystem)" />
+            </div>
+            <br />
+            <div class="form-group">
+                <label for="ServerName">Server Name:</label>
+                <input type="text" readonly class="form-control-plaintext" id="ServerName" name="ServerName" value="@Html.ValueForModel(Model.ServerName)" />
+            </div>
+            <div class="form-group">
+                <label for="ServerWorkload">Server Workload</label>
+                <input type="text" readonly class="form-control-plaintext" id="ServerWorkload" name="ServerWorkload" value="@Html.ValueForModel(Model.ServerWorkload)" />
+            </div>
+            <div class="form-group">
+                <label for="ServerStorage">Server Assigned Storage:</label>
+                <input type="number" readonly class="form-control-plaintext" id="ServerStorage" name="ServerStorage" min="8" max="1000" value="@Html.ValueForModel(Convert.ToString(Model.ServerStorage))" />
+            </div>
+            <div class="form-group">
+                <label for="ServerTenancy">Server Tenancy:</label>
+                <input type="text" readonly class="form-control-plaintext" name="ServerTenancy" id="ServerTenancy" value="@Html.ValueForModel(Model.ServerTenancy)" />
+            </div>
+        </div>
+        <div class="col-lg-6 border-left">
+            <h3>Network Settings</h3>
+            <div class="form-group">
+                <label for="ServerSubnet">Server Subnet: </label>
+                <input type="text" readonly class="form-control-plaintext" id="ServerSubnet" name="ServerSubnet" value="@Html.ValueForModel(Model.ServerSubnet.Name) (@Html.ValueForModel(Model.ServerSubnet.IPv4CIDR) / @Html.ValueForModel(Model.ServerSubnet.IPv6CIDR))" />
+            </div>
+            <div class="form-group">
+                <p class="form-text">Server Firewall Rules</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Direction</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Protocol</th>
+                            <th scope="col">Port</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4">You can whitelist ports when the server has been launched</td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>Incoming and Outgoing Traffic</td>
+                            <td>IMPLICT-DENY</td>
+                            <td>TCP and UDP</td>
+                            <td>All Ports</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <a asp-area="PlatformMannagement" asp-controller="ChallengeServers" asp-action="SpecifySettings" class="btn btn-secondary float-left">Back</a>
+            <button type="submit" class="btn btn-primary float-right">Launch Server</button>
+        </div>
+    </div>
+</form>

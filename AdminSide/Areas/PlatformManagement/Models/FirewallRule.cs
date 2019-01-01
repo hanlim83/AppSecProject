@@ -18,6 +18,8 @@ namespace AdminSide.Areas.PlatformManagement.Models
 
     public class FirewallRule
     {
+        public int ID { get; set; }
+
         public Type Type;
         public Protocol Protocol;
         public int Port;

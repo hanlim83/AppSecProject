@@ -1,7 +1,5 @@
-﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Subnet>
-
-@{
-    ViewData["Title"] = "Create Server - Specify Settings";
+﻿@{
+    ViewData["Title"] = "Create Server - Verify Settings";
 }
 
 <ul class="progress-tracker progress-tracker--text progress-tracker--center">
@@ -12,14 +10,14 @@
             Choose Server Template
         </span>
     </li>
-    <li class="progress-step is-active">
+    <li class="progress-step is-complete">
         <span class="progress-marker"></span>
         <span class="progress-text">
             <h4 class="progress-title">Step 2</h4>
             Specify Server Settings
         </span>
     </li>
-    <li class="progress-step">
+    <li class="progress-step is-active">
         <span class="progress-marker"></span>
         <span class="progress-text">
             <h4 class="progress-title">Step 3</h4>
@@ -34,32 +32,24 @@
         </span>
     </li>
 </ul>
-<form method="post" class="needs-vaildation" novalidate>
+<form method="post">
     <div class="row">
         <div class="col-lg-6 border-right">
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
-                <input type="text" class="form-control" id="ServerName" placeholder="Name of server" name="ServerName">
-                <div class="invalid-feedback">A server needs a name</div>
+                <input type="text" readonly class="form-control-plaintext" id="ServerName" name="ServerName" value="">
             </div>
             <div class="form-group">
                 <label for="ServerWorkload">Server Workload</label>
-                <select class="form-control" id="ServerWorkload" name="ServerWorkload">
-                    <option value="t2.micro">Low</option>
-                    <option value="t2.medium">Medium</option>
-                    <option value="t2.xlarge">Large</option>
-                </select>
-                <div class="invalid-feedback">Server's Workload must be selected</div>
+                <input type="text" readonly class="form-control-plaintext" id="ServerWorkload" name="ServerWorkload" value="">
             </div>
-            <input type="hidden" name="selectedTemplate" value="@TempData["selectedTemplate"]" />
             <div class="form-group">
                 <label for="ServerStorage">Server Assigned Storage:</label>
-                <input type="number" class="form-control" id="ServerStorage" placeholder="Size in Gigabytes" name="ServerStorage" min="8" max="1000">
-                <div class="invalid-feedback">Storage space must be assigned to the server</div>
+                <input type="number" readonly class="form-control-plaintext" id="ServerStorage" name="ServerStorage" min="8" max="1000">
             </div>
             <div class="form-group">
-                <label>Server Tenancy:</label>
+                <p class="form-text">Server Tenancy: </p>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyS" value="Shared" required>
                     <label class="form-check-label" for="ServerTenancyS">Shared</label>
@@ -78,13 +68,8 @@
         <div class="col-lg-6 border-left">
             <h3>Network Settings</h3>
             <div class="form-group">
-                <label for="Subnet">Server Subnet: </label>
-                <select class="form-control" id="Subnet" name="ServerSubnet">
-                    @foreach (var subnet in Model)
-                    {
-                        <option aria-type="@subnet.Type" value="@subnet.ID">@subnet.Name (@subnet.IPv4CIDR / @subnet.IPv6CIDR)</option>
-                    }
-                </select>
+                <label for="Subnet"></label>
+                <select class="form-control" id="Subnet" name="ServerSubnet"></select>
                 <div class="invalid-feedback">Please select a subnet</div>
             </div>
             <div class="form-group">
@@ -116,10 +101,8 @@
         </div>
     </div>
     <div class="row">
-        <div class="col-lg-12">
-            <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back and select a new template</button>>
-            <button type="submit" class="btn btn-primary float-right">Continue</button>
-        </div>
+        <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back and select a new template</button>>
+        <button type="submit" class="btn btn-primary float-right">Continue</button>
     </div>
 </form>
 <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
@@ -141,21 +124,3 @@
         </div>
     </div>
 </div>
-<script>
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            var forms = document.getElementsByClassName('needs-validation');
-            var validation = Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-
-</script>

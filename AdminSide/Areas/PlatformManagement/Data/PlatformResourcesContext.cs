@@ -24,7 +24,7 @@ namespace AdminSide.Areas.PlatformManagement.Data
             modelBuilder.Entity<Server>().ToTable("Server");
             modelBuilder.Entity<Subnet>().ToTable("Subnet");
             modelBuilder.Entity<Template>().ToTable("Template");
-            modelBuilder.Entity<Template>().ToTable("FirewallRules");
+            modelBuilder.Entity<FirewallRule>().ToTable("FirewallRules");
         }
     }
 }
