@@ -11,7 +11,7 @@ namespace AdminSide.Data
     {
         public CompetitionContext(DbContextOptions<CompetitionContext> options) : base(options)
         {
-
+            
         }
 
         public DbSet<Competition> Competitions { get; set; }
@@ -21,6 +21,9 @@ namespace AdminSide.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Competition>().ToTable("Competition");
+            //modelBuilder.Entity<Competition>()
+            //    .HasOne<CompetitionCategory>(c => c.ID)
+            //    .WithMany(g => g.CompetitionID);
             modelBuilder.Entity<CompetitionCategory>().ToTable("CompetitionCategory");
             //modelBuilder.Entity<Competition>().ToTable("Challenges");
 

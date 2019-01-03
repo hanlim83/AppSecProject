@@ -1,4 +1,4 @@
-﻿@model AdminSide.Models.Competition
+﻿@model AdminSide.Models.CategoriesViewModelIEnumerable
 
 @{
     ViewData["Title"] = "Create";
@@ -12,22 +12,22 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="CompetitionName" class="control-label"></label>
-                <input asp-for="CompetitionName" class="form-control" />
-                <span asp-validation-for="CompetitionName" class="text-danger"></span>
+                <label asp-for="competition.CompetitionName" class="control-label"></label>
+                <input asp-for="competition.CompetitionName" class="form-control" />
+                <span asp-validation-for="competition.CompetitionName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
+                <label asp-for="competition.Status" class="control-label"></label>
+                <input asp-for="competition.Status" class="form-control" />
+                <span asp-validation-for="competition.Status" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="BucketName" class="control-label"></label>
-                <input asp-for="BucketName" class="form-control" />
-                <span asp-validation-for="BucketName" class="text-danger"></span>
+                <label asp-for="competition.BucketName" class="control-label"></label>
+                <input asp-for="competition.BucketName" class="form-control" />
+                <span asp-validation-for="competition.BucketName" class="text-danger"></span>
             </div>
             <!--Add more fields below on adding different categories-->
-            <partial name="CategoriesCreate" />
+            <select asp-for="SelectedCategories" asp-items="Model.CategoriesList" class="form-control"></select>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-default" />
             </div>

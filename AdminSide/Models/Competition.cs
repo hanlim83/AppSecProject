@@ -14,6 +14,7 @@ namespace AdminSide.Models
 
     public class Competition
     {
+        [Key]
         public int ID { get; set; }
         [Required]
         [Display(Name = "Competition Name")]

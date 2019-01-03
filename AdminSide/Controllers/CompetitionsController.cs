@@ -10,6 +10,7 @@ using AdminSide.Models;
 using Amazon.S3.Model;
 using Amazon.S3;
 using System.Net;
+using System.Collections.ObjectModel;
 
 namespace AdminSide.Controllers
 {
@@ -55,7 +56,8 @@ namespace AdminSide.Controllers
         // GET: Competitions/Create
         public IActionResult Create()
         {
-            return View();
+            var vm = new CategoriesViewModelIEnumerable();
+            return View(vm);
         }
 
         // POST: Competitions/Create
@@ -63,19 +65,49 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,CompetitionName,Status,BucketName")] Competition competition, [Bind("CategoryName")] CompetitionCategory competitionCategory)
+        //public async Task<IActionResult> Create([Bind("ID,CompetitionName,Status,BucketName")] Competition competition, [Bind("CategoryName")] CompetitionCategory competitionCategory, string[] SelectedCategories)
+        public async Task<IActionResult> Create(CategoriesViewModelIEnumerable model)
+        //public async Task<IActionResult> Create(string[] CategoriesList)
         {
+            /*foreach (var CategoryName in model.SelectedCategories)
+            {
+                Console.WriteLine(CategoryName);
+            }*/
+            //Console.WriteLine(model.competition.BucketName);
+            //Tested and working^
+            //Console.WriteLine(model.SelectedCategories.ElementAt(0));
+            //Console.WriteLine(competitionCategory.Categories.ElementAt(0).CategoryName);
             if (ModelState.IsValid)
             {
-                //_context.Add(competition);
+                //_context.Add(model.competition);
                 //await _context.SaveChangesAsync();
-                _context.Add(competition);
-                competitionCategory.competitionID = competition.ID;
-                _context.Add(competitionCategory);
+                //var competitionID = model.competition.ID;
+
+                //CompetitionCategory competitionCategory = new CompetitionCategory();
+                model.competition.CompetitionCategories = new Collection<CompetitionCategory>();
+                foreach (var CategoryName in model.SelectedCategories)
+                {
+                    //model.competitionCategory = _context.CompetitionCategories.Find("CompetitionID");
+                    //model.competitionCategory.CompetitionID = model.competition.ID;
+                    //model.competitionCategory.CategoryName = CategoryName;
+
+                    //competitionCategory.CategoryName = CategoryName;
+                    //competitionCategory.CompetitionID = model.competition.ID;
+                    
+                    //CompetitionCategoriesTempList.Add
+
+                    model.competition.CompetitionCategories.Add(new CompetitionCategory { CompetitionID=model.competition.ID, CategoryName=CategoryName});
+                    
+                    //competitionCategory.competitionID = _context.Competitions.Find("ID");\
+                    //model.competition = new Competition();
+                    //model.competition.CompetitionCategories.Add(new CompetitionCategory { CompetitionID = model.competition.ID, CategoryName = CategoryName });
+                    //await _context.SaveChangesAsync();
+                }
+                _context.Add(model.competition);
                 await _context.SaveChangesAsync();
                 try
                 {
-                    PutBucketResponse response = await S3Client.PutBucketAsync(competition.BucketName);
+                    PutBucketResponse response = await S3Client.PutBucketAsync(model.competition.BucketName);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
                         //return RedirectToAction("");
@@ -98,7 +130,9 @@ namespace AdminSide.Controllers
             {
 
             }
-            return View(competition);
+            //return View(competition);
+            //return View(model);
+            return RedirectToAction("Index");
         }
 
         // GET: Competitions/Edit/5
