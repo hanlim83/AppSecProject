@@ -4,11 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Index</h2>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+<!--Edit UI to specify this page is to speed up multi-select when creating competitions-->
+<br>
+<div class="float-right">
+    <a asp-action="Create"><button type="button" class="btn btn-danger">New Default Category</button></a>
+</div>
+<br>
+<br>
 <table class="table">
     <thead>
         <tr>
@@ -25,9 +27,8 @@
                 @Html.DisplayFor(modelItem => item.CategoryName)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Edit</button></a>
+                <a asp-action="Delete" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Delete</button></a>
             </td>
         </tr>
 }
