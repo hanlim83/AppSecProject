@@ -16,6 +16,7 @@ namespace AdminSide.Data
 
         public DbSet<Competition> Competitions { get; set; }
         public DbSet<CompetitionCategory> CompetitionCategories { get; set; }
+        public DbSet<CategoryDefault> CategoryDefault { get; set; }
         //public DbSet<Competition> Competitions { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -28,5 +29,11 @@ namespace AdminSide.Data
             //modelBuilder.Entity<Competition>().ToTable("Challenges");
 
         }
+        //public DbSet<Competition> Competitions { get; set; }
+
+        //public DbSet<AdminSide.Models.Challenges> Challenges { get; set; }
+        //public DbSet<Competition> Competitions { get; set; }
+
+        //public DbSet<AdminSide.Models.CategoryDefault> CategoryDefault { get; set; }
     }
 }

@@ -293,6 +293,20 @@ namespace AdminSide.Data
                 context.CompetitionCategories.Add(cc);
             }
             context.SaveChanges();
+
+            var categoryDefault = new CategoryDefault[]
+            {
+            new CategoryDefault{ CategoryName="Web" },
+            new CategoryDefault{ CategoryName="Crypto" },
+            new CategoryDefault{ CategoryName="Forensics" },
+            new CategoryDefault{ CategoryName="Misc" }
+            };
+
+            foreach (CategoryDefault cd in categoryDefault)
+            {
+                context.CategoryDefault.Add(cd);
+            }
+            context.SaveChanges();
         }
     }
 }
