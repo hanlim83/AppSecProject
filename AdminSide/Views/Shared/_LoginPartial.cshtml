@@ -13,10 +13,8 @@
 @if (SignInManager.IsSignedIn(User) && showAll == true)
 {
 <ul class="nav navbar-nav mr-auto">
-    <!--<li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
-    <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
-    <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>-->
-
+    <!--Placing default categories here temporarily-->
+    <li class="nav-item"><a asp-area="" asp-controller="CategoryDefaults" asp-action="Index" class="nav-link">Default Categories</a></li>
     <li class="nav-item"><a asp-area="" asp-controller="Competitions" asp-action="Index" class="nav-link">Competitions</a></li>
     <li class="nav-item"><a asp-area="" asp-controller="Teams" asp-action="Index" class="nav-link">Teams</a></li>
     <li class="nav-item"><a asp-area="" asp-controller="Challenges" asp-action="Index" class="nav-link">Challenges</a></li>
@@ -38,10 +36,7 @@
 else if (SignInManager.IsSignedIn(User) && showAll == false)
 {
     <ul class="nav navbar-nav mr-auto">
-        <!--<li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Home</a></li>
-        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">About</a></li>
-        <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">Contact</a></li>-->
-
+        <li class="nav-item"><a asp-area="" asp-controller="CategoryDefaults" asp-action="Index" class="nav-link">Default Categories</a></li>
         <li class="nav-item"><a asp-area="" asp-controller="Competitions" asp-action="Index" class="nav-link">Competitions</a></li>
         <li class="nav-item"><a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">Newsfeed</a></li>
         <li class="nav-item"><a asp-area="" asp-controller="PlatformManagement" asp-action="Index" class="nav-link">Platform Management</a></li>
