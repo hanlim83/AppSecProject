@@ -6,8 +6,10 @@ using AdminSide.Areas.PlatformManagement.Data;
 using Microsoft.AspNetCore.Mvc;
 using Amazon.EC2;
 using Amazon.EC2.Model;
-using ASPJ_MVC.Models;
+using AdminSide.Areas.PlatformManagement.Models;
 using System.Diagnostics;
+using ASPJ_MVC.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -24,9 +26,27 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             this.EC2Client = ec2Client;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            return View(await _context.Servers.ToListAsync());
+        }
+
+        public async Task<IActionResult> SelectTemplate()
+        {
+            return View(await _context.Templates.ToListAsync());
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SelectTemplate(String selectedTemplate)
+        {
+            TempData["selectedTemplate"] = selectedTemplate;
+            return RedirectToAction("SpecifySettings");
+        }
+
+        public async Task<IActionResult> SpecifySettings()
+        {
+            return View(await _context.Subnets.ToListAsync());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

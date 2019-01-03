@@ -19,7 +19,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string Name { get; set; }
         [Required]
         [Display(Name = "Template Type")]
-        public string Type { get; set; }
+        public TemplateType Type { get; set; }
         [Display(Name = "Date Created")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]

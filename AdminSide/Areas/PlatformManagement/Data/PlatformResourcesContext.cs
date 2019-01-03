@@ -15,6 +15,7 @@ namespace AdminSide.Areas.PlatformManagement.Data
         public DbSet<Server> Servers { get; set; }
         public DbSet<Subnet> Subnets { get; set; }
         public DbSet<Template> Templates { get; set; }
+        public DbSet<FirewallRule> FirewallRules { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -23,6 +24,7 @@ namespace AdminSide.Areas.PlatformManagement.Data
             modelBuilder.Entity<Server>().ToTable("Server");
             modelBuilder.Entity<Subnet>().ToTable("Subnet");
             modelBuilder.Entity<Template>().ToTable("Template");
+            modelBuilder.Entity<FirewallRule>().ToTable("FirewallRules");
         }
     }
 }
