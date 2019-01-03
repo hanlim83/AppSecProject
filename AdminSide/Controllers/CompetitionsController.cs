@@ -57,6 +57,11 @@ namespace AdminSide.Controllers
         public IActionResult Create()
         {
             var vm = new CategoriesViewModelIEnumerable();
+            //vm.PopulateCategoriesList();
+            foreach (var categoryDefault in _context.CategoryDefault)
+            {
+                vm.CategoriesList.Add(new SelectListItem { Value = categoryDefault.CategoryName, Text = categoryDefault.CategoryName });
+            }
             return View(vm);
         }
 
@@ -84,7 +89,7 @@ namespace AdminSide.Controllers
                 //var competitionID = model.competition.ID;
 
                 //CompetitionCategory competitionCategory = new CompetitionCategory();
-                model.competition.CompetitionCategories = new Collection<CompetitionCategory>();
+                model.Competition.CompetitionCategories = new Collection<CompetitionCategory>();
                 foreach (var CategoryName in model.SelectedCategories)
                 {
                     //model.competitionCategory = _context.CompetitionCategories.Find("CompetitionID");
@@ -96,18 +101,18 @@ namespace AdminSide.Controllers
                     
                     //CompetitionCategoriesTempList.Add
 
-                    model.competition.CompetitionCategories.Add(new CompetitionCategory { CompetitionID=model.competition.ID, CategoryName=CategoryName});
+                    model.Competition.CompetitionCategories.Add(new CompetitionCategory { CompetitionID=model.Competition.ID, CategoryName=CategoryName});
                     
                     //competitionCategory.competitionID = _context.Competitions.Find("ID");\
                     //model.competition = new Competition();
                     //model.competition.CompetitionCategories.Add(new CompetitionCategory { CompetitionID = model.competition.ID, CategoryName = CategoryName });
                     //await _context.SaveChangesAsync();
                 }
-                _context.Add(model.competition);
+                _context.Add(model.Competition);
                 await _context.SaveChangesAsync();
                 try
                 {
-                    PutBucketResponse response = await S3Client.PutBucketAsync(model.competition.BucketName);
+                    PutBucketResponse response = await S3Client.PutBucketAsync(model.Competition.BucketName);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
                         //return RedirectToAction("");
