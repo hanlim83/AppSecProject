@@ -1,14 +1,56 @@
-﻿@{
-    ViewData["Title"] = "Challenges";
+﻿@model AdminSide.Models.Competition
+
+@{
+    ViewData["Title"] = "Index";
 }
 
-<title>@ViewData["Title"] - Challenges</title>
-
-<h2>Challenges admin test</h2>
-
-<p>Hello from our challenges admin page!</p>
+<h2>Challenges Index Testing</h2>
 
 <br>
-<div class="float-right">
-    <a asp-action="Create"><button type="button" class="btn btn-danger">New Challenge</button></a>
+<div class="col-md-8 offset-md-3">
+    <h4>Competition</h4>
+    <hr>
+    @foreach (var item in Model.CompetitionCategories)
+    {
+        <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
+        <hr>
+        <p>Challenges here</p>
+        <row>
+            <!--Loop through this part dynamically-->
+            <div>
+                @foreach (var item1 in Model.Challenges)
+                {
+                    if (item1.CompetitionCategoryID == item.ID)
+                    {
+                        <button type="button" class="btn btn-light">
+                            @Html.DisplayFor(modelItem => item1.Name)
+                            <br>
+                            @Html.DisplayFor(modelItem => item1.Value)
+                        </button>
+                    }
+                }
+
+                <!--<button type="button" class="btn btn-light">
+        Challenge 2
+        <br>
+        50
+    </button>
+    <button type="button" class="btn btn-light">
+        Challenge 3
+        <br>
+        100
+    </button>
+    <button type="button" class="btn btn-light">
+        Challenge 4
+        <br>
+        150
+    </button>
+    <button type="button" class="btn btn-light">
+        Challenge 5
+        <br>
+        200
+    </button>-->
+            </div>
+        </row>
+    }
 </div>
