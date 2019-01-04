@@ -6,10 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace UserSide.Controllers
 {
-    public class Chat : Controller
+    public class ChatController : Controller
     {
         public IActionResult Index()
-        { 
+        {
+            return View();
+        }
+        
+        public IActionResult TalkView()
+        {
             return View();
         }
     }
