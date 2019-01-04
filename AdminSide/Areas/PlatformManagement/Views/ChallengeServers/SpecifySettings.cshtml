@@ -34,29 +34,32 @@
         </span>
     </li>
 </ul>
-<form method="post" class="needs-vaildation" novalidate>
+<div class="alert alert-warning" role="alert">
+    Do not refresh this page or you will restart at step 1
+</div>
+<form asp-action="VerifySettings" method="post" class="needs-validation" novalidate>
     <div class="row">
         <div class="col-lg-6 border-right">
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
-                <input type="text" class="form-control" id="ServerName" placeholder="Name of server" name="ServerName">
+                <input type="text" class="form-control" id="ServerName" name="ServerName" required>
                 <div class="invalid-feedback">A server needs a name</div>
             </div>
             <div class="form-group">
                 <label for="ServerWorkload">Server Workload</label>
-                <select class="form-control" id="ServerWorkload" name="ServerWorkload">
-                    <option value="t2.micro">Low</option>
-                    <option value="t2.medium">Medium</option>
-                    <option value="t2.xlarge">Large</option>
+                <select class="form-control" id="ServerWorkload" name="ServerWorkload" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Large">Large</option>
                 </select>
                 <div class="invalid-feedback">Server's Workload must be selected</div>
             </div>
             <input type="hidden" name="selectedTemplate" value="@TempData["selectedTemplate"]" />
             <div class="form-group">
                 <label for="ServerStorage">Server Assigned Storage:</label>
-                <input type="number" class="form-control" id="ServerStorage" placeholder="Size in Gigabytes" name="ServerStorage" min="8" max="1000">
-                <div class="invalid-feedback">Storage space must be assigned to the server</div>
+                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" min="8" max="1000" placeholder="Size in Gigabytes" required>
+                <div class="invalid-feedback">A minimum Storage space of 8 Gigabytes must be assigned to the server</div>
             </div>
             <div class="form-group">
                 <label>Server Tenancy:</label>
@@ -65,21 +68,21 @@
                     <label class="form-check-label" for="ServerTenancyS">Shared</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDI" value="DedicatedInstance">
+                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDI" value="Dedicated Instance">
                     <label class="form-check-label" for="ServerTenancyDI">Dedicated Instance</label>
                 </div>
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDH" value="DedicatedHardware">
+                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDH" value="Dedicated Hardware">
                     <label class="form-check-label" for="ServerTenancyDH">Dedicated Hardware</label>
+                    <div class="invalid-feedback">Select the server's tenancy</div>
                 </div>
-                <div class="invalid-feedback">Select the server's tenancy</div>
             </div>
         </div>
         <div class="col-lg-6 border-left">
             <h3>Network Settings</h3>
             <div class="form-group">
                 <label for="Subnet">Server Subnet: </label>
-                <select class="form-control" id="Subnet" name="ServerSubnet">
+                <select class="form-control" id="Subnet" name="ServerSubnet" required>
                     @foreach (var subnet in Model)
                     {
                         <option aria-type="@subnet.Type" value="@subnet.ID">@subnet.Name (@subnet.IPv4CIDR / @subnet.IPv6CIDR)</option>
@@ -101,7 +104,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="4">You can whitelist ports when the server has been launched</td>
+                            <td colspan="5">You can whitelist ports when the server has been launched</td>
                         </tr>
                         <tr>
                             <th scope="row">1</th>
@@ -117,7 +120,7 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back and select a new template</button>>
+            <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back and select a new template</button>
             <button type="submit" class="btn btn-primary float-right">Continue</button>
         </div>
     </div>
@@ -126,7 +129,7 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="confirmationModalLabel">Comfirmation</h5>
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -136,7 +139,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <a asp-area="PlatformManagement" asp-controller="ChallengeServer" asp-action="SelectTemplate" class="btn btn-primary">Yes</a>
+                <a asp-area="PlatformManagement" asp-controller="ChallengeServers" asp-action="SelectTemplate" class="btn btn-primary">Yes</a>
             </div>
         </div>
     </div>
@@ -157,5 +160,6 @@
             });
         }, false);
     })();
-
+    document.getElementById("ServerWorkload").selectedIndex = -1;
+    document.getElementById("Subnet").selectedIndex = -1;
 </script>

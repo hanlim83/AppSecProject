@@ -34,17 +34,22 @@
         </span>
     </li>
 </ul>
-<form method="post">
+<div class="alert alert-warning" role="alert">
+    Do not refresh this page or you will restart at step 1
+</div>
+<form asp-action="Submission" method="post">
     <div class="row">
         <div class="col-lg-6 border-right">
             <h3>Server Settings</h3>
+            <input type="hidden" id="TemplateID" name="TemplateID" value="@TempData["TemplateID"]">
+            <input type="hidden" id="SubnetID" name="SubnetID" value="@TempData["SubnetID"]">
             <div class="form-group">
                 <label for="TemplateName">Template Name:</label>
-                <input type="text" readonly class="form-control-plaintext" id="TemplateName" name="TemplateName" value="@Html.ValueForModel(Model.TemplateName)" />
+                <input type="text" readonly class="form-control-plaintext" id="TemplateName" name="TemplateName" value="@Html.ValueForModel(Model.selectedTemplate.Name)" />
             </div>
             <div class="form-group">
                 <label for="OperatingSystem">Operating System:</label>
-                <input type="text" readonly class="form-control-plaintext" id="OperatingSystem" name="OperatingSystem" value="@Html.ValueForModel(Model.OperatingSystem)" />
+                <input type="text" readonly class="form-control-plaintext" id="OperatingSystem" name="OperatingSystem" value="@Html.ValueForModel(Model.selectedTemplate.OperatingSystem)" />
             </div>
             <br />
             <div class="form-group">
@@ -56,7 +61,7 @@
                 <input type="text" readonly class="form-control-plaintext" id="ServerWorkload" name="ServerWorkload" value="@Html.ValueForModel(Model.ServerWorkload)" />
             </div>
             <div class="form-group">
-                <label for="ServerStorage">Server Assigned Storage:</label>
+                <label for="ServerStorage">Server Assigned Storage (In Gigabytes):</label>
                 <input type="number" readonly class="form-control-plaintext" id="ServerStorage" name="ServerStorage" min="8" max="1000" value="@Html.ValueForModel(Convert.ToString(Model.ServerStorage))" />
             </div>
             <div class="form-group">
@@ -68,7 +73,7 @@
             <h3>Network Settings</h3>
             <div class="form-group">
                 <label for="ServerSubnet">Server Subnet: </label>
-                <input type="text" readonly class="form-control-plaintext" id="ServerSubnet" name="ServerSubnet" value="@Html.ValueForModel(Model.ServerSubnet.Name) (@Html.ValueForModel(Model.ServerSubnet.IPv4CIDR) / @Html.ValueForModel(Model.ServerSubnet.IPv6CIDR))" />
+                <input type="text" readonly class="form-control-plaintext" id="ServerSubnet" name="SubnetCIDR" value="@Html.ValueForModel(Model.ServerSubnet.Name) (@Html.ValueForModel(Model.ServerSubnet.IPv4CIDR) / @Html.ValueForModel(Model.ServerSubnet.IPv6CIDR))" />
             </div>
             <div class="form-group">
                 <p class="form-text">Server Firewall Rules</p>
@@ -84,7 +89,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="4">You can whitelist ports when the server has been launched</td>
+                            <td colspan="5">You can whitelist ports when the server has been launched</td>
                         </tr>
                         <tr>
                             <th scope="row">1</th>

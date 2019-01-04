@@ -1,0 +1,39 @@
+﻿@model AdminSide.Areas.PlatformManagement.Models.ChallengeServersCreationFormModel
+
+@{
+    ViewData["Title"] = "Create Server - Verify Settings";
+}
+
+<ul class="progress-tracker progress-tracker--text progress-tracker--center">
+    <li class="progress-step is-complete">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 1</h4>
+            Choose Server Template
+        </span>
+    </li>
+    <li class="progress-step is-complete">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 2</h4>
+            Specify Server Settings
+        </span>
+    </li>
+    <li class="progress-step is-complete">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 3</h4>
+            Verify Settings
+        </span>
+    </li>
+    <li class="progress-step is-active">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 4</h4>
+            Launch Server
+        </span>
+    </li>
+</ul>
+<div class="alert alert-danger" role="alert">
+    @ViewData["Exception"]
+</div>
