@@ -36,6 +36,8 @@ namespace AdminSide.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             ViewData["NavigationShowAll"] = true;
+            //Testing for dynamic navbar
+            ViewData["routeID"] = id;
             if (id == null)
             {
                 return NotFound();
@@ -199,8 +201,11 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
+            //Code testing for category deletion in progress here
             var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
                 .FirstOrDefaultAsync(m => m.ID == id);
+            //Code testing for category deletion in progress here
             if (competition == null)
             {
                 return NotFound();
