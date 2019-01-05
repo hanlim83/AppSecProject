@@ -4,17 +4,14 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Challenges Index Testing</h2>
-
 <br>
-<div class="col-md-8 offset-md-3">
+<div class="col-md-8 offset-2">
     <h4>Competition</h4>
     <hr>
     @foreach (var item in Model.CompetitionCategories)
     {
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
         <hr>
-        <p>Challenges here</p>
         <row>
             <!--Loop through this part dynamically-->
             <div>
@@ -22,34 +19,36 @@
                 {
                     if (item1.CompetitionCategoryID == item.ID)
                     {
-                        <button type="button" class="btn btn-light">
-                            @Html.DisplayFor(modelItem => item1.Name)
-                            <br>
-                            @Html.DisplayFor(modelItem => item1.Value)
-                        </button>
+                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item.ID">
+                            <button type="button" class="btn btn-light">
+                                @Html.DisplayFor(modelItem => item1.Name)
+                                <br>
+                                @Html.DisplayFor(modelItem => item1.Value)
+                            </button>
+                        </a>
                     }
                 }
 
                 <!--<button type="button" class="btn btn-light">
-        Challenge 2
-        <br>
-        50
-    </button>
-    <button type="button" class="btn btn-light">
-        Challenge 3
-        <br>
-        100
-    </button>
-    <button type="button" class="btn btn-light">
-        Challenge 4
-        <br>
-        150
-    </button>
-    <button type="button" class="btn btn-light">
-        Challenge 5
-        <br>
-        200
-    </button>-->
+                    Challenge 2
+                    <br>
+                    50
+                </button>
+                <button type="button" class="btn btn-light">
+                    Challenge 3
+                    <br>
+                    100
+                </button>
+                <button type="button" class="btn btn-light">
+                    Challenge 4
+                    <br>
+                    150
+                </button>
+                <button type="button" class="btn btn-light">
+                    Challenge 5
+                    <br>
+                    200
+                </button>-->
             </div>
         </row>
     }
