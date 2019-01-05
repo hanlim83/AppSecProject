@@ -12,6 +12,7 @@ using Amazon.S3;
 using System.Net;
 using System.Collections.ObjectModel;
 using System.Security.Cryptography;
+using Amazon.S3.Transfer;
 
 namespace AdminSide.Controllers
 {
@@ -137,7 +138,7 @@ namespace AdminSide.Controllers
                     ViewData["Exception"] = e.Message;
                     //return View();
                 }
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
             }
             else
             {
@@ -145,6 +146,12 @@ namespace AdminSide.Controllers
             }
             //return View(competition);
             //return View(model);
+            //Testing create folder dynamically
+            foreach (var CategoryName in model.SelectedCategories)
+            {
+                CreateFolder(model.Competition.BucketName, CategoryName);
+            }
+            //Testing create folder dynamically
             return RedirectToAction("Index");
         }
 
@@ -170,6 +177,28 @@ namespace AdminSide.Controllers
             
             string generatedBucketName = competitionName + randNumbers;
             return generatedBucketName;
+        }
+
+        private void CreateFolder(string bucketName, string folderName)
+        {
+            //string bucketName;
+            /*string keyName= folderName + "/";
+            string filePath=null;
+            var fileTransferUtility = new TransferUtility(S3Client);
+            await fileTransferUtility.UploadAsync(filePath, bucketName, keyName);
+            Console.WriteLine("Upload 2 completed");*/
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest
+            {
+
+                BucketName = bucketName,
+                //StorageClass = S3StorageClass.Standard,
+                //ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256,
+                //CannedACL = S3CannedACL.Private,
+                Key = folderName + "/",
+                //ContentBody = awsFolderName
+            };
+            S3Client.PutObjectAsync(putObjectRequest);
         }
 
         // GET: Competitions/Edit/5
