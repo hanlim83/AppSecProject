@@ -16,3 +16,6 @@ function deleteSubnetInput(ID) {
     $('#subnetDeletionInput').val(ID);
     $('#deleteSubnet').modal()
 }
+function modifyServerInput(ID) {
+    $('#modifyServerInput').val(ID);
+}

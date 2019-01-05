@@ -1,61 +1,52 @@
-﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Subnet>
+﻿@model AdminSide.Areas.PlatformManagement.Models.Server
 
 @{
-    ViewData["Title"] = "Create Server - Specify Settings";
+    ViewData["Title"] = "Modify Server";
 }
-
-<ul class="progress-tracker progress-tracker--text progress-tracker--center">
-    <li class="progress-step is-complete">
-        <span class="progress-marker"></span>
-        <span class="progress-text">
-            <h4 class="progress-title">Step 1</h4>
-            Choose Server Template
-        </span>
-    </li>
-    <li class="progress-step is-active">
-        <span class="progress-marker"></span>
-        <span class="progress-text">
-            <h4 class="progress-title">Step 2</h4>
-            Specify Server Settings
-        </span>
-    </li>
-    <li class="progress-step">
-        <span class="progress-marker"></span>
-        <span class="progress-text">
-            <h4 class="progress-title">Step 3</h4>
-            Verify Settings
-        </span>
-    </li>
-    <li class="progress-step">
-        <span class="progress-marker"></span>
-        <span class="progress-text">
-            <h4 class="progress-title">Step 4</h4>
-            Launch Server
-        </span>
-    </li>
-</ul>
-<div class="alert alert-warning" role="alert">
-    Do not refresh this page or you will restart at step 1
-</div>
-<form asp-action="VerifySettings" method="post" class="needs-validation" novalidate>
+<h2>Modify</h2>
+<h4>Subnet</h4>
+<hr />
+@if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])))
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewData["Exception"]
+    </div>
+}
+<form asp-action="Modification" method="post" class="needs-validation" novalidate>
     <div class="row">
         <div class="col-lg-6 border-right">
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
-                <input type="text" class="form-control" id="ServerName" name="ServerName" required>
+                <input type="text" class="form-control" id="ServerName" name="ServerName" value="@Model.Name" required>
                 <div class="invalid-feedback">A server needs a name</div>
+            </div>
+            <input type="hidden" name="ID" value="@Model.ID"/>
+            <div class="form-group">
+                <label for="OperatingSystem">Operating System:</label>
+                <input type="text" disabled class="form-control-plaintext" id="OperatingSystem" name="OperatingSystem" value="@Html.ValueForModel(Model.OperatingSystem)" />
             </div>
             <div class="form-group">
                 <label for="ServerWorkload">Server Workload</label>
                 <select class="form-control" id="ServerWorkload" name="ServerWorkload" required>
+                    @if (Model.Workload == Workload.Low)
+                    {
+                        <option value="Low" selected>Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Large">Large</option>
+                    }
+                    @if (Model.Workload == Workload.Medium)
+                    {
+                        <option value="Low">Low</option>
+                        <option value="Medium" selected>Medium</option>
+                        <option value="Large">Large</option>
+                    }
                     <option value="Low">Low</option>
                     <option value="Medium">Medium</option>
                     <option value="Large">Large</option>
                 </select>
                 <div class="invalid-feedback">Server's Workload must be selected</div>
             </div>
-            <input type="hidden" name="selectedTemplate" value="@TempData["selectedTemplate"]" />
             <div class="form-group">
                 <label for="ServerStorage">Server Assigned Storage:</label>
                 <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" min="8" max="1000" placeholder="Size in Gigabytes" required>
@@ -81,14 +72,8 @@
         <div class="col-lg-6 border-left">
             <h3>Network Settings</h3>
             <div class="form-group">
-                <label for="Subnet">Server Subnet: </label>
-                <select class="form-control" id="Subnet" name="ServerSubnet" required>
-                    @foreach (var subnet in Model)
-                    {
-                        <option aria-type="@subnet.Type" value="@subnet.ID">@subnet.Name (@subnet.IPv4CIDR / @subnet.IPv6CIDR)</option>
-                    }
-                </select>
-                <div class="invalid-feedback">Please select a subnet</div>
+                <label for="ServerSubnet">Server Subnet: </label>
+                <input type="text" disabled class="form-control-plaintext" id="ServerSubnet" name="SubnetCIDR" value="@Html.ValueForModel(Model.LinkedSubnet.Name) (@Html.ValueForModel(Model.LinkedSubnet.IPv4CIDR) / @Html.ValueForModel(Model.LinkedSubnet.IPv6CIDR))" />
             </div>
             <div class="form-group">
                 <p class="form-text">Server Firewall Rules</p>
@@ -103,14 +88,20 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="4">You can whitelist ports when the server has been launched</td>
-                        </tr>
-                        <tr>
                             <td>Incoming and Outgoing Traffic</td>
                             <td>IMPLICT-DENY</td>
                             <td>TCP and UDP</td>
                             <td>All Ports not listed below</td>
                         </tr>
+                        @foreach (var rule in Model.FirewallRules)
+                        {
+                            <tr>
+                                <td>@Html.DisplayFor(modelItem => rule.Direction)</td>
+                                <td>@Html.DisplayFor(modelItem => rule.Type)</td>
+                                <td>@Html.DisplayFor(modelItem => rule.Protocol)</td>
+                                <td>@Html.DisplayFor(modelItem => rule.Port)</td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>
@@ -118,8 +109,8 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
-            <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back and select a new template</button>
-            <button type="submit" class="btn btn-primary float-right">Continue</button>
+            <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back</button>
+            <button type="submit" class="btn btn-primary float-right">Save Changes</button>
         </div>
     </div>
 </form>
@@ -133,11 +124,11 @@
                 </button>
             </div>
             <div class="modal-body">
-                Are you sure that you want to go back to select a new template? All current entries will be lost!
+                Are you sure that you want to go back? All current entries will be lost!
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                <a asp-area="PlatformManagement" asp-controller="ChallengeServers" asp-action="SelectTemplate" class="btn btn-primary">Yes</a>
+                <a asp-area="PlatformManagement" asp-controller="ChallengeServers" asp-action="" class="btn btn-primary">Yes</a>
             </div>
         </div>
     </div>

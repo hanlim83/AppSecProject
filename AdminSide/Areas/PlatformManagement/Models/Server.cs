@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Models
 {
@@ -14,6 +12,16 @@ namespace AdminSide.Areas.PlatformManagement.Models
     public enum State
     {
         Starting,Running,Stopping,Stopped
+    }
+
+    public enum Workload
+    {
+        Low,Medium,Large
+    }
+
+    public enum Tenancy
+    {
+        Shared,DedicatedInstance,DedicatedHardware
     }
 
     public class Server
@@ -40,6 +48,8 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public State State { get; set; }
         public string AWSEC2Reference { get; set; }
         public string AWSSecurityGroupReference { get; set; }
+        public Workload Workload { get; set; }
+        public Tenancy Tenancy { get; set; }
 
         public int SubnetID { get; set; }
         public Subnet LinkedSubnet { get; set; }

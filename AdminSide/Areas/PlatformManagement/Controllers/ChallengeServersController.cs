@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AdminSide.Areas.PlatformManagement.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
 using System.Net;
 using State = AdminSide.Areas.PlatformManagement.Models.State;
+using Tenancy = AdminSide.Areas.PlatformManagement.Models.Tenancy;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -244,14 +244,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     request.Placement = new Placement
                     {
-                        Tenancy = Tenancy.Dedicated
+                        Tenancy = Amazon.EC2.Tenancy.Dedicated
                     };
                 }
                 else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
                 {
                     request.Placement = new Placement
                     {
-                        Tenancy = Tenancy.Host
+                        Tenancy = Amazon.EC2.Tenancy.Host
                     };
                 }
             }
@@ -262,14 +262,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     request.Placement = new Placement
                     {
-                        Tenancy = Tenancy.Dedicated
+                        Tenancy = Amazon.EC2.Tenancy.Dedicated
                     };
                 }
                 else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
                 {
                     request.Placement = new Placement
                     {
-                        Tenancy = Tenancy.Host
+                        Tenancy = Amazon.EC2.Tenancy.Host
                     };
                 }
             }
@@ -280,14 +280,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     request.Placement = new Placement
                     {
-                        Tenancy = Tenancy.Dedicated
+                        Tenancy = Amazon.EC2.Tenancy.Dedicated
                     };
                 }
                 else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
                 {
                     request.Placement = new Placement
                     {
-                        Tenancy = Tenancy.Host
+                        Tenancy = Amazon.EC2.Tenancy.Host
                     };
                 }
             }
@@ -307,6 +307,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         LinkedSubnet = selectedS,
                         SubnetID = selectedS.ID
                     };
+                    if (Model2.ServerWorkload.Equals("Low"))
+                        newlyCreated.Workload = Workload.Low;
+                    else if (Model2.ServerWorkload.Equals("Medium"))
+                        newlyCreated.Workload = Workload.Medium;
+                    else if (Model2.ServerWorkload.Equals("Large"))
+                        newlyCreated.Workload = Workload.Large;
                     if (selectedS.Type == SubnetType.Internet)
                     {
                         newlyCreated.IPAddress = response.Reservation.Instances[0].PublicIpAddress;
@@ -326,6 +332,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         newlyCreated.State = State.Starting;
                     else if (response.Reservation.Instances[0].State.Code == 16)
                         newlyCreated.State = State.Running;
+                    if (Model2.ServerTenancy.Equals("Shared"))
+                        newlyCreated.Tenancy = Tenancy.Shared;
+                    else if (Model2.ServerTenancy.Equals("Dedicated Instance"))
+                        newlyCreated.Tenancy = Tenancy.DedicatedInstance;
+                    else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
+                        newlyCreated.Tenancy = Tenancy.DedicatedHardware;
                     _context.Servers.Add(newlyCreated);
                     _context.SaveChanges();
                     ViewData["ServerName"] = newlyCreated.Name;
@@ -382,6 +394,166 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else
                 return NotFound();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ModifyServer(String serverID)
+        {
+            Server selected = await _context.Servers.FindAsync(Int32.Parse(serverID));
+            StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+            {
+                InstanceIds = new List<string> {
+                    selected.AWSEC2Reference
+            }
+            });
+            if (response.HttpStatusCode == HttpStatusCode.OK)
+                return View(selected);
+            else
+                return StatusCode(500);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Modification([Bind("ID,ServerName,ServerWorkload,ServerStorage,ServerTenancy")] ChallengeServersModificationFormModel Modified)
+        {
+            Server retrieved = await _context.Servers.FindAsync(Int32.Parse(Modified.ID));
+            if (retrieved == null)
+            {
+                return RedirectToAction("");
+            }
+            else
+            {
+                if (!retrieved.Name.Equals(Modified.ServerName))
+                {
+                    retrieved.Name = Modified.ServerName;
+                }
+                DescribeInstanceAttributeResponse Aresponse = await EC2Client.DescribeInstanceAttributeAsync(new DescribeInstanceAttributeRequest
+                {
+                    Attribute = InstanceAttributeName.BlockDeviceMapping,
+                    InstanceId = retrieved.AWSEC2Reference
+                });
+                ModifyInstanceAttributeRequest Irequest = new ModifyInstanceAttributeRequest
+                {
+                    InstanceId = retrieved.AWSEC2Reference
+                };
+                ModifyVolumeRequest Vrequest = new ModifyVolumeRequest
+                {
+                    VolumeId = Aresponse.InstanceAttribute.BlockDeviceMappings[0].Ebs.VolumeId
+                };
+                ModifyInstancePlacementRequest Prequest = new ModifyInstancePlacementRequest
+                {
+                    InstanceId = retrieved.AWSEC2Reference
+                };
+                if (Modified.ServerWorkload.Equals("Low") && retrieved.Workload != Workload.Low)
+                {
+                    Irequest.InstanceType = "t2.micro";
+                    retrieved.Workload = Workload.Low;
+                }
+                else if (Modified.ServerWorkload.Equals("Medium") && retrieved.Workload != Workload.Medium)
+                {
+                    Irequest.InstanceType = "t2.medium";
+                    retrieved.Workload = Workload.Medium;
+                }
+                else if (Modified.ServerWorkload.Equals("Large") && retrieved.Workload != Workload.Large)
+                {
+                    Irequest.InstanceType = "t2.xlarge";
+                    retrieved.Workload = Workload.Large;
+                }
+                if (retrieved.StorageAssigned != Modified.ServerStorage && Modified.ServerStorage > retrieved.StorageAssigned)
+                {
+                    Vrequest.Size = Modified.ServerStorage;
+                    retrieved.StorageAssigned = Modified.ServerStorage;
+                }
+                else
+                {
+
+                }
+                Tenancy previous = retrieved.Tenancy;
+                if (Modified.ServerTenancy.Equals("Dedicated Instance") && retrieved.Tenancy != Tenancy.DedicatedInstance)
+                {
+                    Prequest.Tenancy = HostTenancy.Dedicated;
+                    retrieved.Tenancy = Tenancy.DedicatedInstance;
+                }
+                else if (Modified.ServerTenancy.Equals("Dedicated Hardware") && retrieved.Tenancy != Tenancy.DedicatedHardware)
+                {
+                    Prequest.Tenancy = HostTenancy.Host;
+                    retrieved.Tenancy = Tenancy.DedicatedHardware;
+                }
+                else
+                {
+
+                }
+                if (Irequest.InstanceType != null)
+                {
+                    try
+                    {
+                        ModifyInstanceAttributeResponse response = await EC2Client.ModifyInstanceAttributeAsync(Irequest);
+                    }
+                    catch (AmazonEC2Exception e)
+                    {
+                        return RedirectToAction("");
+                    }
+                }
+                if (Vrequest.Size != 0)
+                {
+                    try
+                    {
+                        ModifyVolumeResponse response = await EC2Client.ModifyVolumeAsync(Vrequest);
+                    }
+                    catch (AmazonEC2Exception e)
+                    {
+                        return RedirectToAction("");
+                    }
+                }
+                try
+                {
+                    _context.Servers.Update(retrieved);
+                    await _context.SaveChangesAsync();
+                    if (Prequest.Tenancy != null)
+                    {
+                        ModifyInstancePlacementResponse response = await EC2Client.ModifyInstancePlacementAsync(Prequest);
+                    }
+                    return RedirectToAction("");
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    retrieved = await _context.Servers.FindAsync(Int32.Parse(Modified.ID));
+                    if (Irequest.InstanceType != null)
+                    {
+                        if (Modified.ServerWorkload.Equals("Low"))
+                        {
+                            Irequest.InstanceType = "t2.micro";
+                            retrieved.Workload = Workload.Low;
+                        }
+                        else if (Modified.ServerWorkload.Equals("Medium"))
+                        {
+                            Irequest.InstanceType = "t2.medium";
+                            retrieved.Workload = Workload.Medium;
+                        }
+                        else if (Modified.ServerWorkload.Equals("Large"))
+                        {
+                            Irequest.InstanceType = "t2.xlarge";
+                            retrieved.Workload = Workload.Large;
+                        }
+                        ModifyInstanceAttributeResponse response = await EC2Client.ModifyInstanceAttributeAsync(Irequest);
+                    }
+                    if (Vrequest.Size != 0)
+                    {
+                        Vrequest.Size = retrieved.StorageAssigned;
+                        ModifyVolumeResponse response = await EC2Client.ModifyVolumeAsync(Vrequest);
+                    }
+                    return RedirectToAction("");
+                }
+                catch (AmazonEC2Exception e)
+                {
+                    retrieved = await _context.Servers.FindAsync(Int32.Parse(Modified.ID));
+                    retrieved.Tenancy = previous;
+                    _context.Servers.Update(retrieved);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("");
+                }
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
