@@ -1,0 +1,33 @@
+﻿@model AdminSide.Models.CategoriesViewModelIEnumerable
+@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+<!--To change this to better UI-->
+<!--Maybe button to add new field-->
+<div class="form-group">
+    <!--<label asp-for="Categories" class="control-label"></label>-->
+    <!--<input asp-for="CategoryName" class="form-control" />-->
+    <p id="categories"></p>
+    <!--Testing dropdown, to add dynamic database retrieval support for default/base categories-->
+    <!--<select multiple class="form-control" id="category" asp-for="Categories" name="category" onChange="OnChange()">
+        <option value="volvo">Volvo</option>
+        <option value="saab">Saab</option>
+        <option value="fiat">Fiat</option>
+        <option value="audi">Audi</option>
+    </select>-->
+    <select asp-for="SelectedCategories" asp-items="Model.CategoriesList"></select>
+    <button type="button" class="btn btn-default">New Category</button>
+    <!--<span asp-validation-for="Categories" class="text-danger"></span>-->
+</div>
+
+<script>
+    function OnChange(){
+        //var value = document.getElementById("category").value;
+        var value = $('#category').val();
+        console.log(value);
+        for (var i = 0; i < value.length; i++) {
+            document.getElementById("categories").innerHTML = value;
+        }
+    }
+</script>

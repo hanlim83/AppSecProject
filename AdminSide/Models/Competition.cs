@@ -14,11 +14,20 @@ namespace AdminSide.Models
 
     public class Competition
     {
+        [Key]
         public int ID { get; set; }
+        [Required]
         [Display(Name = "Competition Name")]
         public string CompetitionName { get; set; }
+        [Required]
         public string Status { get; set; }
+        //May change BucketName to be dynamic next time
+        //To automate bucket naming creation
+        [Required]
+        [Display(Name = "Bucket Name")]
+        public string BucketName { get; set; }
 
-        public ICollection<Competition> Competitions { get; set; }
+        public ICollection<CompetitionCategory> CompetitionCategories { get; set; }
+        public ICollection<Challenge> Challenges { get; set; }
     }
 }

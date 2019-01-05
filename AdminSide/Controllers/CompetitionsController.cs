@@ -7,16 +7,23 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AdminSide.Data;
 using AdminSide.Models;
+using Amazon.S3.Model;
+using Amazon.S3;
+using System.Net;
+using System.Collections.ObjectModel;
 
 namespace AdminSide.Controllers
 {
     public class CompetitionsController : Controller
     {
+        IAmazonS3 S3Client { get; set; }
+
         private readonly CompetitionContext _context;
 
-        public CompetitionsController(CompetitionContext context)
+        public CompetitionsController(CompetitionContext context, IAmazonS3 s3Client)
         {
             _context = context;
+            this.S3Client = s3Client;
         }
 
         // GET: Competitions
@@ -28,12 +35,17 @@ namespace AdminSide.Controllers
         // GET: Competitions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
+            ViewData["NavigationShowAll"] = true;
+            //Testing for dynamic navbar
+            ViewData["routeID"] = id;
             if (id == null)
             {
                 return NotFound();
             }
 
             var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
             {
@@ -46,7 +58,13 @@ namespace AdminSide.Controllers
         // GET: Competitions/Create
         public IActionResult Create()
         {
-            return View();
+            var vm = new CategoriesViewModelIEnumerable();
+            //vm.PopulateCategoriesList();
+            foreach (var categoryDefault in _context.CategoryDefault)
+            {
+                vm.CategoriesList.Add(new SelectListItem { Value = categoryDefault.CategoryName, Text = categoryDefault.CategoryName });
+            }
+            return View(vm);
         }
 
         // POST: Competitions/Create
@@ -54,15 +72,74 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,CompetitionName,Status")] Competition competition)
+        //public async Task<IActionResult> Create([Bind("ID,CompetitionName,Status,BucketName")] Competition competition, [Bind("CategoryName")] CompetitionCategory competitionCategory, string[] SelectedCategories)
+        public async Task<IActionResult> Create(CategoriesViewModelIEnumerable model)
+        //public async Task<IActionResult> Create(string[] CategoriesList)
         {
+            /*foreach (var CategoryName in model.SelectedCategories)
+            {
+                Console.WriteLine(CategoryName);
+            }*/
+            //Console.WriteLine(model.competition.BucketName);
+            //Tested and working^
+            //Console.WriteLine(model.SelectedCategories.ElementAt(0));
+            //Console.WriteLine(competitionCategory.Categories.ElementAt(0).CategoryName);
             if (ModelState.IsValid)
             {
-                _context.Add(competition);
+                //_context.Add(model.competition);
+                //await _context.SaveChangesAsync();
+                //var competitionID = model.competition.ID;
+
+                //CompetitionCategory competitionCategory = new CompetitionCategory();
+                model.Competition.CompetitionCategories = new Collection<CompetitionCategory>();
+                foreach (var CategoryName in model.SelectedCategories)
+                {
+                    //model.competitionCategory = _context.CompetitionCategories.Find("CompetitionID");
+                    //model.competitionCategory.CompetitionID = model.competition.ID;
+                    //model.competitionCategory.CategoryName = CategoryName;
+
+                    //competitionCategory.CategoryName = CategoryName;
+                    //competitionCategory.CompetitionID = model.competition.ID;
+                    
+                    //CompetitionCategoriesTempList.Add
+
+                    model.Competition.CompetitionCategories.Add(new CompetitionCategory { CompetitionID=model.Competition.ID, CategoryName=CategoryName});
+                    
+                    //competitionCategory.competitionID = _context.Competitions.Find("ID");\
+                    //model.competition = new Competition();
+                    //model.competition.CompetitionCategories.Add(new CompetitionCategory { CompetitionID = model.competition.ID, CategoryName = CategoryName });
+                    //await _context.SaveChangesAsync();
+                }
+                _context.Add(model.Competition);
                 await _context.SaveChangesAsync();
+                try
+                {
+                    PutBucketResponse response = await S3Client.PutBucketAsync(model.Competition.BucketName);
+                    if (response.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        //return RedirectToAction("");
+                    }
+                    else
+                    {
+                        //return RedirectToAction("");
+                        //return RedirectToAction(nameof(Index));
+                    }
+
+                }
+                catch (AmazonS3Exception e)
+                {
+                    ViewData["Exception"] = e.Message;
+                    //return View();
+                }
                 return RedirectToAction(nameof(Index));
             }
-            return View(competition);
+            else
+            {
+
+            }
+            //return View(competition);
+            //return View(model);
+            return RedirectToAction("Index");
         }
 
         // GET: Competitions/Edit/5
@@ -124,8 +201,11 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
+            //Code testing for category deletion in progress here
             var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
                 .FirstOrDefaultAsync(m => m.ID == id);
+            //Code testing for category deletion in progress here
             if (competition == null)
             {
                 return NotFound();
