@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
+using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
+using State = AdminSide.Areas.PlatformManagement.Models.State;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
@@ -188,27 +190,40 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     {
                         foreach (var instance in reservation.Instances)
                         {
+                            bool Flag = false;
                             if (server.AWSEC2Reference.Equals(instance.InstanceId))
                             {
-                                if (instance.State.Code == 0)
+                                if (instance.State.Code == 0 && server.State != State.Starting)
+                                {
                                     server.State = State.Starting;
-                                else if (instance.State.Code == 16)
+                                    Flag = true;
+                                } else if (instance.State.Code == 16 && server.State != State.Running)
+                                {
                                     server.State = State.Running;
-                                else if (instance.State.Code == 64)
+                                    Flag = true;
+                                } else if (instance.State.Code == 64 && server.State != State.Stopping)
+                                {
                                     server.State = State.Stopping;
-                                else if (instance.State.Code == 80)
+                                    Flag = true;
+                                } else if (instance.State.Code == 80 && server.State != State.Stopped)
+                                {
                                     server.State = State.Stopped;
-                                if (server.Visibility == Visibility.Internet)
+                                    Flag = true;
+                                }
+                                if (server.Visibility == Visibility.Internet && (server.IPAddress != instance.PublicIpAddress || server.DNSHostname != instance.PublicDnsName))
                                 {
                                     server.IPAddress = instance.PublicIpAddress;
                                     server.DNSHostname = instance.PublicDnsName;
+                                    Flag = true;
                                 }
-                                else
+                                else if ((server.Visibility == Visibility.Extranet || server.Visibility == Visibility.Intranet) && (server.IPAddress != instance.PrivateIpAddress || server.DNSHostname != instance.PrivateDnsName))
                                 {
                                     server.IPAddress = instance.PrivateIpAddress;
                                     server.DNSHostname = instance.PrivateDnsName;
+                                    Flag = true;
                                 }
-                                context.Servers.Update(server);
+                                if (Flag == true)
+                                    context.Servers.Update(server);
                                 break;
                             }
                         }
