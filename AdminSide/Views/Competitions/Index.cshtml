@@ -6,51 +6,49 @@
 
 <title>@ViewData["Title"] - Competition Home</title>
 
-<!--<h2>Competition Home</h2>
-
-<p>Hello from our Competition Admin Home page!</p>-->
-
 <br>
 <!--To remove header and make it more dynamic in the future-->
-<div class="float-right">
-    <a asp-action="Create"><button type="button" class="btn btn-danger">New CTF</button></a>
-</div>
-<br>
-<br>
-<div>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.CompetitionName)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.Status)
-                </th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+<div class="col-md-8 offset-2">
+    <div class="float-right">
+        <a asp-action="Create"><button type="button" class="btn btn-danger">New CTF</button></a>
+    </div>
+    <br>
+    <br>
+    <div>
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CompetitionName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                    <td>
-                        <!--<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
-                        <a asp-action="Details" asp-route-id="@item.ID"><button type="button" class="btn btn-default">View Details</button></a>
-                        <!--To shift 2 buttons below inside Details page next time-->
-                        <a asp-action="Edit" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Edit</button></a>
-                        <a asp-action="Delete" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Delete</button></a>
-                    </td>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CompetitionName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th></th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CompetitionName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            <!--<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
+                            <a asp-action="Details" asp-route-id="@item.ID"><button type="button" class="btn btn-default">View Details</button></a>
+                            <!--To shift 2 buttons below inside Details page next time-->
+                            <a asp-action="Edit" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Edit</button></a>
+                            <a asp-action="Delete" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Delete</button></a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
