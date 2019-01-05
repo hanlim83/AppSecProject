@@ -30,6 +30,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index()
         {
+            /*
             if (!_context.Subnets.Any())
             {
                 DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
@@ -166,8 +167,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else
             {
+            */
                 return View(await _context.Subnets.ToListAsync());
-            }
+            //}
         }
 
         [HttpPost]

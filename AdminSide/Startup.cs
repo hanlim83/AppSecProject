@@ -25,6 +25,7 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticBeanstalk;
 using AdminSide.Areas.PlatformManagement.Data;
 using Amazon.SimpleSystemsManagement;
+using AdminSide.Areas.PlatformManagement.Models;
 
 namespace AdminSide
 {
@@ -168,6 +169,10 @@ namespace AdminSide
             services.AddAWSService<IAmazonElasticBeanstalk>();
             //SSM Initialization
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
+
+            //Background Processing
+            services.AddHostedService<ConsumeScopedServiceHostedService>();
+            services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -11,6 +11,11 @@ namespace AdminSide.Areas.PlatformManagement.Models
         Internet, Extranet, Intranet
     }
 
+    public enum State
+    {
+        Starting,Running,Stopping,Stopped
+    }
+
     public class Server
     {
         public int ID { get; set; }
@@ -32,7 +37,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [Display(Name = "Server Storage Space")]
         public int StorageAssigned { get; set; }
         [Display(Name = "Server State")]
-        public int State { get; set; }
+        public State State { get; set; }
         public string AWSEC2Reference { get; set; }
         public string AWSSecurityGroupReference { get; set; }
 

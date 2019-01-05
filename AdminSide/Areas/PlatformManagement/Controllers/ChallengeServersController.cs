@@ -12,6 +12,7 @@ using ASPJ_MVC.Models;
 using Microsoft.EntityFrameworkCore;
 using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
 using System.Net;
+using State = AdminSide.Areas.PlatformManagement.Models.State;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -57,6 +58,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SpecifySettings(String selectedTemplate)
         {
+            /*
             if (!_context.Subnets.Any())
             {
                 DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
@@ -187,7 +189,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
                 _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
                 _context.Database.CloseConnection();
-            }
+            } */
             if (selectedTemplate != null)
             {
                 TempData["selectedTemplate"] = selectedTemplate;
@@ -320,6 +322,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         else
                             newlyCreated.Visibility = Visibility.Intranet;
                     }
+                    if (response.Reservation.Instances[0].State.Code == 0)
+                        newlyCreated.State = State.Starting;
+                    else if (response.Reservation.Instances[0].State.Code == 16)
+                        newlyCreated.State = State.Running;
                     _context.Servers.Add(newlyCreated);
                     _context.SaveChanges();
                     ViewData["ServerName"] = newlyCreated.Name;
@@ -361,12 +367,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         _context.SaveChanges();
                         ViewData["Result"] = "Successfully Deleted!";
                         return RedirectToAction("");
-                    } else
+                    }
+                    else
                     {
                         ViewData["Result"] = "Deletion Failed!";
                         return RedirectToAction("");
                     }
-                } catch (AmazonEC2Exception e)
+                }
+                catch (AmazonEC2Exception e)
                 {
                     ViewData["Result"] = e.Message;
                     return RedirectToAction("");
