@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using System;
 
-namespace AdminSide.Areas.PlatformManagement.Models
+namespace AdminSide.Areas.PlatformManagement.Services
 {
     internal interface IScopedProcessingService
     {
