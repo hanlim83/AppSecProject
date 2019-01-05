@@ -45,6 +45,7 @@ However, it is gaining more popularity in recent years, and we hope to make it e
 - Popper (Local JS when in Development, CDN when in Production)
 - Google Material Icons (CDN regardless of Development or Production)
 - TurboLinksJS (Local JS when in Development, CDN when in Production)
+- Progress Tracker (Local regardless of Development or Production)
 
 ## Tools Used
 - Visual Studio 2017
