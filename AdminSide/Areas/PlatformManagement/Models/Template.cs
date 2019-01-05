@@ -27,5 +27,9 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [Display(Name = "Operating System")]
         public string OperatingSystem { get; set; }
         public string AWSAMIReference { get; set; }
+        [Display(Name = "Template Description")]
+        public string TemplateDescription { get; set; }
+        public bool SpecificMinimumSize { get; set; }
+        public int MinimumStorage { get; set; }
     }
 }

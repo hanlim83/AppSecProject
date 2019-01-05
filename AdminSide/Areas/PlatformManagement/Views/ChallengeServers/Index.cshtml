@@ -52,18 +52,23 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="btn-group float-right">
-                                            <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            <button type="button" class="btn btn-secondary"></button>
+                                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                 Options
                                             </button>
                                             <div class="dropdown-menu dropdown-menu-right">
                                                 <button class="dropdown-item" type="button">Modify Server Settings</button>
                                                 <button class="dropdown-item" type="button">Use as Template</button>
-                                                <button class="dropdown-item" type="button">Delete Server</button>
+                                                <form asp-action="DeleteServer" method="post">
+                                                    <input type="hidden" name="serverID" value="@server.ID"/>
+                                                    <button class="dropdown-item" type="submit">Delete Server</button>
+                                                </form>
+
                                             </div>
                                         </div>
                                         <div class="float-left" style="display: inline-block; width: 150px; height: 150px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url('http://placehold.it/200x200');">
                                         </div>
-                                        <h5 class="card-title" style="position: relative; left: 10px;">Hello</h5>
+                                        <h5 class="card-title" style="position: relative; left: 10px;">@server.Name</h5>
                                         <p class="card-text" style="position: relative; left: 10px;">Server Visibililty:</p>
                                         <p class="card-text" style="position: relative; left: 10px;">Server IP Address:</p>
                                         <p class="card-text" style="position: relative; left: 10px;">Operating System:</p>

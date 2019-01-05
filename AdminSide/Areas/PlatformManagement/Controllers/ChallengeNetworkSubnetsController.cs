@@ -20,7 +20,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
     {
         private readonly PlatformResourcesContext _context;
 
-        IAmazonEC2 EC2Client { get; set; }
+        private IAmazonEC2 EC2Client { get; set; }
 
         public ChallengeNetworkSubnetsController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
         {

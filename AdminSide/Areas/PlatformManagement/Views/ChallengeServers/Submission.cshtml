@@ -1,4 +1,4 @@
-﻿@model AdminSide.Areas.PlatformManagement.Models.ChallengeServersCreationFormModel
+﻿@model Amazon.EC2.Model.Instance
 
 @{
     ViewData["Title"] = "Create Server - Verify Settings";
@@ -34,6 +34,32 @@
         </span>
     </li>
 </ul>
-<div class="alert alert-danger" role="alert">
-    @ViewData["Exception"]
-</div>
+@if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])))
+{
+    <div class="alert alert-danger" role="alert">
+        @ViewData["Exception"]
+    </div>
+}
+@if (String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])) && Model != null)
+{
+    <div class="alert alert-success" role="alert">
+        Server Successfully Launched!
+    </div>
+    <div class="card" style="margin: auto;">
+        <div class="card-header">
+            @ViewData["ServerName"]
+        </div>
+        <div class="card-body">
+            <h5 class="card-title">Brief Details</h5>
+            <p class="card-text">Current State: @Model.State.Name (@Model.StateReason.Message)</p>
+            <p class="card-text">Private IP (Accesible Only within Challenge Network): @Model.PrivateIpAddress</p>
+            <p class="card-text">Private DNS Name (Accesible Only within Challenge Network): @Model.PrivateDnsName</p>
+            @if (!String.IsNullOrEmpty(Model.PublicIpAddress) && !String.IsNullOrEmpty(Model.PublicDnsName))
+            {
+                <p class="card-text">Private IP (Accesible Only within Challenge Network): @Model.PublicIpAddress</p>
+                <p class="card-text">Private DNS Name (Accesible Only within Challenge Network): @Model.PublicDnsName</p>
+            }
+            <a asp-action="" class="btn btn-primary">Done</a>
+        </div>
+    </div>
+}

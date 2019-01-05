@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AdminSide.Data
 {
-    public class DbInitializer
+    public class DbInitializer2
     {
 
         public static void InitializePlatformResources(PlatformResourcesContext context)
@@ -286,7 +286,7 @@ namespace AdminSide.Data
             }
         }
 
-        public static void InitializeCompetitions (CompetitionContext context)
+        public static void InitializeCompeitions (CompetitionContext context)
         {
             context.Database.EnsureCreated();
 
@@ -297,54 +297,12 @@ namespace AdminSide.Data
 
             var competition = new Competition[]
             {
-            new Competition{CompetitionName="NYP Global CTF", Status="Active", BucketName="NYP Global CTF"}
+            new Competition{ID=1, CompetitionName="NYP Global CTF", Status="Active"}
             };
 
             foreach (Competition c in competition)
             {
                 context.Competitions.Add(c);
-            }
-            context.SaveChanges();
-
-            var competitionCategory = new CompetitionCategory[]
-            {
-            new CompetitionCategory{ CategoryName="Web", CompetitionID=1 },
-            new CompetitionCategory{ CategoryName="Crypto", CompetitionID=1 },
-            new CompetitionCategory{ CategoryName="Forensics", CompetitionID=1 },
-            new CompetitionCategory{ CategoryName="Misc", CompetitionID=1 }
-            };
-
-            foreach (CompetitionCategory cc in competitionCategory)
-            {
-                context.CompetitionCategories.Add(cc);
-            }
-            context.SaveChanges();
-
-            var categoryDefault = new CategoryDefault[]
-            {
-            new CategoryDefault{ CategoryName="Web" },
-            new CategoryDefault{ CategoryName="Crypto" },
-            new CategoryDefault{ CategoryName="Forensics" },
-            new CategoryDefault{ CategoryName="Misc" }
-            };
-
-            foreach (CategoryDefault cd in categoryDefault)
-            {
-                context.CategoryDefault.Add(cd);
-            }
-            context.SaveChanges();
-
-            var challenges = new Challenge[]
-            {
-            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", CompetitionID=1, CompetitionCategoryID=1 },
-            };
-
-            foreach (Challenge ch in challenges)
-            {
-                context.Challenges.Add(ch);
             }
             context.SaveChanges();
         }

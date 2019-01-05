@@ -18,7 +18,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [StringLength(50, ErrorMessage = "A Server must have a name")]
         [Display(Name = "Server Name")]
         public string Name { get; set; }
-        public string Visibility { get; set; }
+        public Visibility Visibility { get; set; }
         [Display(Name = "Date Created")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
@@ -31,7 +31,10 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string DNSHostname { get; set; }
         [Display(Name = "Server Storage Space")]
         public int StorageAssigned { get; set; }
+        [Display(Name = "Server State")]
+        public int State { get; set; }
         public string AWSEC2Reference { get; set; }
+        public string AWSSecurityGroupReference { get; set; }
 
         public int SubnetID { get; set; }
         public Subnet LinkedSubnet { get; set; }
