@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using AdminSide.Areas.PlatformManagement.Data;
 using Amazon.EC2;
-using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
 using System.Diagnostics;
 
