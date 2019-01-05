@@ -23,7 +23,7 @@ namespace AdminSide.Models
         public string Status { get; set; }
         //May change BucketName to be dynamic next time
         //To automate bucket naming creation
-        [Required]
+        //[Required]
         [Display(Name = "Bucket Name")]
         public string BucketName { get; set; }
 

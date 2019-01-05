@@ -21,11 +21,11 @@
                 <input asp-for="Competition.Status" class="form-control" />
                 <span asp-validation-for="Competition.Status" class="text-danger"></span>
             </div>
-            <div class="form-group">
+            <!--<div class="form-group">
                 <label asp-for="Competition.BucketName" class="control-label"></label>
                 <input asp-for="Competition.BucketName" class="form-control" />
                 <span asp-validation-for="Competition.BucketName" class="text-danger"></span>
-            </div>
+            </div>-->
             <!--Add more fields below on adding different categories-->
             <label>Categories</label>
             <p id="categories"></p>
@@ -51,7 +51,7 @@
 }
 
 <script>
-    function OnChange(){
+    function OnChange() {
         //var value = document.getElementById("category").value;
         var value = $('#category').val();
         console.log(value);

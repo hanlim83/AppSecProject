@@ -84,6 +84,7 @@ namespace AdminSide.Controllers
             //Tested and working^
             //Console.WriteLine(model.SelectedCategories.ElementAt(0));
             //Console.WriteLine(competitionCategory.Categories.ElementAt(0).CategoryName);
+            
             if (ModelState.IsValid)
             {
                 //_context.Add(model.competition);
@@ -91,6 +92,10 @@ namespace AdminSide.Controllers
                 //var competitionID = model.competition.ID;
 
                 //CompetitionCategory competitionCategory = new CompetitionCategory();
+
+
+                //Generate bucketname programtically
+                model.Competition.BucketName = "testingbucketprogramticallyggggggggggggggggggggggggg";
                 model.Competition.CompetitionCategories = new Collection<CompetitionCategory>();
                 foreach (var CategoryName in model.SelectedCategories)
                 {
@@ -114,7 +119,7 @@ namespace AdminSide.Controllers
                 await _context.SaveChangesAsync();
                 try
                 {
-                    PutBucketResponse response = await S3Client.PutBucketAsync(model.Competition.BucketName);
+                    PutBucketResponse response = await S3Client.PutBucketAsync("testingbucketprogramticallyggggggggggggggggggggggggg");
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
                         //return RedirectToAction("");
