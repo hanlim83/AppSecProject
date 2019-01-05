@@ -24,6 +24,7 @@ namespace AdminSide.Models
         //May change BucketName to be dynamic next time
         //To automate bucket naming creation
         //[Required]
+        //Add regex here
         [Display(Name = "Bucket Name")]
         public string BucketName { get; set; }
 

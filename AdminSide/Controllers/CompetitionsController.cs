@@ -11,6 +11,7 @@ using Amazon.S3.Model;
 using Amazon.S3;
 using System.Net;
 using System.Collections.ObjectModel;
+using System.Security.Cryptography;
 
 namespace AdminSide.Controllers
 {
@@ -95,7 +96,7 @@ namespace AdminSide.Controllers
 
 
                 //Generate bucketname programtically
-                model.Competition.BucketName = "testingbucketprogramticallyggggggggggggggggggggggggg";
+                model.Competition.BucketName = GenerateBucketName(model.Competition.CompetitionName);
                 model.Competition.CompetitionCategories = new Collection<CompetitionCategory>();
                 foreach (var CategoryName in model.SelectedCategories)
                 {
@@ -119,7 +120,7 @@ namespace AdminSide.Controllers
                 await _context.SaveChangesAsync();
                 try
                 {
-                    PutBucketResponse response = await S3Client.PutBucketAsync("testingbucketprogramticallyggggggggggggggggggggggggg");
+                    PutBucketResponse response = await S3Client.PutBucketAsync(model.Competition.BucketName);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
                         //return RedirectToAction("");
@@ -145,6 +146,30 @@ namespace AdminSide.Controllers
             //return View(competition);
             //return View(model);
             return RedirectToAction("Index");
+        }
+
+        private string GenerateBucketName(string competitionName)
+        {
+            //Make bucket name conform to standards (All lower case & no space)
+            competitionName = competitionName.Replace(" ", string.Empty);
+            competitionName = competitionName.ToLower();
+            //Append 15 digit secure random numbers
+            //var randIntArray = new int[15];
+            string randNumbers = "";
+            //for (int i=0; i<15; i++)
+            //{
+                RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+                var byteArray = new byte[4];
+                provider.GetBytes(byteArray);
+
+                //convert 4 bytes to an integer
+                var randomInteger = BitConverter.ToUInt32(byteArray, 0);
+                //randIntArray[i] = randomInteger;
+                randNumbers = randNumbers + randomInteger;
+            //}
+            
+            string generatedBucketName = competitionName + randNumbers;
+            return generatedBucketName;
         }
 
         // GET: Competitions/Edit/5
