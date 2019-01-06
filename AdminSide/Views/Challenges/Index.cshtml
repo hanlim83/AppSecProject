@@ -5,9 +5,13 @@
 }
 
 <br>
+<!--To remove header and make it more dynamic in the future-->
 <div class="col-md-8 offset-2">
-    <h4>Competition</h4>
-    <hr>
+    <div class="float-right">
+        <a asp-action="Create"><button type="button" class="btn btn-danger">New Challenge</button></a>
+    </div>
+    <br>
+    <br>
     @foreach (var item in Model.CompetitionCategories)
     {
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
@@ -28,28 +32,8 @@
                         </a>
                     }
                 }
-
-                <!--<button type="button" class="btn btn-light">
-                    Challenge 2
-                    <br>
-                    50
-                </button>
-                <button type="button" class="btn btn-light">
-                    Challenge 3
-                    <br>
-                    100
-                </button>
-                <button type="button" class="btn btn-light">
-                    Challenge 4
-                    <br>
-                    150
-                </button>
-                <button type="button" class="btn btn-light">
-                    Challenge 5
-                    <br>
-                    200
-                </button>-->
             </div>
         </row>
     }
+    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Back to Competition Details</button></a>
 </div>

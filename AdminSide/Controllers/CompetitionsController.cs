@@ -12,7 +12,6 @@ using Amazon.S3;
 using System.Net;
 using System.Collections.ObjectModel;
 using System.Security.Cryptography;
-using Amazon.S3.Transfer;
 
 namespace AdminSide.Controllers
 {
