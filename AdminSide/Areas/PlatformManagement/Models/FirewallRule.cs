@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace AdminSide.Areas.PlatformManagement.Models
+﻿namespace AdminSide.Areas.PlatformManagement.Models
 {
     public enum Type
     {
@@ -15,16 +10,20 @@ namespace AdminSide.Areas.PlatformManagement.Models
         TCP,UDP
     }
 
+    public enum Direction
+    {
+        Incoming,Outgoing,Both
+    }
 
     public class FirewallRule
     {
         public int ID { get; set; }
 
-        public Type Type;
-        public Protocol Protocol;
-        public int Port;
-
+        public Type Type { get; set; }
+        public Protocol Protocol { get; set; }
+        public int Port { get; set; }
+        public Direction Direction { get; set; }
         public int ServerID { get; set; }
-        public Server LinkedServer;
+        public Server LinkedServer { get; set; }
     }
 }

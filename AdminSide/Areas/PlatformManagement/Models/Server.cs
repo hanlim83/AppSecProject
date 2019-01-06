@@ -1,14 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Models
 {
     public enum Visibility
     {
         Internet, Extranet, Intranet
+    }
+
+    public enum State
+    {
+        Starting,Running,Stopping,Stopped
+    }
+
+    public enum Workload
+    {
+        Low,Medium,Large
+    }
+
+    public enum Tenancy
+    {
+        Shared,DedicatedInstance,DedicatedHardware
     }
 
     public class Server
@@ -18,7 +31,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [StringLength(50, ErrorMessage = "A Server must have a name")]
         [Display(Name = "Server Name")]
         public string Name { get; set; }
-        public string Visibility { get; set; }
+        public Visibility Visibility { get; set; }
         [Display(Name = "Date Created")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
@@ -31,7 +44,12 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string DNSHostname { get; set; }
         [Display(Name = "Server Storage Space")]
         public int StorageAssigned { get; set; }
+        [Display(Name = "Server State")]
+        public State State { get; set; }
         public string AWSEC2Reference { get; set; }
+        public string AWSSecurityGroupReference { get; set; }
+        public Workload Workload { get; set; }
+        public Tenancy Tenancy { get; set; }
 
         public int SubnetID { get; set; }
         public Subnet LinkedSubnet { get; set; }

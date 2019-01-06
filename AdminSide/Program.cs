@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Data;
 using Microsoft.AspNetCore;

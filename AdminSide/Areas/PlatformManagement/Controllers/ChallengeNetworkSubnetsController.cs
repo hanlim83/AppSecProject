@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AdminSide.Areas.PlatformManagement.Data;
-using AdminSide.Areas.PlatformManagement.Models;
 using Microsoft.AspNetCore.Mvc;
 using Amazon.EC2;
 using Amazon.EC2.Model;
@@ -20,7 +19,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
     {
         private readonly PlatformResourcesContext _context;
 
-        IAmazonEC2 EC2Client { get; set; }
+        private IAmazonEC2 EC2Client { get; set; }
 
         public ChallengeNetworkSubnetsController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
         {
@@ -30,6 +29,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index()
         {
+            /*
             if (!_context.Subnets.Any())
             {
                 DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
@@ -166,8 +166,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else
             {
+            */
                 return View(await _context.Subnets.ToListAsync());
-            }
+            //}
         }
 
         [HttpPost]
