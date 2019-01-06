@@ -278,10 +278,48 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var competition = await _context.Competitions.FindAsync(id);
+            //var competition = await _context.Competitions.FindAsync(id);
+            var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .FirstOrDefaultAsync(m => m.ID == id);
+            foreach (var category in competition.CompetitionCategories)
+            {
+                ClearBucket(competition.BucketName, category.CategoryName);
+            }
+            DeleteBucket(competition.BucketName);
             _context.Competitions.Remove(competition);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        private void ClearBucket(string bucketName, string folderName)
+        {
+            try
+            {
+                var deleteObjectRequest = new DeleteObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = folderName + "/"
+                };
+
+                Console.WriteLine("Deleting an object");
+                S3Client.DeleteObjectAsync(deleteObjectRequest);
+            }
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+        }
+
+        private void DeleteBucket(string bucketName)
+        {
+            //Add code to delete everything in the bucket first
+            //Can delete on the condition the bucket is empty
+            S3Client.DeleteBucketAsync(new DeleteBucketRequest() { BucketName = bucketName, UseClientRegion = true });
         }
 
         private bool CompetitionExists(int id)
