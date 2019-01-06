@@ -46,6 +46,7 @@ However, it is gaining more popularity in recent years, and we hope to make it e
 - Google Material Icons (CDN regardless of Development or Production)
 - TurboLinksJS (Local JS when in Development, CDN when in Production)
 - Progress Tracker (Local CSS regardless of Development or Production)
+- DataTables (Local JS & CSS when in Development, CDN when in Production)
 
 ## Tools Used
 - Visual Studio 2017
