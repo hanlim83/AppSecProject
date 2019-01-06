@@ -9,8 +9,9 @@
           rel="stylesheet">
     <environment include="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/css/bootstrap.css" />
-        <link rel="stylesheet" href="~/css/site.css" data-turbolinks-track="reload" asp-append-version="true"/>
+        <link rel="stylesheet" href="~/css/site.css" data-turbolinks-track="reload" asp-append-version="true" />
         <script src="~/lib/turbolinks/turbolinks.js"></script>
+        <link rel="stylesheet" href="~/lib/DataTables/datatables.css" />
     </environment>
     <environment exclude="Development">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
@@ -22,6 +23,9 @@
                 asp-fallback-src="~/lib/turbolinks/turbolinks.js"
                 integrity="sha256-iM4Yzi/zLj/IshPWMC1IluRxTtRjMqjPGd97TZ9yYpU="
                 crossorigin="anonymous"></script>
+        <link rel="stylesheet" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.css"
+              asp-fallback-href="~/lib/DataTables/datatables.min.css"
+              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
     </environment>
     <link rel="stylesheet" href="~/lib/progress-tracker/progress-tracker.css" />
 </head>
@@ -31,7 +35,7 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"></button>
             <a class="navbar-brand" href="/">ASPJ_MVC</a>
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
-                
+
                 <partial name="_LoginPartial" />
 
             </div>
@@ -45,6 +49,7 @@
         <script src="~/lib/popper/popper.js"></script>
         <script src="~/lib/bootstrap/js/bootstrap.js"></script>
         <script src="~/js/site.js" asp-append-version="true" data-turbolinks-track="reload"></script>
+        <script src="~/lib/DataTables/datatables.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -64,6 +69,8 @@
                 integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
                 crossorigin="anonymous">
         </script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.js"
+                asp-fallback-src="~/lib/DataTables/datatables.min.js"></script>
         <script src="~/js/site.min.js" data-turbolinks-track="reload" asp-append-version="true"></script>
     </environment>
     @RenderSection("Scripts", required: false)
