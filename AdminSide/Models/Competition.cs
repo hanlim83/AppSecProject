@@ -21,8 +21,6 @@ namespace AdminSide.Models
         public string CompetitionName { get; set; }
         [Required]
         public string Status { get; set; }
-        //May change BucketName to be dynamic next time
-        //To automate bucket naming creation
         //[Required]
         //Add regex here
         [Display(Name = "Bucket Name")]
