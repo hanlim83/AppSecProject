@@ -3,17 +3,70 @@
     ViewData["Title"] = "TalkView";
 }
 
+
+
+<!DOCTYPE html>
 <html>
 <head>
-    <style>
-       
-    </style>
+
 </head>
-
 <body>
-    <h2>TalkView</h2>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+               
+            </div>
+            <ul class="nav navbar-nav navbar-right">
+                <li><a href="#">Log Out</a></li>
+            </ul>
+        </div>
+    </nav>
+    <!-- / Navigation Bar -->
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-md-3">
+                <aside class="main visible-md visible-lg">
+                    <div class="row">
+                        <div class="col-xs-12">
+                            <div class="panel panel-default users__bar">
+                                <div class="panel-heading users__heading">
+                               
+                                </div>
+                                <div class="__no__chat__">
+                                    <p>Select a contact to chat with</p>
+                                </div>
+                                <div class="panel-body users__body">
+                                    <ul id="contacts" class="list-group">
 
-    
+                                       
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+
+            </div>
+            <div class="col-xs-12 col-md-9 chat__body">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <ul class="list-group chat__main"></ul>
+                    </div>
+                    <div class="chat__type__body">
+                        <div class="chat__type">
+                            <textarea id="msg_box" placeholder="Type your message"></textarea>
+                            <button class="btn btn-primary" id="sendMessage">Send</button>
+                        </div>
+                    </div>
+                    <div class="chat__typing">
+                        <span id="typerDisplay"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="@Url.Content("~/Content/app.js")"></script>
 </body>
-
 </html>

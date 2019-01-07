@@ -7,9 +7,10 @@ namespace UserSide.Models
 {
     public class Chat
     {
-        private string Name { get; set; }
-        private int Num { get; set; }
-        private string status { get; set; }
+        public string Name { get; set; }
+        public int Num { get; set; }
+
+        public string status { get; set; }
 
     }
 }
