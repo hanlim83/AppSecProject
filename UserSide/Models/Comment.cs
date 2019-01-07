@@ -7,6 +7,8 @@ namespace UserSide.Models
 {
     public class Comment
     {
+        public int CommentID { get; set; }
+
         public string userName { get; set; }
 
         public int topicID { get; set; }
