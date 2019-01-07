@@ -15,24 +15,26 @@
     {
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
         <hr>
-        <row>
-            <!--Loop through this part dynamically-->
-            <div>
-                @foreach (var item1 in Model.Challenges)
-                {
-                    if (item1.CompetitionCategoryID == item.ID)
+        <div>
+            <row>
+                <!--To standardize size of box/styling in future updates-->
+                <div>
+                    @foreach (var item1 in Model.Challenges)
                     {
-                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item.ID">
-                            <button type="button" class="btn btn-light">
-                                @Html.DisplayFor(modelItem => item1.Name)
-                                <br>
-                                @Html.DisplayFor(modelItem => item1.Value)
-                            </button>
-                        </a>
+                        if (item1.CompetitionCategoryID == item.ID)
+                        {
+                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
+                                <button type="button" class="btn btn-light">
+                                    @Html.DisplayFor(modelItem => item1.Name)
+                                    <br>
+                                    @Html.DisplayFor(modelItem => item1.Value)
+                                </button>
+                            </a>
+                        }
                     }
-                }
-            </div>
-        </row>
+                </div>
+            </row>
+        </div>
     }
     <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Back to Competition Details</button></a>
 </div>
