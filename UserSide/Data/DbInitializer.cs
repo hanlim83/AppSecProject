@@ -43,5 +43,10 @@ namespace UserSide.Data
             }
             context.SaveChanges();
         }
+
+        public static void InitializeForum(ForumContext context)
+        {
+            context.Database.EnsureCreated();
+        }
     }
 }
