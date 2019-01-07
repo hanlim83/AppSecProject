@@ -19,6 +19,8 @@ namespace UserSide.Models
 
         public string Content { get; set; }
 
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy} | {0:hh:mm tt}", ApplyFormatInEditMode = true)]
+        [Display(Name = "Posted On")]
         public DateTime DT { get; set; }
 
         public ICollection<Topic> Topics { get; set; }
