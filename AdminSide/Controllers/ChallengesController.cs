@@ -74,9 +74,13 @@ namespace AdminSide.Controllers
         {
             if (ModelState.IsValid)
             {
+                //hardcoded data for all information set to first CTF first Category
+                challenge.CompetitionID = 1;
+                challenge.CompetitionCategoryID = 1;
                 _context.Add(challenge);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Challenges", new { id = "1" });
             }
             return View(challenge);
         }
