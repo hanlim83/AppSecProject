@@ -1,58 +1,35 @@
-﻿@{
+﻿@model UserSide.Models.Competition
+
+@{
     ViewData["Title"] = "Challenges";
 }
 
 <title>@ViewData["Title"] - Challenges</title>
 
-<h2>Challenges test</h2>
-
-<p>Hello from our Challenges page!</p>
-<!--To remove header and make it more dynamic in the future-->
-<div>
-    <h2>Miscellaneous</h2>
+<br>
+<div class="col-md-8 offset-md-2">
     <hr>
-    <!--To restyle with more visible buttons-->
-    <row>
-        <div>
-            <button type="button" class="btn btn-light">
-                Challenge 1
-                <br>
-                30
-            </button>
-            <button type="button" class="btn btn-light">
-                Challenge 2
-                <br>
-                50
-            </button>
-            <button type="button" class="btn btn-light">
-                Challenge 3
-                <br>
-                100
-            </button>
-            <button type="button" class="btn btn-light">
-                Challenge 4
-                <br>
-                150
-            </button>
-            <button type="button" class="btn btn-light">
-                Challenge 5
-                <br>
-                200
-            </button>
-        </div>
-    <hr>
-    <h2>Binary</h2>
-    <hr>
-    <p>Challenges here</p>
-    <hr>
-    <h2>Web</h2>
-    <hr>
-    <p>Challenges here</p>
-    <hr>
-
-    <h2>Crypto</h2>
-    <hr>
-    <p>Challenges here</p>
-
-    <hr>
+    @foreach (var item in Model.CompetitionCategories)
+    {
+        <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
+        <hr>
+        <row>
+            <!--Loop through this part dynamically-->
+            <div>
+                @foreach (var item1 in Model.Challenges)
+                {
+                    if (item1.CompetitionCategoryID == item.ID)
+                    {
+                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item.ID">
+                            <button type="button" class="btn btn-light">
+                                @Html.DisplayFor(modelItem => item1.Name)
+                                <br>
+                                @Html.DisplayFor(modelItem => item1.Value)
+                            </button>
+                        </a>
+                    }
+                }
+            </div>
+        </row>
+    }
 </div>

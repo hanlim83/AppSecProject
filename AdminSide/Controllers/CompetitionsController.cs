@@ -11,6 +11,7 @@ using Amazon.S3.Model;
 using Amazon.S3;
 using System.Net;
 using System.Collections.ObjectModel;
+using System.Security.Cryptography;
 
 namespace AdminSide.Controllers
 {
@@ -84,6 +85,7 @@ namespace AdminSide.Controllers
             //Tested and working^
             //Console.WriteLine(model.SelectedCategories.ElementAt(0));
             //Console.WriteLine(competitionCategory.Categories.ElementAt(0).CategoryName);
+            
             if (ModelState.IsValid)
             {
                 //_context.Add(model.competition);
@@ -91,6 +93,10 @@ namespace AdminSide.Controllers
                 //var competitionID = model.competition.ID;
 
                 //CompetitionCategory competitionCategory = new CompetitionCategory();
+
+
+                //Generate bucketname programtically
+                model.Competition.BucketName = GenerateBucketName(model.Competition.CompetitionName);
                 model.Competition.CompetitionCategories = new Collection<CompetitionCategory>();
                 foreach (var CategoryName in model.SelectedCategories)
                 {
@@ -131,7 +137,7 @@ namespace AdminSide.Controllers
                     ViewData["Exception"] = e.Message;
                     //return View();
                 }
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
             }
             else
             {
@@ -139,7 +145,59 @@ namespace AdminSide.Controllers
             }
             //return View(competition);
             //return View(model);
+            //Testing create folder dynamically
+            foreach (var CategoryName in model.SelectedCategories)
+            {
+                CreateFolder(model.Competition.BucketName, CategoryName);
+            }
+            //Testing create folder dynamically
             return RedirectToAction("Index");
+        }
+
+        private string GenerateBucketName(string competitionName)
+        {
+            //Make bucket name conform to standards (All lower case & no space)
+            competitionName = competitionName.Replace(" ", string.Empty);
+            competitionName = competitionName.ToLower();
+            //Append 15 digit secure random numbers
+            //var randIntArray = new int[15];
+            string randNumbers = "";
+            //for (int i=0; i<15; i++)
+            //{
+                RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+                var byteArray = new byte[4];
+                provider.GetBytes(byteArray);
+
+                //convert 4 bytes to an integer
+                var randomInteger = BitConverter.ToUInt32(byteArray, 0);
+                //randIntArray[i] = randomInteger;
+                randNumbers = randNumbers + randomInteger;
+            //}
+            
+            string generatedBucketName = competitionName + randNumbers;
+            return generatedBucketName;
+        }
+
+        private void CreateFolder(string bucketName, string folderName)
+        {
+            //string bucketName;
+            /*string keyName= folderName + "/";
+            string filePath=null;
+            var fileTransferUtility = new TransferUtility(S3Client);
+            await fileTransferUtility.UploadAsync(filePath, bucketName, keyName);
+            Console.WriteLine("Upload 2 completed");*/
+
+            PutObjectRequest putObjectRequest = new PutObjectRequest
+            {
+
+                BucketName = bucketName,
+                //StorageClass = S3StorageClass.Standard,
+                //ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256,
+                //CannedACL = S3CannedACL.Private,
+                Key = folderName + "/",
+                //ContentBody = awsFolderName
+            };
+            S3Client.PutObjectAsync(putObjectRequest);
         }
 
         // GET: Competitions/Edit/5
@@ -219,10 +277,48 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var competition = await _context.Competitions.FindAsync(id);
+            //var competition = await _context.Competitions.FindAsync(id);
+            var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .FirstOrDefaultAsync(m => m.ID == id);
+            foreach (var category in competition.CompetitionCategories)
+            {
+                ClearBucket(competition.BucketName, category.CategoryName);
+            }
+            DeleteBucket(competition.BucketName);
             _context.Competitions.Remove(competition);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        private void ClearBucket(string bucketName, string folderName)
+        {
+            try
+            {
+                var deleteObjectRequest = new DeleteObjectRequest
+                {
+                    BucketName = bucketName,
+                    Key = folderName + "/"
+                };
+
+                Console.WriteLine("Deleting an object");
+                S3Client.DeleteObjectAsync(deleteObjectRequest);
+            }
+            catch (AmazonS3Exception e)
+            {
+                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+        }
+
+        private void DeleteBucket(string bucketName)
+        {
+            //Add code to delete everything in the bucket first
+            //Can delete on the condition the bucket is empty
+            S3Client.DeleteBucketAsync(new DeleteBucketRequest() { BucketName = bucketName, UseClientRegion = true });
         }
 
         private bool CompetitionExists(int id)

@@ -26,6 +26,7 @@ using Amazon.ElasticBeanstalk;
 using UserSide.Areas.Identity.Services;
 using Amazon.SimpleSystemsManagement;
 
+
 namespace UserSide
 {
     public class Startup
@@ -82,6 +83,17 @@ namespace UserSide
             return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
         }
 
+        private string GetRdsConnectionStringForum()
+        {
+            string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
+            string port = Configuration.GetValue<string>("RDS_PORT");
+            string dbname = "Forum";
+            string username = Configuration.GetValue<string>("RDS_USERNAME");
+            string password = Configuration.GetValue<string>("RDS_PASSWORD");
+
+            return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
+        }
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -100,7 +112,7 @@ namespace UserSide
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
             GetRdsConnectionString()));
-            
+
             //services.AddIdentity<IdentityUser, IdentityRole>()
             //    .AddEntityFrameworkStores<ApplicationDbContext>()
             //    .AddDefaultTokenProviders();
@@ -109,6 +121,12 @@ namespace UserSide
             services.AddDbContext<CompetitionContext>(options =>
             options.UseSqlServer(
             GetRdsConnectionStringCompetition()));
+
+
+            //Forum Db Context
+            services.AddDbContext<ForumContext>(options =>
+            options.UseSqlServer(
+            GetRdsConnectionStringForum()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
         .AddRazorPagesOptions(options =>
@@ -160,7 +178,7 @@ namespace UserSide
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -171,7 +189,7 @@ namespace UserSide
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
             }
-            
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();

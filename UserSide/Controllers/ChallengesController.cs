@@ -1,13 +1,14 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using AdminSide.Data;
-using AdminSide.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using UserSide.Data;
+using UserSide.Models;
 
-namespace AdminSide.Controllers
+namespace UserSide.Controllers
 {
     public class ChallengesController : Controller
     {
@@ -21,7 +22,6 @@ namespace AdminSide.Controllers
         // GET: Challenges
         public async Task<IActionResult> Index(int? id)
         {
-            ViewData["NavigationShowAll"] = true;
             if (id == null)
             {
                 return NotFound();
@@ -38,20 +38,17 @@ namespace AdminSide.Controllers
             }
 
             return View(competition);
-
-            //return View(await _context.Challenges.ToListAsync());
         }
 
         // GET: Challenges/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            ViewData["NavigationShowAll"] = true;
             if (id == null)
             {
                 return NotFound();
             }
 
-            var challenge = await _context.Challenges
+            var challenge = await _context.Challenge
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (challenge == null)
             {
@@ -62,40 +59,9 @@ namespace AdminSide.Controllers
         }
 
         // GET: Challenges/Create
-        public async Task<IActionResult> Create(int? id)
+        public IActionResult Create()
         {
-            ViewData["NavigationShowAll"] = true;
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var vm = new ChallengesViewModelIEnumerable();
-
-            var competition = await _context.Competitions
-                .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (competition == null)
-            {
-                return NotFound();
-            }
-
-            vm.Competition = competition;
-            var dictionary = new Dictionary<int, string>
-            {
-
-            };
-            foreach (var categoryDefault in _context.CategoryDefault)
-            {
-                //vm.CategoriesList.Add(new SelectListItem { Value = categoryDefault.CategoryName, Text = categoryDefault.CategoryName });
-                dictionary.Add(categoryDefault.ID, categoryDefault.CategoryName);
-            }
-            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
-
-            return View(vm);
-            //return View();
+            return View();
         }
 
         // POST: Challenges/Create
@@ -107,13 +73,9 @@ namespace AdminSide.Controllers
         {
             if (ModelState.IsValid)
             {
-                //hardcoded data for all information set to first CTF first Category
-                challenge.CompetitionID = 1;
-                //challenge.CompetitionCategoryID = 1;
                 _context.Add(challenge);
                 await _context.SaveChangesAsync();
-                //return RedirectToAction(nameof(Index));
-                return RedirectToAction("Index", "Challenges", new { id = "1" });
+                return RedirectToAction(nameof(Index));
             }
             return View(challenge);
         }
@@ -126,7 +88,7 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            var challenge = await _context.Challenges.FindAsync(id);
+            var challenge = await _context.Challenge.FindAsync(id);
             if (challenge == null)
             {
                 return NotFound();
@@ -177,7 +139,7 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            var challenge = await _context.Challenges
+            var challenge = await _context.Challenge
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (challenge == null)
             {
@@ -192,15 +154,15 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var challenge = await _context.Challenges.FindAsync(id);
-            _context.Challenges.Remove(challenge);
+            var challenge = await _context.Challenge.FindAsync(id);
+            _context.Challenge.Remove(challenge);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool ChallengeExists(int id)
         {
-            return _context.Challenges.Any(e => e.ID == id);
+            return _context.Challenge.Any(e => e.ID == id);
         }
     }
 }

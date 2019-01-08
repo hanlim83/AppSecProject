@@ -9,7 +9,7 @@ namespace UserSide.Data
 {
     public class DbInitializer
     {
-        public static void InitializePlatformResources (CompetitionContext context)
+        public static void InitializePlatformResources(CompetitionContext context)
         {
             context.Database.EnsureCreated();
 
@@ -42,6 +42,11 @@ namespace UserSide.Data
                 context.CompetitionCategories.Add(cc);
             }
             context.SaveChanges();
+        }
+
+        public static void InitializeForum(ForumContext context)
+        {
+            context.Database.EnsureCreated();
         }
     }
 }

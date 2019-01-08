@@ -16,11 +16,15 @@ namespace UserSide.Data
 
         public DbSet<Competition> Competitions { get; set; }
         public DbSet<CompetitionCategory> CompetitionCategories { get; set; }
+        public DbSet<Challenge> Challenges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Competition>().ToTable("Competition");
             modelBuilder.Entity<CompetitionCategory>().ToTable("CompetitionCategory");
+            modelBuilder.Entity<Challenge>().ToTable("Challenges");
         }
+
+        public DbSet<UserSide.Models.Challenge> Challenge { get; set; }
     }
 }

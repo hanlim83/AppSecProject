@@ -6,41 +6,42 @@
 }
 
 <br>
-<h2>Ongoing CTF</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CompetitionName)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<div class="col-md-8 offset-2">
+    <h2>Ongoing CTF</h2>
+    <table class="table">
+        <thead>
             <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CompetitionName)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Status)
-                </td>
-                <td>
-                    <!--Collect data and determine if user has joined or not and route differently-->
-                    <!--<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
-
-                    <!--Assuming user already join and has team-->
-                    <a asp-controller="Challenges" asp-action="Testing" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Enter</button></a>
-                </td>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompetitionName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
-<br>
-<h2>Past CTF</h2>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CompetitionName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Status)
+                    </td>
+                    <td>
+                        <!--Collect data and determine if user has joined or not and route differently-->
+                        <!--<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
+                        <!--Assuming user already join and has team-->
+                        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Enter</button></a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <br>
+    <h2>Past CTF</h2>
+</div>

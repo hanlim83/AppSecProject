@@ -4,53 +4,37 @@
     ViewData["Title"] = "Index";
 }
 
-<h2>Challenges Index Testing</h2>
-
 <br>
-<div class="col-md-8 offset-md-3">
-    <h4>Competition</h4>
-    <hr>
+<div class="col-md-8 offset-2">
+    <div class="float-right">
+        <a asp-action="Create" asp-route-id="@Model.ID"><button type="button" class="btn btn-danger">New Challenge</button></a>
+    </div>
+    <br>
+    <br>
     @foreach (var item in Model.CompetitionCategories)
     {
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
         <hr>
-        <p>Challenges here</p>
-        <row>
-            <!--Loop through this part dynamically-->
-            <div>
-                @foreach (var item1 in Model.Challenges)
-                {
-                    if (item1.CompetitionCategoryID == item.ID)
+        <div>
+            <row>
+                <!--To standardize size of box/styling in future updates-->
+                <div>
+                    @foreach (var item1 in Model.Challenges)
                     {
-                        <button type="button" class="btn btn-light">
-                            @Html.DisplayFor(modelItem => item1.Name)
-                            <br>
-                            @Html.DisplayFor(modelItem => item1.Value)
-                        </button>
+                        if (item1.CompetitionCategoryID == item.ID)
+                        {
+                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
+                                <button type="button" class="btn btn-light">
+                                    @Html.DisplayFor(modelItem => item1.Name)
+                                    <br>
+                                    @Html.DisplayFor(modelItem => item1.Value)
+                                </button>
+                            </a>
+                        }
                     }
-                }
-
-                <!--<button type="button" class="btn btn-light">
-        Challenge 2
-        <br>
-        50
-    </button>
-    <button type="button" class="btn btn-light">
-        Challenge 3
-        <br>
-        100
-    </button>
-    <button type="button" class="btn btn-light">
-        Challenge 4
-        <br>
-        150
-    </button>
-    <button type="button" class="btn btn-light">
-        Challenge 5
-        <br>
-        200
-    </button>-->
-            </div>
-        </row>
+                </div>
+            </row>
+        </div>
     }
+    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Back to Competition Details</button></a>
 </div>

@@ -4,12 +4,11 @@
     ViewData["Title"] = "Edit";
 }
 
-<h2>Edit</h2>
-
-<h4>CategoryDefault</h4>
-<hr />
+<br>
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-8 offset-2">
+        <h2>Edit Default (Commonly Used) Categories</h2>
+        <hr />
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID" />
@@ -24,8 +23,8 @@
         </form>
     </div>
 </div>
-
+<!--
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
-
+-->
