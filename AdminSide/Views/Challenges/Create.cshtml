@@ -43,12 +43,17 @@
         <div class="form-group">
             <label asp-for="Challenge.CompetitionCategoryID" class="control-label"></label>
             <select asp-for="Challenge.CompetitionCategoryID" class="form-control" asp-items="ViewBag.SelectList"></select>
+            <span asp-validation-for="Challenge.CompetitionCategoryID" class="text-danger"></span>
+        </div>
+        <div>
+            <input type="hidden" asp-for="Challenge.CompetitionID" value="@Model.Competition.ID">
+            <span asp-validation-for="Challenge.CompetitionID" class="text-danger"></span>
         </div>
         <!--@foreach (var item in Model.Competition.CompetitionCategories)
-            {
-                <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
-                <hr>
-            }-->
+        {
+            <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
+            <hr>
+        }-->
         <div class="custom-file">
             <input type="file" class="custom-file-input" id="customFile">
             <label class="custom-file-label" for="customFile">Choose file</label>

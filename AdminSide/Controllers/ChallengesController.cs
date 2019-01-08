@@ -87,10 +87,10 @@ namespace AdminSide.Controllers
             {
 
             };
-            foreach (var categoryDefault in _context.CategoryDefault)
+            foreach (var category in competition.CompetitionCategories)
             {
                 //vm.CategoriesList.Add(new SelectListItem { Value = categoryDefault.CategoryName, Text = categoryDefault.CategoryName });
-                dictionary.Add(categoryDefault.ID, categoryDefault.CategoryName);
+                dictionary.Add(category.ID, category.CategoryName);
             }
             ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
 
@@ -108,12 +108,12 @@ namespace AdminSide.Controllers
             if (ModelState.IsValid)
             {
                 //hardcoded data for all information set to first CTF first Category
-                challenge.CompetitionID = 1;
+                //challenge.CompetitionID = 1;
                 //challenge.CompetitionCategoryID = 1;
                 _context.Add(challenge);
                 await _context.SaveChangesAsync();
                 //return RedirectToAction(nameof(Index));
-                return RedirectToAction("Index", "Challenges", new { id = "1" });
+                return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
             }
             return View(challenge);
         }
