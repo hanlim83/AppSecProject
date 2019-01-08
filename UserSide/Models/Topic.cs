@@ -8,7 +8,7 @@ namespace UserSide.Models
 {
     public class Topic
     {
-        public int topicID { get; set; }
+        public int TopicID { get; set; }
 
         [StringLength(50, MinimumLength = 3)]
         public string Title { get; set; }
@@ -17,10 +17,13 @@ namespace UserSide.Models
 
         public string Content { get; set; }
 
-        public int forumID { get; set; }
+        public int ForumID { get; set; }
 
-        public Forum linkedForum { get; set; }
+        public Forum LinkedForum { get; set; }
+
+        public ForumCategory LinkedCategory { get; set; }
 
         public ICollection<Comment> Comments { get; set; }
+
     }
 }

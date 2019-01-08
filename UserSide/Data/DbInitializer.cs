@@ -47,6 +47,11 @@ namespace UserSide.Data
         public static void InitializeForum(ForumContext context)
         {
             context.Database.EnsureCreated();
+
+            if (context.Forums.Any())
+            {
+                return;   // DB has been seeded
+            }
         }
     }
 }

@@ -10,9 +10,9 @@ namespace UserSide.Models
     public class Forum
     {
 
-        public int forumID { get; set; }
+        public int ForumID { get; set; }
 
-        public string userName { get; set; }
+        public string UserName { get; set; }
 
         [StringLength(50, MinimumLength = 3)]
         public string Title { get; set; }
@@ -26,6 +26,8 @@ namespace UserSide.Models
         public DateTime DT { get; set; }
 
         public ICollection<Topic> Topics { get; set; }
+
+        public ForumCategory LinkedCategory { get; set; }
 
 
     }

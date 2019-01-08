@@ -9,14 +9,14 @@ namespace UserSide.Models
     {
         public int CommentID { get; set; }
 
-        public string userName { get; set; }
+        public string UserName { get; set; }
 
-        public int topicID { get; set; }
+        public int TopicID { get; set; }
 
         public string Content { get; set; }
 
         public DateTime DT { get; set; }
 
-        public Topic linkedTopic { get; set; }
+        public Topic LinkedTopic { get; set; }
     }
 }
