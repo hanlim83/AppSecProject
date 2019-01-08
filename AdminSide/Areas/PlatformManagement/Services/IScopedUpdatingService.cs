@@ -13,18 +13,13 @@ using State = AdminSide.Areas.PlatformManagement.Models.State;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
-    internal interface IScopedProcessingService
-    {
-        Task DoWorkAsync();
-    }
-
-    internal class ScopedProcessingService : IScopedProcessingService
+    internal class IScopedUpdatingService : IScopedProcessingService
     {
         private readonly ILogger _logger;
         private readonly PlatformResourcesContext context;
         private readonly IAmazonEC2 ec2Client;
 
-        public ScopedProcessingService(ILogger<ScopedProcessingService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client)
+        public IScopedUpdatingService(ILogger<IScopedUpdatingService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client)
         {
             _logger = logger;
             context = Context;

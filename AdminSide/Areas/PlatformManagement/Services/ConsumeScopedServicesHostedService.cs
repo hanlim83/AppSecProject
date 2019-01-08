@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
-    internal class ConsumeScopedServiceHostedService : IHostedService, IDisposable
+    internal class ConsumeScopedServicesHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
         private Timer _timer;
 
-        public ConsumeScopedServiceHostedService(ILogger<ConsumeScopedServiceHostedService> logger, IServiceProvider services)
+        public ConsumeScopedServicesHostedService(ILogger<ConsumeScopedServicesHostedService> logger, IServiceProvider services)
         {
             _logger = logger;
             Services = services;
@@ -33,11 +33,11 @@ namespace AdminSide.Areas.PlatformManagement.Services
         {
             using (var scope = Services.CreateScope())
             {
-                var scopedProcessingService =
+                var scopedUpdatingService =
                     scope.ServiceProvider
-                        .GetRequiredService<IScopedProcessingService>();
+                        .GetRequiredService<IScopedUpdatingService>();
 
-                await scopedProcessingService.DoWorkAsync();
+                await scopedUpdatingService.DoWorkAsync();
             }
         }
         public Task StopAsync(CancellationToken cancellationToken)
