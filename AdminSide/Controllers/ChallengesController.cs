@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AdminSide.Data;
 using AdminSide.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Collections.Generic;
 
 namespace AdminSide.Controllers
 {
@@ -60,9 +62,40 @@ namespace AdminSide.Controllers
         }
 
         // GET: Challenges/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create(int? id)
         {
-            return View();
+            ViewData["NavigationShowAll"] = true;
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var vm = new ChallengesViewModelIEnumerable();
+
+            var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .Include(c1 => c1.Challenges)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            vm.Competition = competition;
+            var dictionary = new Dictionary<int, string>
+            {
+
+            };
+            foreach (var categoryDefault in _context.CategoryDefault)
+            {
+                //vm.CategoriesList.Add(new SelectListItem { Value = categoryDefault.CategoryName, Text = categoryDefault.CategoryName });
+                dictionary.Add(categoryDefault.ID, categoryDefault.CategoryName);
+            }
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+
+            return View(vm);
+            //return View();
         }
 
         // POST: Challenges/Create
@@ -76,7 +109,7 @@ namespace AdminSide.Controllers
             {
                 //hardcoded data for all information set to first CTF first Category
                 challenge.CompetitionID = 1;
-                challenge.CompetitionCategoryID = 1;
+                //challenge.CompetitionCategoryID = 1;
                 _context.Add(challenge);
                 await _context.SaveChangesAsync();
                 //return RedirectToAction(nameof(Index));
