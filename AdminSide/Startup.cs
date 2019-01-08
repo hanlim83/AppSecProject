@@ -170,8 +170,8 @@ namespace AdminSide
 
             //Background Processing
             services.AddHostedService<ConsumeScopedServicesHostedService>();
-            services.AddScoped<IScopedProcessingService, IScopedUpdatingService>();
-            services.AddScoped<IScopedProcessingService, IScopedRetrievalService>();
+            services.AddScoped<IScopedUpdatingService, ScopedUpdatingService>();
+            services.AddScoped<IScopedRetrievalService, ScopedRetrievalService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
