@@ -1,23 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace UserSide.Models
 {
-    public class Forum
+    public class Post
     {
+        [Key]
+        public int PostID { get; set; }
 
-        public int ForumID { get; set; }
-
+        [Display(Name = "Posted By")]
         public string UserName { get; set; }
 
-        [StringLength(50, MinimumLength = 3)]
+        [StringLength(50, MinimumLength = 5)]
         public string Title { get; set; }
-
-        //public string Category { get; set; }
-        public int CategoryID { get; set; }
 
         public string Content { get; set; }
 
@@ -25,10 +24,15 @@ namespace UserSide.Models
         [Display(Name = "Posted On")]
         public DateTime DT { get; set; }
 
-        public ICollection<Topic> Topics { get; set; }
+        [ForeignKey("CategoryID")]
+        public int CategoryID { get; set; }
+        //public string CategoryName { get; set; }
 
-        public ForumCategory LinkedCategory { get; set; }
+        public ICollection<Comment> Comments { get; set; }
 
+        //public ForumCategory LinkedCategory { get; set; }
+
+        public string Secret { get; set; }
 
     }
 }

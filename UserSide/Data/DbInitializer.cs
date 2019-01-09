@@ -48,15 +48,15 @@ namespace UserSide.Data
         {
             context.Database.EnsureCreated();
 
-            if (context.Forums.Any())
+            if (context.Posts.Any())
             {
                 return;   // DB has been seeded
             }
 
             var category = new ForumCategory[]
             {
-            new ForumCategory{CategoryID=1, CategoryName="General"},
-            new ForumCategory{CategoryID=1, CategoryName="Crypto"}
+            new ForumCategory{CategoryName="General"},
+            new ForumCategory{CategoryName="Crypto"}
             };
 
             foreach (ForumCategory c in category)
@@ -65,19 +65,20 @@ namespace UserSide.Data
             }
             context.SaveChanges();
 
-            var forum = new Forum[]
+            var post = new Post[]
             {
-            new Forum{ Title="Errors", Content="How To Fix", UserName="Elxxwy", CategoryID=1 },
-            new Forum{ Title="General", Content="How To Do", UserName="Eevee", CategoryID=2 },
-            new Forum{ Title="Errors", Content="How To UnFix", UserName="Eevee", CategoryID=1 },
-            new Forum{ Title="General", Content="How To Undo", UserName="Elxxwy", CategoryID=2 },
+            new Post{ Title="Errors", Content="How To Fix", UserName="Elxxwy", CategoryID=1 },
+            new Post{ Title="General", Content="How To Do", UserName="Eevee", CategoryID=2 },
+            new Post{ Title="Errors", Content="How To UnFix", UserName="EVELYN", CategoryID=1 },
+            new Post{ Title="General", Content="How To Undo", UserName="Elxxwy", CategoryID=2 },
             };
 
-            foreach (Forum f in forum)
+            foreach (Post p in post)
             {
-                context.Forums.Add(f);
+                context.Posts.Add(p);
             }
             context.SaveChanges();
+
         }
     }
 }

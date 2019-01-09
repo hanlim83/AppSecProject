@@ -29,6 +29,12 @@
     <Content Update="Views\Competitions\SignUp.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Views\Forum\Delete.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Forum\Details.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Forum\NewTopicF.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

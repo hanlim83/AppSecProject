@@ -14,15 +14,13 @@ namespace UserSide.Data
 
         }
 
-        public DbSet<Forum> Forums { get; set; }
-        public DbSet<Topic> Topics { get; set; }
+        public DbSet<Post> Posts { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<ForumCategory> ForumCategories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Forum>().ToTable("Forum");
-            modelBuilder.Entity<Topic>().ToTable("Topic");
+            modelBuilder.Entity<Post>().ToTable("Post");
             modelBuilder.Entity<Comment>().ToTable("Comment");
             modelBuilder.Entity<ForumCategory>().ToTable("ForumCategory");
         }

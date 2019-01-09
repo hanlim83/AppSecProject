@@ -13,7 +13,10 @@ namespace UserSide.Models
 
         public string CategoryName { get; set; }
 
-        public ICollection<Forum> Forums { get; set; }
-        public ICollection<Topic> Topics { get; set; }
+        //public ICollection<Post> Posts { get; set; }
+
+        public Post LinkedPost { get; set; }
+
+        public string Secret { get; set; }
     }
 }
