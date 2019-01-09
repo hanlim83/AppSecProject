@@ -8,7 +8,7 @@
 <div class="col-md-8 offset-2">
     <h2>Create Challenge</h2>
     <hr>
-    <form asp-action="Create">
+    <form method="post" enctype="multipart/form-data" asp-action="Create">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label asp-for="Challenge.Name" class="control-label"></label>
@@ -31,15 +31,15 @@
             <span asp-validation-for="Challenge.Flag" class="text-danger"></span>
         </div>
         <!--
-        <div class="form-group">
-            <label asp-for="CompetitionID" class="control-label"></label>
-            <select asp-for="CompetitionID" class="form-control" asp-items="ViewBag.CompetitionID"></select>
-        </div>
-        <div class="form-group">
-            <label asp-for="CompetitionCategoryID" class="control-label"></label>
-            <select asp-for="CompetitionCategoryID" class="form-control" asp-items="ViewBag.CompetitionCategoryID"></select>
-        </div>
-        -->
+    <div class="form-group">
+        <label asp-for="CompetitionID" class="control-label"></label>
+        <select asp-for="CompetitionID" class="form-control" asp-items="ViewBag.CompetitionID"></select>
+    </div>
+    <div class="form-group">
+        <label asp-for="CompetitionCategoryID" class="control-label"></label>
+        <select asp-for="CompetitionCategoryID" class="form-control" asp-items="ViewBag.CompetitionCategoryID"></select>
+    </div>
+    -->
         <div class="form-group">
             <label asp-for="Challenge.CompetitionCategoryID" class="control-label"></label>
             <select asp-for="Challenge.CompetitionCategoryID" class="form-control" asp-items="ViewBag.SelectList"></select>
@@ -49,14 +49,31 @@
             <input type="hidden" asp-for="Challenge.CompetitionID" value="@Model.Competition.ID">
             <span asp-validation-for="Challenge.CompetitionID" class="text-danger"></span>
         </div>
-        <!--@foreach (var item in Model.Competition.CompetitionCategories)
+        @*@foreach (var item in Model.Competition.CompetitionCategories)
         {
             <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
             <hr>
-        }-->
-        <div class="custom-file">
+        }*@
+        <!--Commenting out to test real file input-->
+        @*<div class="custom-file">
             <input type="file" class="custom-file-input" id="customFile">
             <label class="custom-file-label" for="customFile">Choose file</label>
+        </div>*@
+        <!--Testing nice UI-->
+        @*<div class="form-group">
+            <div class="col-md-10">
+                <p>Upload one or more files using this form:</p>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFile" name="files" multiple />
+                    <label class="custom-file-label" for="customFile">Choose file</label>
+                </div>
+            </div>
+        </div>*@
+        <div class="form-group">
+            <div class="col-md-10">
+                <p>Upload one or more files using this form:</p>
+                <input type="file" name="files" multiple />
+            </div>
         </div>
         <br>
         <br>
