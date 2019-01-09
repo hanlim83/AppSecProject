@@ -55,8 +55,8 @@ namespace UserSide.Data
 
             var category = new ForumCategory[]
             {
-            new ForumCategory{CategoryID=1, CategoryName="General"},
-            new ForumCategory{CategoryID=1, CategoryName="Crypto"}
+            new ForumCategory{CategoryName="General"},
+            new ForumCategory{CategoryName="Crypto"}
             };
 
             foreach (ForumCategory c in category)
