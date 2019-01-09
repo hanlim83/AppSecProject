@@ -7,6 +7,7 @@ using System.Web;
 using System.Xml.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using CodeHollow.FeedReader;
 
 namespace AdminSide.Controllers
 {
@@ -23,7 +24,7 @@ namespace AdminSide.Controllers
         }
 
         // RSS FEED Codes
-        [HttpPost]
+        /*[HttpPost]
         public ActionResult Index (string RSSURL)
         {
             WebClient wclient = new WebClient();
@@ -38,6 +39,21 @@ namespace AdminSide.Controllers
                 PubDate = ((string)x.Element("pubDate"))
             });
             ViewBag.RSSFeed = RSSFeedData;
+            ViewBag.URL = RSSURL;
+            return View();
+        }*/
+        [HttpPost]
+        public async Task<IActionResult> Index (string RSSURL)
+        {
+            var feed = await FeedReader.ReadAsync(RSSURL); //await will wait for the feed
+            RSSFeed rssfeed = new RSSFeed
+            {
+                Title = feed.Title,
+                Link = feed.Link,
+                Description = feed.Description,
+                PubDate = feed.LastUpdatedDateString
+            };
+            ViewBag.RSSFeed = feed;
             ViewBag.URL = RSSURL;
             return View();
         }

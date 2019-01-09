@@ -19,6 +19,7 @@
     <PackageReference Include="AWSSDK.S3" Version="3.3.31.6" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.3.9" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.3.37.7" />
+    <PackageReference Include="CodeHollow.FeedReader" Version="1.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.6" PrivateAssets="All" />
