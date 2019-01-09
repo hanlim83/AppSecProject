@@ -1,10 +1,17 @@
-﻿@model IEnumerable<UserSide.Models.Competition>
+﻿@using Microsoft.AspNetCore.Identity
+@model IEnumerable<UserSide.Models.Competition>
 
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+@inject UserManager<IdentityUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
 
+}
+
+<h1>@user.NormalizedUserName</h1>
 <br>
 <div class="col-md-8 offset-2">
     <h2>Ongoing CTF</h2>
