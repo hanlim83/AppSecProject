@@ -52,6 +52,32 @@ namespace UserSide.Data
             {
                 return;   // DB has been seeded
             }
+
+            var category = new ForumCategory[]
+            {
+            new ForumCategory{CategoryID=1, CategoryName="General"},
+            new ForumCategory{CategoryID=1, CategoryName="Crypto"}
+            };
+
+            foreach (ForumCategory c in category)
+            {
+                context.ForumCategories.Add(c);
+            }
+            context.SaveChanges();
+
+            var forum = new Forum[]
+            {
+            new Forum{ Title="Errors", Content="How To Fix", UserName="Elxxwy", CategoryID=1 },
+            new Forum{ Title="General", Content="How To Do", UserName="Eevee", CategoryID=2 },
+            new Forum{ Title="Errors", Content="How To UnFix", UserName="Eevee", CategoryID=1 },
+            new Forum{ Title="General", Content="How To Undo", UserName="Elxxwy", CategoryID=2 },
+            };
+
+            foreach (Forum f in forum)
+            {
+                context.Forums.Add(f);
+            }
+            context.SaveChanges();
         }
     }
 }
