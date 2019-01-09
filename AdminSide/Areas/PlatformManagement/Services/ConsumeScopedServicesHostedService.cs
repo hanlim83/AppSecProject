@@ -21,15 +21,15 @@ namespace AdminSide.Areas.PlatformManagement.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Update Background Service is starting.");
+            _logger.LogInformation("Update Background Service has been scheduled to start.");
 
-            _timer = new Timer(DoWorkAsync, null, TimeSpan.Zero,
+            _timer = new Timer(DoWorkAsyncUpdate, null, TimeSpan.FromSeconds(30),
                 TimeSpan.FromSeconds(60));
 
             return Task.CompletedTask;
         }
 
-        private async void DoWorkAsync(object state)
+        private async void DoWorkAsyncUpdate(object state)
         {
             using (var scope = Services.CreateScope())
             {

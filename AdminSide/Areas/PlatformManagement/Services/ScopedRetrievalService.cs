@@ -38,7 +38,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
 
         public async Task DoWorkAsync()
         {
-            _logger.LogInformation("Update Background Service is running.");
+            _logger.LogInformation("Retrieval Background Service is running.");
             try
             {
                 if (context.Subnets.Any())
@@ -50,6 +50,18 @@ namespace AdminSide.Areas.PlatformManagement.Services
                      new Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
                 }
                     });
+                    List<Subnet> existingSubnets =  await context.Subnets.ToListAsync();
+                    foreach (var Rsubnet in response.Subnets)
+                    {
+                        Boolean matched = false;
+                        foreach (var Esubent in existingSubnets)
+                        {
+                            if (Rsubnet.SubnetId.Equals(Esubent.AWSVPCSubnetReference))
+                            {
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
