@@ -173,6 +173,9 @@ namespace UserSide
             services.AddAWSService<IAmazonElasticBeanstalk>();
             //SSM Initialization
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
+
+            //Chat Signalr
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
