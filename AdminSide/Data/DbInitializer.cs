@@ -344,6 +344,20 @@ namespace AdminSide.Data
                 context.Challenges.Add(ch);
             }
             context.SaveChanges();
+
+            var teams = new Team[]
+            {
+            new Team{ TeamName="T0X1C V4P04", Password="Pass123!", CompetitionID=1},
+            new Team{ TeamName="Team 1", Password="Pass123!", CompetitionID=1},
+            new Team{ TeamName="Team 2", Password="Pass123!", CompetitionID=1},
+            new Team{ TeamName="Team 3", Password="Pass123!", CompetitionID=1},
+            };
+
+            foreach (Team t in teams)
+            {
+                context.Teams.Add(t);
+            }
+            context.SaveChanges();
         }
     }
 }
