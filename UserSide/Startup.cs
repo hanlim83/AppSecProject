@@ -25,7 +25,7 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticBeanstalk;
 using UserSide.Areas.Identity.Services;
 using Amazon.SimpleSystemsManagement;
-
+using UserSide.Hubs;
 
 namespace UserSide
 {
@@ -198,6 +198,12 @@ namespace UserSide
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+
+            //Signalr app 
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("/chatHub");
+            });
 
             app.UseMvc(routes =>
             {

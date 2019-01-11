@@ -1,12 +1,55 @@
-﻿
+﻿@model Amazon.CloudWatchLogs.Model.GetLogEventsResponse
 @{
     ViewData["Title"] = "Platform Logs";
 }
 <div class="row">
     <div class="col-lg-3">
-        <partial name="../_MainNav.cshtml"/>
+        <partial name="../_MainNav.cshtml" />
     </div>
     <div class="col-lg-9">
+        <div class="row">
+            <div class="col-lg-12">
+                <form asp-action="" method="post" class="form-inline">
+                    <label class="my-1 mr-2" for="logGroup">Select which component of the platform to view logs for:</label>
+                    <select class="custom-select my-1 mr-sm-2" id="Component">
+                        <option value="RDS">SQL Database CPU Usage</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary my-1">Retrieve Events</button>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                @if (Model != null)
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    TimeStamp
+                                </th>
+                                <th>
+                                    Message
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loggedEvent in Model.Events)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Timestamp.ToString("yyyy-MM-dd- HH:mm:ss"))
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Message)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
 
+                }
+            </div>
+        </div>
     </div>
 </div>

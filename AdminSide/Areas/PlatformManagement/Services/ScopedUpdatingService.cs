@@ -11,25 +11,29 @@ using System;
 using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
 using State = AdminSide.Areas.PlatformManagement.Models.State;
 using System.Data.SqlClient;
+using Amazon.CloudWatch;
+using Amazon.CloudWatchEvents;
+using Amazon.CloudWatchLogs;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
-    internal interface IScopedProcessingService
-    {
-        Task DoWorkAsync();
-    }
-
-    internal class ScopedProcessingService : IScopedProcessingService
+    internal class ScopedUpdatingService : IScopedUpdatingService
     {
         private readonly ILogger _logger;
         private readonly PlatformResourcesContext context;
         private readonly IAmazonEC2 ec2Client;
+        private readonly IAmazonCloudWatch cwClient;
+        private readonly IAmazonCloudWatchEvents cweClient;
+        private readonly IAmazonCloudWatchLogs cwlClient;
 
-        public ScopedProcessingService(ILogger<ScopedProcessingService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client)
+        public ScopedUpdatingService(ILogger<ScopedUpdatingService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient)
         {
             _logger = logger;
             context = Context;
             ec2Client = EC2Client;
+            cwClient = cloudwatchClient;
+            cweClient = cloudwatcheventsClient;
+            cwlClient = cloudwatchlogsClient;
         }
 
         public async Task DoWorkAsync()

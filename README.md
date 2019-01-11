@@ -38,18 +38,20 @@ However, it is gaining more popularity in recent years, and we hope to make it e
   - User will be able to immediately receive the message once send out.
 
 ## External Resources Used
-- Bootstrap (Local JS & CSS when in Development, CDN when in Production)
-- jQuery (Local JS when in Development, CDN when in Production)
-- jQuery Vaildation (Local JS when in Development, CDN when in Production)
-- jQuery Vaildation Unobtrusive (Local JS when in Development, CDN when in Production)
-- Popper (Local JS when in Development, CDN when in Production)
-- Google Material Icons (CDN regardless of Development or Production)
-- TurboLinksJS (Local JS when in Development, CDN when in Production)
-- Progress Tracker (Local CSS regardless of Development or Production)
-- DataTables (Local JS & CSS when in Development, CDN when in Production)
+- [Bootstrap](https://github.com/twbs/bootstrap) (Local JS & CSS when in Development, CDN when in Production)
+   - [jQuery](https://github.com/jquery/jquery) (Local JS when in Development, CDN when in Production)
+      - [jQuery Vaildation](https://github.com/jquery-validation/jquery-validation) (Local JS when in Development, CDN when in Production)
+      - [jQuery Vaildation Unobtrusive](https://github.com/aspnet/jquery-validation-unobtrusive) (Local JS when in Development, CDN when in Production)
+   - [Popper](https://github.com/FezVrasta/popper.js) (Local JS when in Development, CDN when in Production)
+- [Google Material Icons](https://github.com/google/material-design-icons) (CDN regardless of Development or Production)
+- [TurboLinksJS](https://github.com/turbolinks/turbolinks) (Local JS when in Development, CDN when in Production)
+- [Progress Tracker](https://github.com/NigelOToole/progress-tracker/) (Local CSS regardless of Development or Production)
+- [DataTables](https://datatables.net/) (Local JS & CSS when in Development, CDN when in Production)
 
 ## Tools Used
 - Visual Studio 2017
 - ASP.NET Core 2.1 Framework
 - ASP.NET Entity Core Framework
 - Amazon Web Services (S3, RDS, EC2, EBS, VPC, SNS, ELB)
+- [FeedReader](https://github.com/codehollow/FeedReader)
+- [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)
