@@ -44,7 +44,19 @@ namespace UserSide.Controllers
                     break;
             }
 
-            return View(await context1.Posts.AsNoTracking().ToListAsync());
+            var category = await context1.ForumCategories
+                .Include(p => p.Posts)
+                .AsNoTracking()
+                .ToListAsync();
+                //.FirstOrDefaultAsync(m => m.CategoryID == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+
+            return View(category);
+
+            //return View(await context1.Posts.AsNoTracking().ToListAsync());
         }
         //public IActionResult Index()
         //{
