@@ -11,10 +11,5 @@ namespace AdminSide.Models
         public Competition Competition { get; set; }
         public CompetitionCategory CompetitionCategory { get; set; }
         public Challenge Challenge { get; set; }
-
-        public List<SelectListItem> CategoriesList { get; } = new List<SelectListItem>
-        {
-
-        };
     }
 }

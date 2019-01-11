@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Index";
+    int counter=0;
 }
 
 <br>
@@ -13,12 +14,14 @@
     <br>
     @foreach (var item in Model.CompetitionCategories)
     {
+        
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
         <hr>
         <div>
             <row>
                 <!--To standardize size of box/styling in future updates-->
                 <div>
+                    @{ counter = 0;}
                     @foreach (var item1 in Model.Challenges)
                     {
                         if (item1.CompetitionCategoryID == item.ID)
@@ -30,7 +33,12 @@
                                     @Html.DisplayFor(modelItem => item1.Value)
                                 </button>
                             </a>
+                            counter++;
                         }
+                    }
+                    @if (counter == 0)
+                    {
+                        <p>This category has no challenges yet</p>
                     }
                 </div>
             </row>

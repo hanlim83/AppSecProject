@@ -20,7 +20,7 @@
                 {
                     if (item1.CompetitionCategoryID == item.ID)
                     {
-                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item.ID">
+                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
                             <button type="button" class="btn btn-light">
                                 @Html.DisplayFor(modelItem => item1.Name)
                                 <br>

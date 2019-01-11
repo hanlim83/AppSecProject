@@ -25,7 +25,7 @@ using Amazon.ElasticLoadBalancingV2;
 using Amazon.ElasticBeanstalk;
 using UserSide.Areas.Identity.Services;
 using Amazon.SimpleSystemsManagement;
-
+using UserSide.Hubs;
 
 namespace UserSide
 {
@@ -173,6 +173,9 @@ namespace UserSide
             services.AddAWSService<IAmazonElasticBeanstalk>();
             //SSM Initialization
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
+
+            //Chat Signalr
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -195,6 +198,12 @@ namespace UserSide
             app.UseCookiePolicy();
 
             app.UseAuthentication();
+
+            //Signalr app 
+            app.UseSignalR(routes =>
+            {
+                routes.MapHub<ChatHub>("/chatHub");
+            });
 
             app.UseMvc(routes =>
             {

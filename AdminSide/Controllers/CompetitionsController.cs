@@ -283,7 +283,7 @@ namespace AdminSide.Controllers
                 .FirstOrDefaultAsync(m => m.ID == id);
             foreach (var category in competition.CompetitionCategories)
             {
-                ClearBucket(competition.BucketName, category.CategoryName);
+                await ClearBucket(competition.BucketName, category.CategoryName);
             }
             DeleteBucket(competition.BucketName);
             _context.Competitions.Remove(competition);
@@ -291,18 +291,39 @@ namespace AdminSide.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private void ClearBucket(string bucketName, string folderName)
+        private async Task ClearBucket(string bucketName, string folderName)
         {
             try
             {
-                var deleteObjectRequest = new DeleteObjectRequest
+                //Old delete codes
+                //var deleteObjectRequest = new DeleteObjectRequest
+                //{
+                //    BucketName = bucketName,
+                //    Key = folderName + "/"
+                //};
+
+                //Console.WriteLine("Deleting an object");
+                //S3Client.DeleteObjectAsync(deleteObjectRequest);
+
+                //New delete codes
+                DeleteObjectsRequest request2 = new DeleteObjectsRequest();
+                ListObjectsRequest request = new ListObjectsRequest
                 {
                     BucketName = bucketName,
-                    Key = folderName + "/"
+                    Prefix = folderName
+
                 };
 
-                Console.WriteLine("Deleting an object");
-                S3Client.DeleteObjectAsync(deleteObjectRequest);
+                ListObjectsResponse response = await S3Client.ListObjectsAsync(request);
+                // Process response.
+                foreach (S3Object entry in response.S3Objects)
+                {
+
+                    request2.AddKey(entry.Key);
+                }
+                request2.BucketName = bucketName;
+                DeleteObjectsResponse response2 = await S3Client.DeleteObjectsAsync(request2);
+
             }
             catch (AmazonS3Exception e)
             {

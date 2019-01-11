@@ -1,8 +1,13 @@
-﻿using System;
+﻿using AdminSide.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Web;
+using System.Xml.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using CodeHollow.FeedReader;
 
 namespace AdminSide.Controllers
 {
@@ -15,6 +20,41 @@ namespace AdminSide.Controllers
 
         public IActionResult SearchPage()
         {
+            return View();
+        }
+
+        // RSS FEED Codes
+        /*[HttpPost]
+        public ActionResult Index (string RSSURL)
+        {
+            WebClient wclient = new WebClient();
+            string RSSDate = wclient.DownloadString(RSSURL);
+
+            XDocument xml = XDocument.Parse(RSSDate);
+            var RSSFeedData = (from x in xml.Descendants("item") select new RSSFeed
+            {
+                Title = ((string)x.Element("title")),
+                Link = ((string)x.Element("link")),
+                Description = ((string)x.Element("description")),
+                PubDate = ((string)x.Element("pubDate"))
+            });
+            ViewBag.RSSFeed = RSSFeedData;
+            ViewBag.URL = RSSURL;
+            return View();
+        }*/
+        [HttpPost]
+        public async Task<IActionResult> Index (string RSSURL)
+        {
+            var feed = await FeedReader.ReadAsync(RSSURL); //await will wait for the feed
+            RSSFeed rssfeed = new RSSFeed
+            {
+                Title = feed.Title,
+                Link = feed.Link,
+                Description = feed.Description,
+                PubDate = feed.LastUpdatedDateString
+            };
+            ViewBag.RSSFeed = feed;
+            ViewBag.URL = RSSURL;
             return View();
         }
     }
