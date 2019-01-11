@@ -21,8 +21,10 @@ namespace AdminSide
                 {
                     var contextPR = services.GetRequiredService<PlatformResourcesContext>();
                     var contextC = services.GetRequiredService<CompetitionContext>();
+                    var contextF = services.GetRequiredService<ForumContext>();
                     DbInitializer.InitializePlatformResources(contextPR);
                     DbInitializer.InitializeCompetitions(contextC);
+                    DbInitializer.InitializeForum(contextF);
                 }
                 catch (Exception ex)
                 {

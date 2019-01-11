@@ -1,5 +1,6 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
+using AdminSide.Data;
 using AdminSide.Models;
 using System;
 using System.Linq;
@@ -358,6 +359,43 @@ namespace AdminSide.Data
                 context.Teams.Add(t);
             }
             context.SaveChanges();
+        }
+
+        public static void InitializeForum(ForumContext context)
+        {
+            context.Database.EnsureCreated();
+
+            if (context.Posts.Any())
+            {
+                return;   // DB has been seeded
+            }
+
+            var category = new ForumCategory[]
+            {
+            new ForumCategory{CategoryName="General"},
+            new ForumCategory{CategoryName="Crypto"}
+            };
+
+            foreach (ForumCategory c in category)
+            {
+                context.ForumCategories.Add(c);
+            }
+            context.SaveChanges();
+
+            var post = new Post[]
+            {
+            new Post{ Title="Errors", Content="How To Fix", UserName="Elxxwy", CategoryID=1 },
+            new Post{ Title="General", Content="How To Do", UserName="Eevee", CategoryID=2 },
+            new Post{ Title="Errors", Content="How To UnFix", UserName="EVELYN", CategoryID=1 },
+            new Post{ Title="General", Content="How To Undo", UserName="Elxxwy", CategoryID=2 },
+            };
+
+            foreach (Post p in post)
+            {
+                context.Posts.Add(p);
+            }
+            context.SaveChanges();
+
         }
     }
 }
