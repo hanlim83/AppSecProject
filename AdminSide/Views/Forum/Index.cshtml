@@ -1,0 +1,131 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+<!-- Style -->
+<style>
+    /* BACK TO TOP*/
+    #myBtn {
+        display: none;
+        position: fixed;
+        bottom: 15px;
+        right: 50px;
+        z-index: 99;
+        font-size: 18px;
+        border: groove;
+        padding: 5px;
+        outline: none;
+        background-color: white;
+        cursor: pointer;
+        border-radius: 2px;
+    }
+
+        #myBtn:hover {
+            background-color: #555;
+            color: white;
+        }
+</style>
+
+<!-- Back To Top -->
+<div>
+    <button onclick="topFunction()" id="myBtn" title="Go to top">Back to Top</button>
+</div>
+
+<!-- Everything before the Panel Category -->
+<div class="container">
+    <br />
+    <h2> Forum Page (Admin) </h2>
+    <p>
+        <a asp-action="NewTopicF"> New Topic </a>
+    </p>
+
+    <form asp-action="Index" method="get">
+        <div class="form-actions no-colour">
+            <p>
+                Search: <input type="text" name="SearchString" value="@ViewData["currentFilter"]" />
+                <input type="submit" value="Search" class="btn btn-default" /> |
+                <a asp-action="Index"> Back to Full List</a>
+            </p>
+        </div>
+    </form>
+</div>
+
+<!-- Panel Category 1 -->
+@foreach (var category in Model)
+{
+    <div class="container" id="cat1" style="padding: 10px;">
+        <div class="panel-group">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">
+                        <a data-toggle="collapse" href="#collapse1">Category: @Html.DisplayName(category.CategoryName)</a>
+                    </h4>
+                </div>
+                <div id="collapse1" class=".collapse in">
+                    <div class="card-body" style="padding: 10px;">
+
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th> Title </th>
+                                    <th> Content </th>
+                                    <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]"> Posted By </a></th>
+                                    <th><a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]"> Posted On </a></th>
+                                    @*<th> @Html.DisplayNameFor(model => model.Title) </th>
+                                        <th> @Html.DisplayNameFor(model => model.Content) </th>
+                                        <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">@Html.DisplayNameFor(model => model.UserName)</a></th>
+                                        <th><a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]">@Html.DisplayNameFor(model => model.DT)</a></th>*@
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in category.Posts)
+                                {
+                                    <tr>
+                                        @*<td>
+                                            @Html.DisplayFor(modelItem => item.Title)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.Content)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.UserName)
+                                        </td>
+                                        <td>
+                                            @Html.DisplayFor(modelItem => item.DT)
+                                        </td>*@
+                                        <td>
+                                            <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |
+                                            <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |
+                                            <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!-- Script for Back To Top Button -->
+<script>
+    // When the user scrolls down 20px from the top of the document, show the button
+    window.onscroll = function () { scrollFunction() };
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 10 || document.documentElement.scrollTop > 10) {
+            document.getElementById("myBtn").style.display = "block";
+        } else {
+            document.getElementById("myBtn").style.display = "none";
+        }
+    }
+
+    // When the user clicks on the button, scroll to the top of the document
+    function topFunction() {
+        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+    }
+</script>
