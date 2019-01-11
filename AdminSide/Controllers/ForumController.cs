@@ -21,13 +21,34 @@ namespace AdminSide.Controllers
             context1 = con;
         }
 
+        //public IActionResult Index()
+        //{
+        //    return View();
+        //}
+
         // GET: Forum Post
-        public async Task<IActionResult> Index(string sortOrder)
+        public async Task<IActionResult> Index(string sortOrder, string searchString/*, string currentFilter, int? page*/)
         {
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
+
+            //if (searchString != null)
+            //{
+            //    page = 1;
+            //}
+            //else
+            //{
+            //    searchString = currentFilter;
+            //}
+
+            ViewData["CurrentFilter"] = searchString;
+
             var posts = from p in context1.Posts
                         select p;
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                posts = posts.Where(p => p.UserName.Contains(searchString) || p.Title.Contains(searchString));
+            }
 
             switch (sortOrder)
             {
@@ -54,44 +75,14 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            return View(category);
+            //int pageSize = 3;
 
+            return View(category);
+            //return View(await PaginatedListF<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
             //return View(await context1.Posts.AsNoTracking().ToListAsync());
         }
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
 
-        // GET: Topic/Create
-        public IActionResult NewTopicF()
-        {
-            return View();
-        }
-
-        // POST: Topic/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> NewTopicF([Bind("Title,Content,UserName, DT, CategoryID")] Post post)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    context1.Add(post);
-                    await context1.SaveChangesAsync();
-                    return RedirectToAction(nameof(Index));
-                }
-            }
-            catch (DbUpdateException /* ex */)
-            {
-                //Log the error (uncomment ex variable name and write a log.
-                ModelState.AddModelError("", "Please Try Again.");
-            }
-            return View(post);
-        }
-
-
+        // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -113,8 +104,77 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
-        // GET: Students/Delete/5
-        public async Task<IActionResult> Delete(int? id, bool? saveChangesError = false)
+        // GET: Topic/Create
+        public IActionResult NewTopicF()
+        {
+            return View();
+        }
+
+        // POST: Topic/Create
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> NewTopicF([Bind("Title,Content,UserName, DT, CategoryID")] Post post)
+        {
+            if (ModelState.IsValid)
+            {
+                context1.Add(post);
+                await context1.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(post);
+        }
+
+        // GET: Forum/Edit
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var post = await context1.Posts.FindAsync(id);
+            if (post == null)
+            {
+                return NotFound();
+            }
+            return View(post);
+        }
+
+        // POST: Forum/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Title,Content,UserName, DT, CategoryID")] Post post)
+        {
+            if (id != post.PostID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    context1.Update(post);
+                    await context1.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PostExists(post.PostID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(post);
+        }
+
+        // GET: Forum/Delete
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
             {
@@ -129,16 +189,10 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            if (saveChangesError.GetValueOrDefault())
-            {
-                ViewData["ErrorMessage"] =
-                    "Delete failed. Try again.";
-            }
-
             return View(post);
         }
 
-        // POST: Students/Delete/5
+        // POST: Forum/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -149,9 +203,17 @@ namespace AdminSide.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool StudentExists(int id)
+        private bool PostExists(int id)
         {
             return context1.Posts.Any(e => e.PostID == id);
+        }
+
+        private void PopulateCategoryDropDownList(object selectCategory = null)
+        {
+            var categoryQuery = from c in context1.ForumCategories
+                                orderby c.CategoryName
+                                select c;
+            ViewBag.CategoryID = new SelectList(categoryQuery.AsNoTracking(), "CategoryID", "CategoryName", selectCategory);
         }
     }
 }

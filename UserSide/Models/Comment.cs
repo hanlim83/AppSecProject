@@ -16,6 +16,7 @@ namespace UserSide.Models
 
         public string Content { get; set; }
 
+        [DataType(DataType.Date)]
         public DateTime DT { get; set; }
 
         [ForeignKey("PostID")]

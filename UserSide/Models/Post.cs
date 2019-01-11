@@ -20,17 +20,18 @@ namespace UserSide.Models
 
         public string Content { get; set; }
 
+        [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy} | {0:hh:mm tt}", ApplyFormatInEditMode = true)]
         [Display(Name = "Posted On")]
         public DateTime DT { get; set; }
 
         [ForeignKey("CategoryID")]
         public int CategoryID { get; set; }
-        //public string CategoryName { get; set; }
+
+        [ForeignKey("CategoryName")]
+        public string CategoryName { get; set; }
 
         public ICollection<Comment> Comments { get; set; }
-
-        //public ForumCategory LinkedCategory { get; set; }
 
         public string Secret { get; set; }
 
