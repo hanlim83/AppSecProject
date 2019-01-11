@@ -11,7 +11,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
 
     public enum State
     {
-        Starting,Running,Stopping,Stopped
+        Starting,Running,Stopping,Stopped,Error
     }
 
     public enum Workload

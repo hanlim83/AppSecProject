@@ -169,8 +169,9 @@ namespace AdminSide
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
 
             //Background Processing
-            services.AddHostedService<ConsumeScopedServiceHostedService>();
-            services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
+            services.AddHostedService<ConsumeScopedServicesHostedService>();
+            services.AddScoped<IScopedUpdatingService, ScopedUpdatingService>();
+            services.AddScoped<IScopedRetrievalService, ScopedRetrievalService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

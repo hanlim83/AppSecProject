@@ -430,7 +430,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         {
 
                             if (ipv6Subnet == ipv6CIDR[i])
+                            {
                                 passed = false;
+                                break;
+                            }
                             else
                                 passed = true;
                         }

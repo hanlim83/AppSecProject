@@ -39,6 +39,26 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             return View();
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Index(string Component)
+        {
+            if (Component == null)
+                return View();
+            else
+            {
+                if (Component.Equals("RDS"))
+                {
+                    return View(await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest {
+                        LogGroupName= "RDSOSMetrics",
+                        LogStreamName= "db-74DSOXWDBQWHTVNTY7RFXWRZYE"
+                    }));
+                }
+                else
+                    return View();
+            }
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

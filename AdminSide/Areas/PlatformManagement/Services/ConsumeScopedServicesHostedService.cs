@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
-    internal class ConsumeScopedServiceHostedService : IHostedService, IDisposable
+    internal class ConsumeScopedServicesHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
         private Timer _timer;
 
-        public ConsumeScopedServiceHostedService(ILogger<ConsumeScopedServiceHostedService> logger, IServiceProvider services)
+        public ConsumeScopedServicesHostedService(ILogger<ConsumeScopedServicesHostedService> logger, IServiceProvider services)
         {
             _logger = logger;
             Services = services;
@@ -21,23 +21,23 @@ namespace AdminSide.Areas.PlatformManagement.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Update Background Service is starting.");
+            _logger.LogInformation("Update Background Service has been scheduled to start.");
 
-            _timer = new Timer(DoWorkAsync, null, TimeSpan.Zero,
+            _timer = new Timer(DoWorkAsyncUpdate, null, TimeSpan.FromSeconds(30),
                 TimeSpan.FromSeconds(60));
 
             return Task.CompletedTask;
         }
 
-        private async void DoWorkAsync(object state)
+        private async void DoWorkAsyncUpdate(object state)
         {
             using (var scope = Services.CreateScope())
             {
-                var scopedProcessingService =
+                var scopedUpdatingService =
                     scope.ServiceProvider
-                        .GetRequiredService<IScopedProcessingService>();
+                        .GetRequiredService<IScopedUpdatingService>();
 
-                await scopedProcessingService.DoWorkAsync();
+                await scopedUpdatingService.DoWorkAsync();
             }
         }
         public Task StopAsync(CancellationToken cancellationToken)
