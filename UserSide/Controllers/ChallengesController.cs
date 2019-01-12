@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Amazon.S3;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +14,14 @@ namespace UserSide.Controllers
 {
     public class ChallengesController : Controller
     {
+        IAmazonS3 S3Client { get; set; }
+
         private readonly CompetitionContext _context;
 
-        public ChallengesController(CompetitionContext context)
+        public ChallengesController(CompetitionContext context, IAmazonS3 s3Client)
         {
             _context = context;
+            this.S3Client = s3Client;
         }
 
         // GET: Challenges
@@ -56,6 +61,17 @@ namespace UserSide.Controllers
             }
             //Stop field from being populated at View
             challenge.Flag = null;
+
+            var competition = await _context.Competitions.FindAsync(challenge.CompetitionID);
+            string bucketName = competition.BucketName;
+            var category = await _context.CompetitionCategories.FindAsync(challenge.CompetitionCategoryID);
+            string folderName = category.CategoryName;
+            string fileName = challenge.FileName;
+            Regex pattern = new Regex("[+]");
+            string tempFileName = pattern.Replace(fileName, "%2B");
+            tempFileName.Replace(' ', '+');
+
+            ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
 
             return View(challenge);
         }

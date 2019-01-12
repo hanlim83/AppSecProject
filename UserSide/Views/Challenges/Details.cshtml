@@ -30,6 +30,9 @@
                 @Html.DisplayFor(model => model.Value)
             </dd>
         </dl>
+        <form method="get" action="@ViewData["FileLink"]">
+            <button type="submit">Download!</button>
+        </form>
     </div>
     <div>
         <form method="post" asp-action="Details">
