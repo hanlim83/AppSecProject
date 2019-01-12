@@ -120,11 +120,6 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     string[] ipv6CIDRStr = IPv6CIDR.Split(":");
                     for (int i = 0; i < 3; i++)
                     {
-                        String testing = ipv6CIDRStr[0] + ":" + ipv6CIDRStr[1] + ":" + ipv6CIDRStr[2] + ":" + ipv6CIDRStr[3].Substring(0, 3) + i + "::/64";
-                        if (testing.Equals("2406:da18:b5d:dc00::/64"))
-                            _logger.LogInformation("True");
-                        else
-                            _logger.LogInformation("False");
                         CreateSubnetResponse responseCreateSubnet = await ec2Client.CreateSubnetAsync(new CreateSubnetRequest
                         {
                             CidrBlock = IPv4CIDR.Substring(0, 7)+i+ ".0/24",
@@ -425,6 +420,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     context.Routes.Add(Extranetv4);
                     context.Routes.Add(Extranetv6);
                     await context.SaveChangesAsync();
+                    _logger.LogInformation("Setup Background Service Sleeping while waiting for NAT Gateway to be ready");
                     Thread.Sleep(new TimeSpan(0, 1, 0));
                     responseCreateRoute = await ec2Client.CreateRouteAsync(new CreateRouteRequest
                     {
@@ -453,6 +449,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                         }
                     });
+                    _logger.LogInformation("Setup Background Service Completed!");
                 } else
                     _logger.LogInformation("Route Tables Found!");
                 //if (context.Subnets.Any())
@@ -701,10 +698,6 @@ namespace AdminSide.Areas.PlatformManagement.Services
             {
                 _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message);
             }
-        }
-        public async Task AWSNATDelayedTask()
-        {
-
         }
     }
 }
