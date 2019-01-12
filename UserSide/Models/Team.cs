@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdminSide.Models
+namespace UserSide.Models
 {
     public class Team
     {
@@ -21,9 +21,6 @@ namespace AdminSide.Models
         [DataType(DataType.Password)]
         public string Password { get; set; }
         public int Score { get; set; }
-
-        //[Display(Name = "Remember me?")]
-        //public bool RememberMe { get; set; }
 
         [ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
