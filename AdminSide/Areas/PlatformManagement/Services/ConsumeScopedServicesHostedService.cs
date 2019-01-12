@@ -10,7 +10,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
     internal class ConsumeScopedServicesHostedService : IHostedService, IDisposable
     {
         private readonly ILogger _logger;
-        private Timer _timer;
+        private Timer _timer1;
+        private Timer _timer2;
 
         public ConsumeScopedServicesHostedService(ILogger<ConsumeScopedServicesHostedService> logger, IServiceProvider services)
         {
@@ -21,12 +22,29 @@ namespace AdminSide.Areas.PlatformManagement.Services
 
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Update Background Service has been scheduled to start.");
+            _logger.LogInformation("Setup Background Service is about to start.");
 
-            _timer = new Timer(DoWorkAsyncUpdate, null, TimeSpan.FromSeconds(30),
-                TimeSpan.FromSeconds(60));
+            _timer1 = new Timer(DoWorkAsyncSetup, null, TimeSpan.FromSeconds(10),
+                TimeSpan.FromMilliseconds(-1));
+
+            //_logger.LogInformation("Update Background Service has been scheduled to start.");
+
+            //_timer2 = new Timer(DoWorkAsyncUpdate, null, TimeSpan.FromSeconds(30),
+            //    TimeSpan.FromSeconds(60));
 
             return Task.CompletedTask;
+        }
+
+        private async void DoWorkAsyncSetup(object state)
+        {
+            using (var scope = Services.CreateScope())
+            {
+                var ScopedSetupService =
+                    scope.ServiceProvider
+                        .GetRequiredService<IScopedSetupService>();
+
+                await ScopedSetupService.DoWorkAsync();
+            }
         }
 
         private async void DoWorkAsyncUpdate(object state)
@@ -44,14 +62,14 @@ namespace AdminSide.Areas.PlatformManagement.Services
         {
             _logger.LogInformation("Update Background Service is stopping.");
 
-            _timer?.Change(Timeout.Infinite, 0);
+            _timer1?.Change(Timeout.Infinite, 0);
 
             return Task.CompletedTask;
         }
 
         public void Dispose()
         {
-            _timer?.Dispose();
+            _timer1?.Dispose();
         }
     }
 }

@@ -30,7 +30,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string AWSVPCSubnetReference { get; set; }
 
         public RouteTable LinkedRT { get; set; }
-        public int RouteTableID { get; set; }
+        public int? RouteTableID { get; set; }
         public string AWSVPCRouteTableAssoicationID { get; set; }
 
         public ICollection<Server>LinkedServers { get; set; }
