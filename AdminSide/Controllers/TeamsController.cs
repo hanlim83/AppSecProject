@@ -20,9 +20,25 @@ namespace AdminSide.Controllers
         }
 
         // GET: Teams
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            return View(await _context.Teams.ToListAsync());
+            ViewData["NavigationShowAll"] = true;
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            return View(competition);
+            //return View(await _context.Teams.ToListAsync());
         }
 
         // GET: Teams/Details/5
@@ -44,9 +60,16 @@ namespace AdminSide.Controllers
         }
 
         // GET: Teams/Create
-        public IActionResult Create()
+        public IActionResult Create(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Team team = new Team();
+            team.CompetitionID = (int)id;
+            return View(team);
         }
 
         // POST: Teams/Create
@@ -60,9 +83,11 @@ namespace AdminSide.Controllers
             {
                 _context.Add(team);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Teams", new { id = team.CompetitionID });
             }
             return View(team);
+            //return RedirectToAction("Index", "Teams", new { id = team.CompetitionID });
         }
 
         // GET: Teams/Edit/5

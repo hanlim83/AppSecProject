@@ -334,10 +334,10 @@ namespace AdminSide.Data
 
             var challenges = new Challenge[]
             {
-            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
             };
 
             foreach (Challenge ch in challenges)

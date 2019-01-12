@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.IO;
 using Amazon.S3.Transfer;
 using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace AdminSide.Controllers
 {
@@ -69,6 +70,39 @@ namespace AdminSide.Controllers
             return View(challenge);
         }
 
+        //Update Details code
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Details(int id, [Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge)
+        {
+            if (id != challenge.ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(challenge);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ChallengeExists(challenge.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
+            }
+            return View(challenge);
+        }
+
         // GET: Challenges/Create
         public async Task<IActionResult> Create(int? id)
         {
@@ -111,7 +145,7 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge, List<IFormFile> files)
+        public async Task<IActionResult> Create([Bind("ID,Name,Description,Value,Flag,FileName,CompetitionID,CompetitionCategoryID")] Challenge challenge, List<IFormFile> files)
         {
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
@@ -125,6 +159,7 @@ namespace AdminSide.Controllers
                 {
                     foreach (var file in files)
                     {
+                        challenge.FileName = file.FileName;
                         await UploadFileToS3(file, competition.BucketName, category.CategoryName);
                     }
                 }
@@ -239,9 +274,26 @@ namespace AdminSide.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var challenge = await _context.Challenges.FindAsync(id);
+            await DeleteFileAsync(challenge.CompetitionID, challenge.CompetitionCategoryID, challenge.FileName);
             _context.Challenges.Remove(challenge);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
+        }
+
+        private async Task DeleteFileAsync(int competitionID, int competitionCategoryID, string fileName)
+        {
+            var competition = await _context.Competitions.FindAsync(competitionID);
+            string bucketName = competition.BucketName;
+            var category = await _context.CompetitionCategories.FindAsync(competitionCategoryID);
+            string folderName = category.CategoryName;
+            var deleteObjectRequest = new DeleteObjectRequest
+            {
+                BucketName = bucketName,
+                Key = folderName + "/" + fileName
+            };
+
+            //Console.WriteLine("Deleting an object");
+            await S3Client.DeleteObjectAsync(deleteObjectRequest);
         }
 
         private bool ChallengeExists(int id)
