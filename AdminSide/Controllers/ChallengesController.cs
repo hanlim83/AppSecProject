@@ -69,6 +69,39 @@ namespace AdminSide.Controllers
             return View(challenge);
         }
 
+        //Update Details code
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Details(int id, [Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge)
+        {
+            if (id != challenge.ID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(challenge);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!ChallengeExists(challenge.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
+            }
+            return View(challenge);
+        }
+
         // GET: Challenges/Create
         public async Task<IActionResult> Create(int? id)
         {
@@ -233,6 +266,8 @@ namespace AdminSide.Controllers
 
             return View(challenge);
         }
+
+
 
         // POST: Challenges/Delete/5
         [HttpPost, ActionName("Delete")]
