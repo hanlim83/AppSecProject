@@ -54,8 +54,43 @@ namespace UserSide.Controllers
             {
                 return NotFound();
             }
+            //Stop field from being populated at View
+            challenge.Flag = null;
 
             return View(challenge);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Details([Bind("Flag")] Challenge challenge, int? id)
+        {
+            //if (ModelState.IsValid)
+            //{
+            //    _context.Add(challenge);
+            //    await _context.SaveChangesAsync();
+            //    return RedirectToAction(nameof(Index));
+            //}
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var temp_challenge = await _context.Challenge
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (temp_challenge == null)
+            {
+                return NotFound();
+            }
+
+            if (challenge.Flag.Equals(temp_challenge.Flag))
+            {
+                //Flag is correct
+                //Add points to score and stuff
+                return RedirectToAction("Index", "Challenges", new { id });
+            }
+            //Wrong flag
+            return RedirectToAction("Details", "Challenges", new { id });
+            //return View(id);
         }
 
         // GET: Challenges/Create
