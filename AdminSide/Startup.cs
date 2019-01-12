@@ -168,10 +168,12 @@ namespace AdminSide
             //SSM Initialization
             services.AddAWSService<IAmazonSimpleSystemsManagement>();
 
+            /*
             //Background Processing
             services.AddHostedService<ConsumeScopedServicesHostedService>();
             services.AddScoped<IScopedUpdatingService, ScopedUpdatingService>();
             services.AddScoped<IScopedRetrievalService, ScopedRetrievalService>();
+            */
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
