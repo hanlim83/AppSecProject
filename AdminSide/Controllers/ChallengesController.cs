@@ -111,7 +111,7 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge, List<IFormFile> files)
+        public async Task<IActionResult> Create([Bind("ID,Name,Description,Value,Flag,FileName,CompetitionID,CompetitionCategoryID")] Challenge challenge, List<IFormFile> files)
         {
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
@@ -125,6 +125,7 @@ namespace AdminSide.Controllers
                 {
                     foreach (var file in files)
                     {
+                        challenge.FileName = file.FileName;
                         await UploadFileToS3(file, competition.BucketName, category.CategoryName);
                     }
                 }
