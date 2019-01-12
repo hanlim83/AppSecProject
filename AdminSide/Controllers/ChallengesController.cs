@@ -11,6 +11,7 @@ using System.Net.Http.Headers;
 using System.IO;
 using Amazon.S3.Transfer;
 using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace AdminSide.Controllers
 {
@@ -267,17 +268,32 @@ namespace AdminSide.Controllers
             return View(challenge);
         }
 
-
-
         // POST: Challenges/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var challenge = await _context.Challenges.FindAsync(id);
+            await DeleteFileAsync(challenge.CompetitionID, challenge.CompetitionCategoryID, challenge.FileName);
             _context.Challenges.Remove(challenge);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
+        }
+
+        private async Task DeleteFileAsync(int competitionID, int competitionCategoryID, string fileName)
+        {
+            var competition = await _context.Competitions.FindAsync(competitionID);
+            string bucketName = competition.BucketName;
+            var category = await _context.CompetitionCategories.FindAsync(competitionCategoryID);
+            string folderName = category.CategoryName;
+            var deleteObjectRequest = new DeleteObjectRequest
+            {
+                BucketName = bucketName,
+                Key = folderName + "/" + fileName
+            };
+
+            //Console.WriteLine("Deleting an object");
+            await S3Client.DeleteObjectAsync(deleteObjectRequest);
         }
 
         private bool ChallengeExists(int id)
