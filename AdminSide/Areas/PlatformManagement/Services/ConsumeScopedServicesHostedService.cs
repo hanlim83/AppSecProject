@@ -27,10 +27,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
             _timer1 = new Timer(DoWorkAsyncSetup, null, TimeSpan.FromSeconds(10),
                 TimeSpan.FromMilliseconds(-1));
 
-            //_logger.LogInformation("Update Background Service has been scheduled to start.");
+            _logger.LogInformation("Update Background Service has been scheduled to start.");
 
-            //_timer2 = new Timer(DoWorkAsyncUpdate, null, TimeSpan.FromSeconds(30),
-            //    TimeSpan.FromSeconds(60));
+            _timer2 = new Timer(DoWorkAsyncUpdate, null, TimeSpan.FromSeconds(30),
+                TimeSpan.FromSeconds(60));
 
             return Task.CompletedTask;
         }
