@@ -1,4 +1,5 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
+using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
@@ -45,7 +46,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     ViewData["Result"] = "Invaild Subnet!";
                     return View(await _context.Subnets.ToListAsync());
                 }
-                else if (subnetID == "1" || subnetID == "2" || subnetID == "3")
+                else if (Deletesubnet.editable == false)
                 {
                     ViewData["Result"] = "You cannot delete a default subnet!";
                     return View(await _context.Subnets.ToListAsync());
@@ -55,9 +56,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                     {
                         Filters = new List<Amazon.EC2.Model.Filter>
-                {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
-                }
+                        {
+                            new Filter("vpc-id",new List<string>
+                            {
+                                Deletesubnet.LinkedVPC.AWSVPCReference
+                            })
+                        }
                     });
                     Boolean flag = false;
                     for (int i = 0; i < response.Subnets.Count; i++)
@@ -105,7 +109,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else if (action.Equals("Modify") && !String.IsNullOrEmpty(subnetID))
             {
-                if (subnetID == "1" || subnetID == "2" || subnetID == "3")
+                var Modifysubnet = await _context.Subnets.FindAsync(Int32.Parse(subnetID));
+                if (Modifysubnet.editable == false)
                 {
                     ViewData["Result"] = "You cannot modify a default subnet!";
                     return View(await _context.Subnets.ToListAsync());
@@ -149,7 +154,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 return StatusCode(500);
             }
-            else if (subnet.ID == 1 || subnet.ID == 2 || subnet.ID == 3)
+            else if (subnet.editable == false)
             {
                 ViewData["Exception"] = "You cannot edit a default subnet!";
                 return View(subnet);
@@ -275,11 +280,15 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Create()
         {
+            VPC vpc = await _context.VPCs.FindAsync(1);
             DescribeVpcsResponse response = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
             {
-                Filters = new List<Amazon.EC2.Model.Filter>
+                Filters = new List<Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                    new Filter("vpc-id", new List<string>
+                    {
+                        vpc.AWSVPCReference
+                    })
                 }
             });
             String[] IPBlocks = response.Vpcs[0].CidrBlock.Split(".");
@@ -341,11 +350,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         ViewData["Exception"] = "Input Invaild!";
                         return View();
                 }
+                VPC vpc = await _context.VPCs.FindAsync(1);
                 DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                 {
                     Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
                 }
                 });
                 List<int> ipv6CIDR = new List<int>();
@@ -358,11 +368,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     {
                         Filters = new List<Amazon.EC2.Model.Filter>
                         {
-                            new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                            new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
                         }
                     });
-                    Vpc vpc = responseV.Vpcs[0];
-                    VpcIpv6CidrBlockAssociation ipv6CidrBlockAssociation = vpc.Ipv6CidrBlockAssociationSet[0];
+                    Vpc vpcR = responseV.Vpcs[0];
+                    VpcIpv6CidrBlockAssociation ipv6CidrBlockAssociation = vpcR.Ipv6CidrBlockAssociationSet[0];
                     ipv6CIDRstr = ipv6CidrBlockAssociation.Ipv6CidrBlock.Split(":");
                 }
                 else
@@ -470,7 +480,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             {
                                 Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
                 }
                             });
                             String[] IPBlocks = responseD.Vpcs[0].CidrBlock.Split(".");
@@ -485,7 +495,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         {
                             Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
                 }
                         });
                         String[] IPBlocks = responseD.Vpcs[0].CidrBlock.Split(".");
@@ -501,7 +511,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     {
                         Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
                 }
                     });
                     String[] IPBlocks = responseD.Vpcs[0].CidrBlock.Split(".");

@@ -28,6 +28,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         [Display(Name = "IPv6 CIDR")]
         public string IPv6CIDR { get; set; }
         public string AWSVPCSubnetReference { get; set; }
+        public bool editable { get; set; }
 
         public RouteTable LinkedRT { get; set; }
         public int? RouteTableID { get; set; }
