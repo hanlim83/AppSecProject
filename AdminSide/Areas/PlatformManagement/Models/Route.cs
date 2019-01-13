@@ -34,6 +34,6 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string customSubnets { get; set; }
 
         public int RouteTableID { get; set; }
-        public RouteTable LinkedRouteTable { get; set; }
+        public virtual RouteTable LinkedRouteTable { get; set; }
     }
 }

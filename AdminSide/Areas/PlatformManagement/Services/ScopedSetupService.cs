@@ -95,6 +95,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     };
                     context.VPCs.Add(newlyCreatedVPC);
                     await context.SaveChangesAsync();
+                    _logger.LogInformation("VPC created!");
                 } else
                     _logger.LogInformation("VPC already created!");
                 VPC vpc = await context.VPCs.FindAsync(1);
@@ -200,6 +201,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         context.Subnets.Add(newSubnet);
                     }
                     await context.SaveChangesAsync();
+                    _logger.LogInformation("Subnets created!");
                 }
                 else
                     _logger.LogInformation("Subnets already created!");
@@ -468,6 +470,22 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                         }
                     });
+                    _logger.LogInformation("Route Tables Created!");
+                    _logger.LogInformation("Linking Subnets to Route Tables (SQL)");
+                    Subnet subnet = await context.Subnets.FindAsync(1);
+                    RouteTable routeTable = await context.RouteTables.FindAsync(1);
+                    subnet.RouteTableID = routeTable.ID;
+                    context.Subnets.Update(subnet);
+                    subnet = await context.Subnets.FindAsync(2);
+                    routeTable = await context.RouteTables.FindAsync(3);
+                    subnet.RouteTableID = routeTable.ID;
+                    context.Subnets.Update(subnet);
+                    subnet = await context.Subnets.FindAsync(3);
+                    routeTable = await context.RouteTables.FindAsync(2);
+                    subnet.RouteTableID = routeTable.ID;
+                    context.Subnets.Update(subnet);
+                    await context.SaveChangesAsync();
+                    _logger.LogInformation("Linking Subnets to Route Tables (SQL) Completed!");
                     _logger.LogInformation("Setup Background Service Completed!");
                 } else
                     _logger.LogInformation("Route Tables Found!");

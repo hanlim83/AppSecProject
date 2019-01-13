@@ -124,7 +124,7 @@ namespace AdminSide
 
             //Platform Resources Db Context
             services.AddDbContext<PlatformResourcesContext>(options =>
-            options.UseSqlServer(
+            options.UseLazyLoadingProxies().UseSqlServer(
             GetRdsConnectionStringPlatformResources()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)

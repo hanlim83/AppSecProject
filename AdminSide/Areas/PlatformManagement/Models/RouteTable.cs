@@ -6,9 +6,9 @@ namespace AdminSide.Areas.PlatformManagement.Models
     {
         public int ID { get; set; }
         public string AWSVPCRouteTableReference { get; set; }
-        public ICollection<Subnet>LinkedSubnets { get; set; }
-        public ICollection<Route>LinkedRoutes { get; set; }
+        public virtual ICollection<Subnet>LinkedSubnets { get; set; }
+        public virtual ICollection<Route>LinkedRoutes { get; set; }
         public int VPCID { get; set; }
-        public VPC LinkedVPC { get; set; }
+        public virtual VPC LinkedVPC { get; set; }
     }
 }

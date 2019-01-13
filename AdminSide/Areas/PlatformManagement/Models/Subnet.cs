@@ -30,13 +30,13 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string AWSVPCSubnetReference { get; set; }
         public bool editable { get; set; }
 
-        public RouteTable LinkedRT { get; set; }
+        public virtual RouteTable LinkedRT { get; set; }
         public int? RouteTableID { get; set; }
         public string AWSVPCRouteTableAssoicationID { get; set; }
 
         public int VPCID { get; set; }
-        public VPC LinkedVPC { get; set; }
+        public virtual VPC LinkedVPC { get; set; }
 
-        public ICollection<Server>LinkedServers { get; set; }
+        public virtual ICollection<Server>LinkedServers { get; set; }
     }
 }

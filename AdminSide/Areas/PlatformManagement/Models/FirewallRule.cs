@@ -25,6 +25,6 @@
         public Direction Direction { get; set; }
         public int ServerID { get; set; }
         public string IPCIDR { get; set; }
-        public Server LinkedServer { get; set; }
+        public virtual Server LinkedServer { get; set; }
     }
 }
