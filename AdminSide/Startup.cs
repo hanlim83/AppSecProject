@@ -133,6 +133,10 @@ namespace AdminSide
             options.AllowAreas = true;
             options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
             options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+        })
+        .AddMvcOptions(options =>
+        {
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
         });
 
             services.ConfigureApplicationCookie(options =>
