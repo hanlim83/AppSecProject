@@ -53,7 +53,7 @@ namespace UserSide.Controllers
                 return NotFound();
             }
 
-            var challenge = await _context.Challenge
+            var challenge = await _context.Challenges
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (challenge == null)
             {
@@ -91,7 +91,7 @@ namespace UserSide.Controllers
                 return NotFound();
             }
 
-            var temp_challenge = await _context.Challenge
+            var temp_challenge = await _context.Challenges
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (temp_challenge == null)
             {
@@ -109,111 +109,9 @@ namespace UserSide.Controllers
             //return View(id);
         }
 
-        // GET: Challenges/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Challenges/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(challenge);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(challenge);
-        }
-
-        // GET: Challenges/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var challenge = await _context.Challenge.FindAsync(id);
-            if (challenge == null)
-            {
-                return NotFound();
-            }
-            return View(challenge);
-        }
-
-        // POST: Challenges/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge)
-        {
-            if (id != challenge.ID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(challenge);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ChallengeExists(challenge.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(challenge);
-        }
-
-        // GET: Challenges/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var challenge = await _context.Challenge
-                .FirstOrDefaultAsync(m => m.ID == id);
-            if (challenge == null)
-            {
-                return NotFound();
-            }
-
-            return View(challenge);
-        }
-
-        // POST: Challenges/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var challenge = await _context.Challenge.FindAsync(id);
-            _context.Challenge.Remove(challenge);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
         private bool ChallengeExists(int id)
         {
-            return _context.Challenge.Any(e => e.ID == id);
+            return _context.Challenges.Any(e => e.ID == id);
         }
     }
 }
