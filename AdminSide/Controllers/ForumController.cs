@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using UserSide.Data;
-using UserSide.Models;
+using AdminSide.Data;
+using AdminSide.Models;
 
-namespace UserSide.Controllers
+namespace AdminSide.Controllers
 {
     public class ForumController : Controller
     {
@@ -27,7 +27,7 @@ namespace UserSide.Controllers
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
             var posts = from p in context1.Posts
-            select p;
+                        select p;
 
             switch (sortOrder)
             {
@@ -48,7 +48,7 @@ namespace UserSide.Controllers
                 .Include(p => p.Posts)
                 .AsNoTracking()
                 .ToListAsync();
-                //.FirstOrDefaultAsync(m => m.CategoryID == id);
+            //.FirstOrDefaultAsync(m => m.CategoryID == id);
             if (category == null)
             {
                 return NotFound();

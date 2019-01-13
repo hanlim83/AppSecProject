@@ -1,0 +1,40 @@
+﻿@model AdminSide.Models.Post
+@{
+    ViewData["Title"] = "Details";
+}
+<br />
+<div class="container">
+    <h2> Details of the Post </h2>
+</div>
+
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th> @Html.DisplayNameFor(model => model.Title) </th>
+                <th> @Html.DisplayNameFor(model => model.Content) </th>
+                <th> @Html.DisplayNameFor(model => model.UserName) </th>
+                <th> @Html.DisplayNameFor(model => model.DT) </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => modelItem.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => modelItem.Content)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => modelItem.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => modelItem.DT)
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="container">
+    <a asp-action="Index">Back to Posts</a>
+</div>
