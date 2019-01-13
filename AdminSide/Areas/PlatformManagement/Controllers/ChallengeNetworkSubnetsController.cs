@@ -1,17 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AdminSide.Areas.PlatformManagement.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using AdminSide.Areas.PlatformManagement.Data;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
-using System.Diagnostics;
-using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
-using RouteTable = AdminSide.Areas.PlatformManagement.Models.RouteTable;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using RouteTable = AdminSide.Areas.PlatformManagement.Models.RouteTable;
+using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -34,7 +34,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Index(string action, string subnetID)
         {
             if (action.Equals("Delete") && !String.IsNullOrEmpty(subnetID))
@@ -137,7 +137,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Edit(int ID, [Bind("ID,Name,Type,IPv4CIDR,IPv6CIDR")] Subnet Newsubnet)
         {
             var subnet = await _context.Subnets.FindAsync(ID);
@@ -160,7 +160,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     await EC2Client.DeleteTagsAsync(new DeleteTagsRequest
                     {
-                        Resources =  new List<string>
+                        Resources = new List<string>
                         {
                             subnet.AWSVPCSubnetReference
                         },
@@ -169,7 +169,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             new Tag("Name")
                         }
                     });
-                    await EC2Client.CreateTagsAsync(new CreateTagsRequest {
+                    await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                    {
                         Resources = new List<string>
                         {
                             subnet.AWSVPCSubnetReference
@@ -287,7 +288,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Create([Bind("Name,Type,IPv4CIDR,SubnetSize")] Subnet subnet)
         {
             if (ModelState.IsValid)
