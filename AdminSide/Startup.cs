@@ -136,7 +136,7 @@ namespace AdminSide
 
             //Platform Resources Db Context
             services.AddDbContext<PlatformResourcesContext>(options =>
-            options.UseSqlServer(
+            options.UseLazyLoadingProxies().UseSqlServer(
             GetRdsConnectionStringPlatformResources()));
 
             //Forum Db Context
@@ -150,6 +150,10 @@ namespace AdminSide
             options.AllowAreas = true;
             options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
             options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+        })
+        .AddMvcOptions(options =>
+        {
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
         });
 
             services.ConfigureApplicationCookie(options =>
@@ -188,7 +192,7 @@ namespace AdminSide
             //Background Processing
             services.AddHostedService<ConsumeScopedServicesHostedService>();
             services.AddScoped<IScopedUpdatingService, ScopedUpdatingService>();
-            services.AddScoped<IScopedRetrievalService, ScopedRetrievalService>();
+            services.AddScoped<IScopedSetupService, ScopedSetupService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

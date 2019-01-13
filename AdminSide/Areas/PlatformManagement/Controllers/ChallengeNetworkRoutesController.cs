@@ -8,6 +8,7 @@ using Amazon.EC2;
 using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -24,9 +25,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             this.EC2Client = ec2Client;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            return View(await _context.Routes.ToListAsync());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
