@@ -6,5 +6,6 @@ namespace AdminSide.Areas.PlatformManagement.Models
     {
         public int ID { get; set; }
         public string AWSVPCReference { get; set; }
+        public string AWSVPCDefaultSecurityGroup { get; set; }
     }
 }

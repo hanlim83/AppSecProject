@@ -33,6 +33,9 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public int? RouteTableID { get; set; }
         public string AWSVPCRouteTableAssoicationID { get; set; }
 
+        public int VPCID { get; set; }
+        public VPC LinkedVPC { get; set; }
+
         public ICollection<Server>LinkedServers { get; set; }
     }
 }

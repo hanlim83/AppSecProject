@@ -74,9 +74,24 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             new Tag("Name","ASPJ VM VPC - Autocreated")
                         }
                     });
+                    DescribeSecurityGroupsResponse responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
+                    {
+                        Filters = new List<Filter>
+                        {
+                            new Filter
+                            {
+                                Name ="vpc-id",
+                                Values = new List<string>
+                                {
+                                    responseCreateVPC.Vpc.VpcId
+                                } 
+                            }
+                        }
+                    });
                     VPC newlyCreatedVPC = new VPC
                     {
-                        AWSVPCReference = responseCreateVPC.Vpc.VpcId
+                        AWSVPCReference = responseCreateVPC.Vpc.VpcId,
+                        AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId
                     };
                     context.VPCs.Add(newlyCreatedVPC);
                     await context.SaveChangesAsync();
@@ -131,7 +146,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             IPv4CIDR = responseCreateSubnet.Subnet.CidrBlock,
                             IPv6CIDR = responseCreateSubnet.Subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock,
                             SubnetSize = "254",
-                            AWSVPCSubnetReference = responseCreateSubnet.Subnet.SubnetId
+                            AWSVPCSubnetReference = responseCreateSubnet.Subnet.SubnetId,
+                            VPCID = vpc.ID
                         };
                         if (i == 0)
                         {
@@ -200,7 +216,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     Amazon.EC2.Model.RouteTable AWSIntranet = responseDescribeRouteTable.RouteTables[0];
                     RouteTable RTIntranet = new RouteTable
                     {
-                        AWSVPCRouteTableReference = AWSIntranet.RouteTableId
+                        AWSVPCRouteTableReference = AWSIntranet.RouteTableId,
+                        VPCID = vpc.ID
                     };
                     await ec2Client.CreateTagsAsync(new CreateTagsRequest
                     {
@@ -264,7 +281,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     });
                     RouteTable RTInternet = new RouteTable
                     {
-                        AWSVPCRouteTableReference = responseCreateRouteTable.RouteTable.RouteTableId
+                        AWSVPCRouteTableReference = responseCreateRouteTable.RouteTable.RouteTableId,
+                        VPCID = vpc.ID
                     };
                     context.RouteTables.Add(RTInternet);
                     await context.SaveChangesAsync();
@@ -355,7 +373,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     });
                     RouteTable RTExtranet = new RouteTable
                     {
-                        AWSVPCRouteTableReference = responseCreateRouteTable.RouteTable.RouteTableId
+                        AWSVPCRouteTableReference = responseCreateRouteTable.RouteTable.RouteTableId,
+                        VPCID = vpc.ID
                     };
                     context.RouteTables.Add(RTExtranet);
                     AllocateAddressResponse responseAllocateAddress = await ec2Client.AllocateAddressAsync(new AllocateAddressRequest
