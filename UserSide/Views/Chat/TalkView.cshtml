@@ -3,7 +3,8 @@
     ViewData["Title"] = "TalkView";
 }
 
-
+@using Microsoft.AspNetCore.Identity
+@model IEnumerable<UserSide.Models.Competition>
 
 <!DOCTYPE html>
 <html>
@@ -46,7 +47,6 @@
             display: inline-block;
             text-align: right;
             width: 60%;
-            padding:
         }
 
         .headind_srch {
@@ -227,63 +227,18 @@
     </style>
 </head>
 <body>
-    @*<!-- Navigation Bar -->
-        <nav class="navbar navbar-inverse">
-            <div class="container-fluid">
-                <div class="navbar-header">
 
-                </div>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Log Out</a></li>
-                </ul>
-            </div>
-        </nav>
-        <!-- / Navigation Bar -->
-        <div class="container">
-            <div class="row">
-                <div class="col-xs-12 col-md-3">
-                    <aside class="main visible-md visible-lg">
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <div class="panel panel-default users__bar">
-                                    <div class="panel-heading users__heading">
+    @inject UserManager<IdentityUser> UserManager
+    @{
+        var user = await UserManager.GetUserAsync(User);
 
-                                    </div>
-                                    <div class="__no__chat__">
-                                        <p>Select a contact to chat with</p>
-                                    </div>
-                                    <div class="panel-body users__body">
-                                        <ul id="contacts" class="list-group">
+    }
+
+    <h1>@user.UserName</h1>
+
+ 
 
 
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </aside>
-
-
-                </div>
-                <div class="col-xs-12 col-md-9 chat__body">
-                    <div class="row">
-                        <div class="col-xs-12">
-                            <ul class="list-group chat__main"></ul>
-                        </div>
-                        <div class="chat__type__body">
-                            <div class="chat__type">
-                                <textarea id="msg_box" placeholder="Type your message"></textarea>
-                                <button class="btn btn-primary" id="sendMessage">Send</button>
-                            </div>
-                        </div>
-                        <div class="chat__typing">
-                            <span id="typerDisplay"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script src="@Url.Content("~/Content/app.js")"></script>*@
 
     <div class="container">
         <h3 class=" text-center">Messaging</h3>
@@ -441,20 +396,54 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="outgoing_msg">
+                            <div class="sent_msg">
+                                <div class="col-6">&nbsp;</div>
+                                <div class="col-6">
+                                    <ul id="messagesList"></ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="type_msg">
                         <div class="input_msg_write">
-                            <input type="text" class="write_msg" placeholder="Type a message" />
-                            <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+                            <input type="text" class="write_msg" placeholder="Type a message"  id="messageInput" />
+                            <button class="msg_send_btn" type="button" id="sendButton" value="Send Message"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
                         </div>
                     </div>
                 </div>
             </div>
 
 
-      
+            @*<div class="container">
+            <div class="row">&nbsp;</div>
+            <div class="row">
+                <div class="col-6">&nbsp;</div>
+                <div class="col-6">
+                    User..........<input type="text" id="userInput" />
+                    <br />
+                    Message...<input type="text" id="messageInput" />
+                    <input type="button" id="sendButton" value="Send Message" />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <hr />
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-6">&nbsp;</div>
+                <div class="col-6">
+                    <ul id="messagesList"></ul>
+                </div>
+            </div>
+        </div>*@
 
         </div>
     </div>
+
+    <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+    <script src="~/js/chat.js"></script>
+
 </body>
 </html>
