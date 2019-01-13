@@ -359,6 +359,17 @@ namespace AdminSide.Data
                 context.Teams.Add(t);
             }
             context.SaveChanges();
+
+            var teamUsers = new TeamUser[]
+            {
+            new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f"}
+            };
+
+            foreach (TeamUser tu in teamUsers)
+            {
+                context.TeamUsers.Add(tu);
+            }
+            context.SaveChanges();
         }
 
         public static void InitializeForum(ForumContext context)
