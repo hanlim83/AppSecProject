@@ -221,7 +221,7 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,CompetitionName,Status")] Competition competition)
+        public async Task<IActionResult> Edit(int id, [Bind("ID,CompetitionName,Status,BucketName")] Competition competition)
         {
             if (id != competition.ID)
             {
