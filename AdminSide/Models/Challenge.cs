@@ -21,6 +21,7 @@ namespace AdminSide.Models
         public int Value { get; set; }
         [Required]
         public string Flag { get; set; }
+        public string FileName { get; set; }
 
         [ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }

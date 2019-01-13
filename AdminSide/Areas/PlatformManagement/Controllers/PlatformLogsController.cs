@@ -1,17 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using AdminSide.Areas.PlatformManagement.Data;
+﻿using AdminSide.Areas.PlatformManagement.Data;
 using Amazon.CloudWatch;
-using Amazon.CloudWatch.Model;
 using Amazon.CloudWatchEvents;
-using Amazon.CloudWatchEvents.Model;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using ASPJ_MVC.Models;
+using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -40,7 +35,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Index(string Component)
         {
             if (Component == null)
@@ -49,9 +44,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 if (Component.Equals("RDS"))
                 {
-                    return View(await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest {
-                        LogGroupName= "RDSOSMetrics",
-                        LogStreamName= "db-74DSOXWDBQWHTVNTY7RFXWRZYE"
+                    return View(await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest
+                    {
+                        LogGroupName = "RDSOSMetrics",
+                        LogStreamName = "db-74DSOXWDBQWHTVNTY7RFXWRZYE"
                     }));
                 }
                 else

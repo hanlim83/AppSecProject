@@ -94,6 +94,18 @@ namespace AdminSide
             return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
         }
 
+        // For FORUM
+        private string GetRdsConnectionStringForum()
+        {
+            string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
+            string port = Configuration.GetValue<string>("RDS_PORT");
+            string dbname = "Forum";
+            string username = Configuration.GetValue<string>("RDS_USERNAME");
+            string password = Configuration.GetValue<string>("RDS_PASSWORD");
+
+            return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
+        }
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -124,8 +136,13 @@ namespace AdminSide
 
             //Platform Resources Db Context
             services.AddDbContext<PlatformResourcesContext>(options =>
-            options.UseSqlServer(
+            options.UseLazyLoadingProxies().UseSqlServer(
             GetRdsConnectionStringPlatformResources()));
+
+            //Forum Db Context
+            services.AddDbContext<ForumContext>(options =>
+            options.UseSqlServer(
+            GetRdsConnectionStringForum()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
         .AddRazorPagesOptions(options =>
@@ -133,6 +150,10 @@ namespace AdminSide
             options.AllowAreas = true;
             options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
             options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+        })
+        .AddMvcOptions(options =>
+        {
+            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
         });
 
             services.ConfigureApplicationCookie(options =>
@@ -171,7 +192,7 @@ namespace AdminSide
             //Background Processing
             services.AddHostedService<ConsumeScopedServicesHostedService>();
             services.AddScoped<IScopedUpdatingService, ScopedUpdatingService>();
-            services.AddScoped<IScopedRetrievalService, ScopedRetrievalService>();
+            services.AddScoped<IScopedSetupService, ScopedSetupService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

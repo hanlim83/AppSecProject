@@ -1,5 +1,6 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
+using AdminSide.Data;
 using AdminSide.Models;
 using System;
 using System.Linq;
@@ -12,126 +13,6 @@ namespace AdminSide.Data
         public static void InitializePlatformResources(PlatformResourcesContext context)
         {
             context.Database.EnsureCreated();
-            if (!context.RouteTables.Any() && !context.Routes.Any())
-            {
-                var defaultRouteTables = new RouteTable[]
-                {
-                    new RouteTable
-                    {
-                        AWSVPCRouteTableReference = "rtb-087bb7bba0f0c4eee"
-                    },
-                    new RouteTable
-                    {
-                        AWSVPCRouteTableReference = "rtb-0fe88d50b748fd6e9"
-                    },
-                    new RouteTable
-                    {
-                        AWSVPCRouteTableReference = "rtb-0f051204240351aee"
-                    }
-                };
-                foreach (RouteTable rt in defaultRouteTables)
-                {
-                    context.RouteTables.Add(rt);
-                }
-                var defaultRoutes = new Route[]
-                {
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "172.30.0.0/16",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "2406:da18:456:f300::/56",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "0.0.0.0/0",
-                        Destination = "Internet Gateway",
-                        Description = "Route to the Internet (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "::/80",
-                        Destination = "Internet Gateway",
-                        Description = "Route to the Internet (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "172.30.0.0/16",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "2406:da18:456:f300::/56",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "0.0.0.0/0",
-                        Destination = "NAT Gateway",
-                        Description = "Route to the Internet (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "::/80",
-                        Destination = "One-Way Internet Gateway",
-                        Description = "Route to the Internet (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0f051204240351aee").ID,
-                        IPCIDR = "172.30.0.0/16",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0f051204240351aee").ID,
-                        IPCIDR = "2406:da18:456:f300::/56",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    }
-                };
-                foreach (Route r in defaultRoutes)
-                {
-                    context.Routes.Add(r);
-                }
-                context.SaveChanges();
-            }
             if (!context.Templates.Any())
             {
                 var defaultTemplates = new Template[]
@@ -333,10 +214,10 @@ namespace AdminSide.Data
 
             var challenges = new Challenge[]
             {
-            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
             };
 
             foreach (Challenge ch in challenges)
@@ -358,6 +239,43 @@ namespace AdminSide.Data
                 context.Teams.Add(t);
             }
             context.SaveChanges();
+        }
+
+        public static void InitializeForum(ForumContext context)
+        {
+            context.Database.EnsureCreated();
+
+            if (context.Posts.Any())
+            {
+                return;   // DB has been seeded
+            }
+
+            var category = new ForumCategory[]
+            {
+            new ForumCategory{CategoryName="General"},
+            new ForumCategory{CategoryName="Crypto"}
+            };
+
+            foreach (ForumCategory c in category)
+            {
+                context.ForumCategories.Add(c);
+            }
+            context.SaveChanges();
+
+            var post = new Post[]
+            {
+            new Post{ Title="Errors", Content="How To Fix", UserName="Elxxwy", CategoryID=1 },
+            new Post{ Title="General", Content="How To Do", UserName="Eevee", CategoryID=2 },
+            new Post{ Title="Errors", Content="How To UnFix", UserName="EVELYN", CategoryID=1 },
+            new Post{ Title="General", Content="How To Undo", UserName="Elxxwy", CategoryID=2 },
+            };
+
+            foreach (Post p in post)
+            {
+                context.Posts.Add(p);
+            }
+            context.SaveChanges();
+
         }
     }
 }

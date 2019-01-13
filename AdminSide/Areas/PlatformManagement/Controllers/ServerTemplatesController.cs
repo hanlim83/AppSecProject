@@ -3,6 +3,8 @@ using AdminSide.Areas.PlatformManagement.Data;
 using Amazon.EC2;
 using ASPJ_MVC.Models;
 using System.Diagnostics;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -19,9 +21,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             this.EC2Client = ec2Client;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            return View(await _context.Templates.ToListAsync());
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
