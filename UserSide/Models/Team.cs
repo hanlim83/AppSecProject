@@ -24,5 +24,8 @@ namespace UserSide.Models
 
         [ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
+
+        public ICollection<TeamUser> TeamUsers { get; set; }
+
     }
 }
