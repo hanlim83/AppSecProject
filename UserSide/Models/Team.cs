@@ -16,7 +16,6 @@ namespace UserSide.Models
         [Required]
         [DisplayName("Team Name")]
         public string TeamName { get; set; }
-
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }

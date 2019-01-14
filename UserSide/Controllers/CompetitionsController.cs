@@ -74,14 +74,39 @@ namespace UserSide.Controllers
             }
 
             var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
             {
                 return NotFound();
             }
 
-            return View();
+            ViewData["CompetitionID"] = id;
+
+            TeamCreateViewModel teamCreateViewModel = new TeamCreateViewModel();
+            teamCreateViewModel.Competition = competition;
+
+            return View(teamCreateViewModel);
             //return View();
+        }
+
+        // POST: Competitions/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SignUp(TeamCreateViewModel teamCreateViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                //teamCreateViewModel.Team.TeamUsers.Add(new TeamUser { TeamId = teamCreateViewModel.Team.TeamID, UserId = teamCreateViewModel.UserID });
+                _context.Add(teamCreateViewModel.Team);
+                teamCreateViewModel.TeamUser.TeamId = teamCreateViewModel.Team.TeamID;
+                _context.Add(teamCreateViewModel.TeamUser);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index", "Competitions", new { id = teamCreateViewModel.Team.CompetitionID });
         }
 
         private bool CompetitionExists(int id)
