@@ -39,9 +39,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
         public async Task DoWorkAsync()
         {
             _logger.LogInformation("Update Background Service is running.");
-            VPC vpc = await context.VPCs.FindAsync(1);
             try
             {
+                VPC vpc = await context.VPCs.FindAsync(1);
                 //if (context.Subnets.Any())
                 //{
                 //    _logger.LogInformation("Update Background Service is checking Subnets");
@@ -256,9 +256,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     });
                 }
                 _logger.LogInformation("Update Background Service has completed!");
-            } catch (SqlException)
+            } catch (SqlException e)
             {
-                _logger.LogInformation("Update Background Service faced an exception!");
+                _logger.LogInformation("Update Background Service faced an exception! "+e.Message+" | "+e.Source);
                 return;
             }  
         }
