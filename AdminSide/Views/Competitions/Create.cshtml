@@ -20,13 +20,8 @@
             <input asp-for="Competition.Status" class="form-control" />
             <span asp-validation-for="Competition.Status" class="text-danger"></span>
         </div>
-        <!--<div class="form-group">
-            <label asp-for="Competition.BucketName" class="control-label"></label>
-            <input asp-for="Competition.BucketName" class="form-control" />
-            <span asp-validation-for="Competition.BucketName" class="text-danger"></span>
-        </div>-->
         <!--Add more fields below on adding different categories-->
-        <label>Categories</label>
+        <label>Categories (Ctrl + right click to do multi-select)</label>
         <p id="categories"></p>
         <!--<select asp-for="SelectedCategories" asp-items="Model.CategoriesList" id="category" name="category" onChange="OnChange()" class="form-control"></select>-->
         <select asp-for="SelectedCategories" asp-items="Model.CategoriesList" id="category" onChange="OnChange()" class="form-control"></select>
@@ -52,9 +47,8 @@
     function OnChange() {
         //var value = document.getElementById("category").value;
         var value = $('#category').val();
-        console.log(value);
         for (var i = 0; i < value.length; i++) {
-            document.getElementById("categories").innerHTML = value;
+            document.getElementById("categories").innerHTML = "Categories selected: " + value;
         }
     }
 </script>
