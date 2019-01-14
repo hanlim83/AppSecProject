@@ -52,8 +52,8 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public Tenancy Tenancy { get; set; }
 
         public int SubnetID { get; set; }
-        public Subnet LinkedSubnet { get; set; }
+        public virtual Subnet LinkedSubnet { get; set; }
 
-        public ICollection<FirewallRule> FirewallRules { get; set; }
+        public virtual ICollection<FirewallRule> FirewallRules { get; set; }
     }
 }

@@ -45,8 +45,36 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url('http://placehold.it/100x100');">
-                                </div>
+                                @if (Template.OperatingSystem.Contains("Amazon Linux"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/AWSLinux.png);">
+                                    </div>
+                                }
+                                @if (Template.OperatingSystem.Contains("Red Hat"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/RedHatLinux.png);">
+                                    </div>
+                                }
+                                @if (Template.OperatingSystem.Contains("SUSE"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/SUSELinux.png);">
+                                    </div>
+                                }
+                                @if (Template.OperatingSystem.Contains("Ubuntu"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/UbuntuLinux.png);">
+                                    </div>
+                                }
+                                @if (Template.OperatingSystem.Contains("Windows"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/Windows.png);">
+                                    </div>
+                                }
+                                @if (Template.OperatingSystem.Contains("Kali Linux"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/KaliLinux.png);">
+                                    </div>
+                                }
                                 <h5 class="card-title" style="position: relative; left: 10px;">@Html.ValueForModel(Template.OperatingSystem)</h5>
                                 <p class="card-text" style="position: relative; left: 10px;">Date Created: @Html.ValueForModel(Convert.ToString(Template.DateCreated))</p>
                                 <form asp-action="SpecifySettings" method="post">
@@ -57,6 +85,7 @@
                         </div>
                     </div>
                 </div>
+                <br />
             }
         }
     </div>
@@ -70,8 +99,36 @@
                     <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
-                                <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url('http://placehold.it/100x100');">
-                                </div>
+                                @if (template.OperatingSystem.Contains("Amazon Linux"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/AWSLinux.png);">
+                                    </div>
+                                }
+                                @if (template.OperatingSystem.Contains("Red Hat"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/RedHatLinux.png);">
+                                    </div>
+                                }
+                                @if (template.OperatingSystem.Contains("SUSE"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/SUSELinux.png);">
+                                    </div>
+                                }
+                                @if (template.OperatingSystem.Contains("Ubuntu"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/UbuntuLinux.png);">
+                                    </div>
+                                }
+                                @if (template.OperatingSystem.Contains("Windows"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/Windows.png);">
+                                    </div>
+                                }
+                                @if (template.OperatingSystem.Contains("Kali Linux"))
+                                {
+                                    <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/KaliLinux.png);">
+                                    </div>
+                                }
                                 <h5 class="card-title" style="position: relative; left: 10px;">@Html.ValueForModel(template.Name)</h5>
                                 <p class="card-text" style="position: relative; left: 10px;">Operating System: @Html.ValueForModel(Convert.ToString(template.OperatingSystem))</p>
                                 <p class="card-text" style="position: relative; left: 10px;">Date Created: @Html.ValueForModel(Convert.ToString(template.DateCreated))</p>
@@ -84,6 +141,7 @@
                         </div>
                     </div>
                 </div>
+                <br />
             }
         }
         @if (Model.Count() < 5)

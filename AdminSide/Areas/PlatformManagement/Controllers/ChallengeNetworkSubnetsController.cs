@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using AdminSide.Areas.PlatformManagement.Data;
-using Microsoft.AspNetCore.Mvc;
+﻿using AdminSide.Areas.PlatformManagement.Data;
+using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
-using System.Diagnostics;
-using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
+using RouteTable = AdminSide.Areas.PlatformManagement.Models.RouteTable;
+using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -29,161 +31,22 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index()
         {
-            /*
-            if (!_context.Subnets.Any())
-            {
-                DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
-                {
-                    Filters = new List<Amazon.EC2.Model.Filter>
-                {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
-                }
-                });
-                int incrementer = 4;
-                _context.Database.OpenConnection();
-                _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet ON");
-                foreach (var subnet in response.Subnets)
-                {
-                    try
-                    {
-                        Subnet newSubnet = new Subnet();
-                        if (subnet.CidrBlock.Equals("172.30.0.0/24"))
-                        {
-                            newSubnet.ID = 1;
-                            newSubnet.Name = "Default Internet Subnet";
-                            newSubnet.IPv4CIDR = subnet.CidrBlock;
-                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                            newSubnet.Type = SubnetType.Internet;
-                            newSubnet.SubnetSize = "254";
-                            _context.Subnets.Add(newSubnet);
-                            await _context.SaveChangesAsync();
-                        }
-                        else if (subnet.CidrBlock.Equals("172.30.1.0/24"))
-                        {
-                            newSubnet.ID = 2;
-                            newSubnet.Name = "Default Extranet Subnet";
-                            newSubnet.IPv4CIDR = subnet.CidrBlock;
-                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                            newSubnet.Type = SubnetType.Extranet;
-                            newSubnet.SubnetSize = "254";
-                            _context.Subnets.Add(newSubnet);
-                            await _context.SaveChangesAsync();
-                        }
-                        else if (subnet.CidrBlock.Equals("172.30.2.0/24"))
-                        {
-                            newSubnet.ID = 3;
-                            newSubnet.Name = "Default Intranet Subnet";
-                            newSubnet.IPv4CIDR = subnet.CidrBlock;
-                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                            newSubnet.Type = SubnetType.Intranet;
-                            newSubnet.SubnetSize = "254";
-                            _context.Subnets.Add(newSubnet);
-                            await _context.SaveChangesAsync();
-                        }
-                        else
-                        {
-                            newSubnet.ID = incrementer;
-                            newSubnet.Name = subnet.SubnetId;
-                            newSubnet.IPv4CIDR = subnet.CidrBlock;
-                            newSubnet.IPv6CIDR = subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock;
-                            newSubnet.AWSVPCSubnetReference = subnet.SubnetId;
-                            newSubnet.Type = SubnetType.Extranet;
-                            string subnetPrefix = subnet.CidrBlock.Substring(subnet.CidrBlock.Length - 3);
-                            switch (subnetPrefix)
-                            {
-                                case "/17":
-                                    newSubnet.SubnetSize = Convert.ToString(32766);
-                                    break;
-                                case "/18":
-                                    newSubnet.SubnetSize = Convert.ToString(16382);
-                                    break;
-                                case "/19":
-                                    newSubnet.SubnetSize = Convert.ToString(8190);
-                                    break;
-                                case "/20":
-                                    newSubnet.SubnetSize = Convert.ToString(4094);
-                                    break;
-                                case "/21":
-                                    newSubnet.SubnetSize = Convert.ToString(2046);
-                                    break;
-                                case "/22":
-                                    newSubnet.SubnetSize = Convert.ToString(1022);
-                                    break;
-                                case "/23":
-                                    newSubnet.SubnetSize = Convert.ToString(510);
-                                    break;
-                                case "/24":
-                                    newSubnet.SubnetSize = Convert.ToString(254);
-                                    break;
-                                case "/25":
-                                    newSubnet.SubnetSize = Convert.ToString(126);
-                                    break;
-                                case "/26":
-                                    newSubnet.SubnetSize = Convert.ToString(62);
-                                    break;
-                                case "/27":
-                                    newSubnet.SubnetSize = Convert.ToString(30);
-                                    break;
-                                case "/28":
-                                    newSubnet.SubnetSize = Convert.ToString(14);
-                                    break;
-                                case "/29":
-                                    newSubnet.SubnetSize = Convert.ToString(6);
-                                    break;
-                                case "/30":
-                                    newSubnet.SubnetSize = Convert.ToString(2);
-                                    break;
-                                default:
-                                    break;
-                            }
-                            _context.Subnets.Add(newSubnet);
-                            await _context.SaveChangesAsync();
-                            ++incrementer;
-                        }
-                    }
-                    catch (Exception)
-                    {
-                        _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
-                        if (_context.Subnets.Any())
-                        {
-                            foreach(Subnet failed in _context.Subnets)
-                            {
-                                _context.Subnets.Remove(failed);
-                            }
-                            _context.SaveChanges();
-                        }
-                        _context.Database.CloseConnection();
-                        ViewData["Result"] = "An error occured when quering AWS for Subnet information!";
-                        return View(await _context.Subnets.ToListAsync());
-                    }
-                }
-                _context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
-                _context.Database.CloseConnection();
-                return View(await _context.Subnets.ToListAsync());
-            }
-            else
-            {
-            */
-                return View(await _context.Subnets.ToListAsync());
-            //}
+            return View(await _context.Subnets.ToListAsync());
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Index(string action, string subnetID)
         {
             if (action.Equals("Delete") && !String.IsNullOrEmpty(subnetID))
             {
-                var Deletesubnet = await _context.Subnets.FindAsync(Int32.Parse(subnetID));
+                Subnet Deletesubnet = await _context.Subnets.FindAsync(Int32.Parse(subnetID));
                 if (Deletesubnet == null)
                 {
                     ViewData["Result"] = "Invaild Subnet!";
                     return View(await _context.Subnets.ToListAsync());
                 }
-                else if (subnetID == "1" || subnetID == "2" || subnetID == "3")
+                else if (Deletesubnet.editable == false)
                 {
                     ViewData["Result"] = "You cannot delete a default subnet!";
                     return View(await _context.Subnets.ToListAsync());
@@ -193,9 +56,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                     {
                         Filters = new List<Amazon.EC2.Model.Filter>
-                {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
-                }
+                        {
+                            new Filter("vpc-id",new List<string>
+                            {
+                                Deletesubnet.LinkedVPC.AWSVPCReference
+                            })
+                        }
                     });
                     Boolean flag = false;
                     for (int i = 0; i < response.Subnets.Count; i++)
@@ -217,6 +83,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     {
                         try
                         {
+                            List<RouteTable> RTs = await _context.RouteTables.ToListAsync();
                             DeleteSubnetRequest request = new DeleteSubnetRequest(Deletesubnet.AWSVPCSubnetReference);
                             DeleteSubnetResponse responseEC2 = await EC2Client.DeleteSubnetAsync(request);
                             if (responseEC2.HttpStatusCode == HttpStatusCode.OK)
@@ -242,7 +109,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else if (action.Equals("Modify") && !String.IsNullOrEmpty(subnetID))
             {
-                if (subnetID == "1" || subnetID == "2" || subnetID == "3")
+                var Modifysubnet = await _context.Subnets.FindAsync(Int32.Parse(subnetID));
+                if (Modifysubnet.editable == false)
                 {
                     ViewData["Result"] = "You cannot modify a default subnet!";
                     return View(await _context.Subnets.ToListAsync());
@@ -274,7 +142,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Edit(int ID, [Bind("ID,Name,Type,IPv4CIDR,IPv6CIDR")] Subnet Newsubnet)
         {
             var subnet = await _context.Subnets.FindAsync(ID);
@@ -286,15 +154,107 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 return StatusCode(500);
             }
-            else if (subnet.ID == 1 || subnet.ID == 2 || subnet.ID == 3)
+            else if (subnet.editable == false)
             {
                 ViewData["Exception"] = "You cannot edit a default subnet!";
                 return View(subnet);
             }
             else
             {
-                subnet.Name = Newsubnet.Name;
-                subnet.Type = Newsubnet.Type;
+                if (!subnet.Name.Equals(Newsubnet.Name))
+                {
+                    await EC2Client.DeleteTagsAsync(new DeleteTagsRequest
+                    {
+                        Resources = new List<string>
+                        {
+                            subnet.AWSVPCSubnetReference
+                        },
+                        Tags = new List<Tag>
+                        {
+                            new Tag("Name")
+                        }
+                    });
+                    await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                    {
+                        Resources = new List<string>
+                        {
+                            subnet.AWSVPCSubnetReference
+                        },
+                        Tags = new List<Tag>
+                        {
+                            new Tag("Name",Newsubnet.Name)
+                        }
+                    });
+                    subnet.Name = Newsubnet.Name;
+                }
+                if (subnet.Type != Newsubnet.Type)
+                {
+                    try
+                    {
+                        DisassociateRouteTableResponse responseD = await EC2Client.DisassociateRouteTableAsync(new DisassociateRouteTableRequest
+                        {
+                            AssociationId = subnet.AWSVPCRouteTableAssoicationID
+                        });
+                        if (responseD.HttpStatusCode == HttpStatusCode.OK)
+                        {
+                            AssociateRouteTableRequest requestA = new AssociateRouteTableRequest
+                            {
+                                SubnetId = subnet.AWSVPCSubnetReference
+                            };
+                            if (Newsubnet.Type == Models.SubnetType.Internet)
+                            {
+                                RouteTable Internet = await _context.RouteTables.FindAsync(1);
+                                requestA.RouteTableId = Internet.AWSVPCRouteTableReference;
+                            }
+                            else if (Newsubnet.Type == Models.SubnetType.Extranet)
+                            {
+                                RouteTable Extranet = await _context.RouteTables.FindAsync(2);
+                                requestA.RouteTableId = Extranet.AWSVPCRouteTableReference;
+                            }
+                            else if (Newsubnet.Type == Models.SubnetType.Intranet)
+                            {
+                                RouteTable Intranet = await _context.RouteTables.FindAsync(3);
+                                requestA.RouteTableId = Intranet.AWSVPCRouteTableReference;
+                            }
+                            AssociateRouteTableResponse responseA = await EC2Client.AssociateRouteTableAsync(requestA);
+                            if (responseA.HttpStatusCode == HttpStatusCode.OK)
+                            {
+                                subnet.Type = Newsubnet.Type;
+                            }
+                            else
+                            {
+                                if (subnet.Type == Models.SubnetType.Internet)
+                                {
+                                    RouteTable Internet = await _context.RouteTables.FindAsync(1);
+                                    requestA.RouteTableId = Internet.AWSVPCRouteTableReference;
+                                }
+                                else if (subnet.Type == Models.SubnetType.Extranet)
+                                {
+                                    RouteTable Extranet = await _context.RouteTables.FindAsync(2);
+                                    requestA.RouteTableId = Extranet.AWSVPCRouteTableReference;
+                                }
+                                else if (subnet.Type == Models.SubnetType.Intranet)
+                                {
+                                    RouteTable Intranet = await _context.RouteTables.FindAsync(3);
+                                    requestA.RouteTableId = Intranet.AWSVPCRouteTableReference;
+                                }
+                                await EC2Client.AssociateRouteTableAsync(requestA);
+                                ViewData["Exception"] = "Edit Failed! - Route Table linking Failed";
+                                return View(subnet);
+                            }
+                        }
+                        else
+                        {
+                            ViewData["Exception"] = "Edit Failed!";
+                            return View(subnet);
+                        }
+                    }
+                    catch (AmazonEC2Exception e)
+                    {
+                        ViewData["Exception"] = e;
+                        return View(subnet);
+                    }
+                }
                 try
                 {
                     _context.Update(subnet);
@@ -320,11 +280,15 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Create()
         {
+            VPC vpc = await _context.VPCs.FindAsync(1);
             DescribeVpcsResponse response = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
             {
-                Filters = new List<Amazon.EC2.Model.Filter>
+                Filters = new List<Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                    new Filter("vpc-id", new List<string>
+                    {
+                        vpc.AWSVPCReference
+                    })
                 }
             });
             String[] IPBlocks = response.Vpcs[0].CidrBlock.Split(".");
@@ -333,11 +297,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Create([Bind("Name,Type,IPv4CIDR,SubnetSize")] Subnet subnet)
         {
             if (ModelState.IsValid)
             {
+                subnet.editable = true;
                 switch (Int32.Parse(subnet.SubnetSize))
                 {
                     case 32766:
@@ -386,36 +351,35 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         ViewData["Exception"] = "Input Invaild!";
                         return View();
                 }
+                VPC vpc = await _context.VPCs.FindAsync(1);
+                subnet.VPCID = vpc.ID;
                 DescribeSubnetsResponse response = await EC2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                 {
                     Filters = new List<Amazon.EC2.Model.Filter>
                 {
-                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
                 }
                 });
                 List<int> ipv6CIDR = new List<int>();
                 List<Amazon.EC2.Model.Subnet> subnets = response.Subnets;
                 int ipv6Subnet = 0;
                 string[] ipv6CIDRstr = new string[6];
-                if (subnets.Count == 0)
+                DescribeVpcsResponse responseV = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                 {
-                    DescribeVpcsResponse responseV = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
-                    {
-                        Filters = new List<Amazon.EC2.Model.Filter>
+                    Filters = new List<Amazon.EC2.Model.Filter>
                         {
-                            new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {"vpc-09cd2d2019d9ac437"}}
+                            new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
                         }
-                    });
-                    Vpc vpc = responseV.Vpcs[0];
-                    VpcIpv6CidrBlockAssociation ipv6CidrBlockAssociation = vpc.Ipv6CidrBlockAssociationSet[0];
-                    ipv6CIDRstr = ipv6CidrBlockAssociation.Ipv6CidrBlock.Split(":");
-                }
-                else
+                });
+                Vpc vpcR = responseV.Vpcs[0];
+                VpcIpv6CidrBlockAssociation ipv6CidrBlockAssociation = vpcR.Ipv6CidrBlockAssociationSet[0];
+                ipv6CIDRstr = ipv6CidrBlockAssociation.Ipv6CidrBlock.Split(":");
+                if (subnets.Count != 0)
                 {
                     foreach (Amazon.EC2.Model.Subnet s in subnets)
                     {
                         List<SubnetIpv6CidrBlockAssociation> ipv6 = s.Ipv6CidrBlockAssociationSet;
-                        ipv6CIDRstr = ipv6[0].Ipv6CidrBlock.Split(":");
+                        ipv6CIDRstr = ipv6.ElementAt(0).Ipv6CidrBlock.Split(":");
                         ipv6Subnet = int.Parse(ipv6CIDRstr[3].Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
                         ipv6CIDR.Add(ipv6Subnet);
                     }
@@ -429,7 +393,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         foreach (int i in ipv6CIDR)
                         {
 
-                            if (ipv6Subnet == ipv6CIDR[i])
+                            if (ipv6Subnet <= ipv6CIDR[i])
                             {
                                 passed = false;
                                 break;
@@ -441,7 +405,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             flag = true;
                     }
                 }
-                if (ipv6CIDRstr[5] == "/56")
+                if (ipv6CIDRstr[5].Equals("/56"))
                 {
                     if (ipv6Subnet < 9)
                         subnet.IPv6CIDR = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + "0" + ipv6Subnet.ToString() + "::/64";
@@ -455,27 +419,107 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     else
                         subnet.IPv6CIDR = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + Convert.ToInt32(ipv6Subnet).ToString() + "::" + ipv6CIDRstr[5];
                 }
-                CreateSubnetRequest request = new CreateSubnetRequest("vpc-09cd2d2019d9ac437", subnet.IPv4CIDR);
-                request.Ipv6CidrBlock = subnet.IPv6CIDR;
+                CreateSubnetRequest requestS = new CreateSubnetRequest()
+                {
+                    CidrBlock = subnet.IPv4CIDR,
+                    VpcId = vpc.AWSVPCReference,
+                    Ipv6CidrBlock = subnet.IPv6CIDR
+                };
                 try
                 {
-                    CreateSubnetResponse responseS = await EC2Client.CreateSubnetAsync(request);
+                    CreateSubnetResponse responseS = await EC2Client.CreateSubnetAsync(requestS);
                     if (responseS.HttpStatusCode == HttpStatusCode.OK)
                     {
                         subnet.AWSVPCSubnetReference = responseS.Subnet.SubnetId;
-                        _context.Subnets.Add(subnet);
-                        await _context.SaveChangesAsync();
-                        TempData["Result"] = "Successfully Created!";
-                        return RedirectToAction("Index");
+                        await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                        {
+                            Resources = new List<string>
+                            {
+                                responseS.Subnet.SubnetId
+                            },
+                            Tags = new List<Tag>
+                            {
+                                new Tag("Name",subnet.Name)
+                            }
+                        });
+                        AssociateRouteTableRequest requestRT = new AssociateRouteTableRequest
+                        {
+                            SubnetId = responseS.Subnet.SubnetId,
+                        };
+                        if (subnet.Type == Models.SubnetType.Internet)
+                        {
+                            RouteTable Internet = await _context.RouteTables.FindAsync(2);
+                            requestRT.RouteTableId = Internet.AWSVPCRouteTableReference;
+                            subnet.RouteTableID = Internet.ID;
+                        }
+                        else if (subnet.Type == Models.SubnetType.Extranet)
+                        {
+                            RouteTable Extranet = await _context.RouteTables.FindAsync(3);
+                            requestRT.RouteTableId = Extranet.AWSVPCRouteTableReference;
+                            subnet.RouteTableID = Extranet.ID;
+                        }
+                        else if (subnet.Type == Models.SubnetType.Intranet)
+                        {
+                            RouteTable Intranet = await _context.RouteTables.FindAsync(2);
+                            requestRT.RouteTableId = Intranet.AWSVPCRouteTableReference;
+                            subnet.RouteTableID = Intranet.ID;
+                        }
+                        AssociateRouteTableResponse responseRT = await EC2Client.AssociateRouteTableAsync(requestRT);
+                        if (responseRT.HttpStatusCode == HttpStatusCode.OK)
+                        {
+                            subnet.AWSVPCRouteTableAssoicationID = responseRT.AssociationId;
+                            _context.Subnets.Add(subnet);
+                            await _context.SaveChangesAsync();
+                            TempData["Result"] = "Successfully Created!";
+                            return RedirectToAction("Index");
+                        }
+                        else
+                        {
+                            await EC2Client.DeleteSubnetAsync(new DeleteSubnetRequest
+                            {
+                                SubnetId = subnet.AWSVPCSubnetReference
+                            });
+                            DescribeVpcsResponse responseD = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                            {
+                                Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
+                }
+                            });
+                            String[] IPBlocks = responseD.Vpcs[0].CidrBlock.Split(".");
+                            ViewData["IPCIDR"] = IPBlocks[0] + "." + IPBlocks[1];
+                            ViewData["Exception"] = "Failed to Create!";
+                            return View();
+                        }
                     }
                     else
                     {
+                        DescribeVpcsResponse responseD = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                        {
+                            Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
+                }
+                        });
+                        String[] IPBlocks = responseD.Vpcs[0].CidrBlock.Split(".");
+                        ViewData["IPCIDR"] = IPBlocks[0] + "." + IPBlocks[1];
+                        ViewData["Exception"] = "Failed to Create!";
                         ViewData["Exception"] = "Failed to Create!";
                         return View();
                     }
                 }
                 catch (Amazon.EC2.AmazonEC2Exception e)
                 {
+                    DescribeVpcsResponse responseD = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                    {
+                        Filters = new List<Amazon.EC2.Model.Filter>
+                {
+                     new Amazon.EC2.Model.Filter {Name = "vpc-id", Values = new List<string> {vpc.AWSVPCReference}}
+                }
+                    });
+                    String[] IPBlocks = responseD.Vpcs[0].CidrBlock.Split(".");
+                    ViewData["IPCIDR"] = IPBlocks[0] + "." + IPBlocks[1];
+                    ViewData["Exception"] = "Failed to Create!";
                     ViewData["Exception"] = e.Message;
                     return View();
                 }
