@@ -165,6 +165,17 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 RunInstancesResponse response = await EC2Client.RunInstancesAsync(request);
                 if (response.HttpStatusCode.Equals(HttpStatusCode.OK))
                 {
+                    await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                    {
+                        Resources = new List<string>
+                        {
+                            response.Reservation.Instances[0].InstanceId
+                        },
+                        Tags = new List<Tag>
+                        {
+                            new Tag("Name",Model2.ServerName)
+                        }
+                    });
                     Server newlyCreated = new Server
                     {
                         Name = Model2.ServerName,
@@ -270,16 +281,21 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         public async Task<IActionResult> ModifyServer(String serverID)
         {
             Server selected = await _context.Servers.FindAsync(Int32.Parse(serverID));
-            StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+            if (selected != null)
             {
-                InstanceIds = new List<string> {
+                StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+                {
+                    InstanceIds = new List<string> {
                     selected.AWSEC2Reference
             }
-            });
-            if (response.HttpStatusCode == HttpStatusCode.OK)
-                return View(selected);
+                });
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                    return View(selected);
+                else
+                    return StatusCode(500);
+            }
             else
-                return StatusCode(500);
+                return NotFound(); 
         }
 
         [HttpPost]
@@ -289,12 +305,37 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             Server retrieved = await _context.Servers.FindAsync(Int32.Parse(Modified.ID));
             if (retrieved == null)
             {
-                return RedirectToAction("");
+                return NotFound();
             }
             else
             {
                 if (!retrieved.Name.Equals(Modified.ServerName))
                 {
+                    DeleteTagsResponse responseDeleteTag = await EC2Client.DeleteTagsAsync(new DeleteTagsRequest
+                    {
+                        Resources = new List<string>
+                        {
+                            retrieved.AWSEC2Reference
+                        },
+                        Tags = new List<Tag>
+                        {
+                            new Tag("Name")
+                        }
+                    });
+                    if (responseDeleteTag.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                        {
+                            Resources = new List<string>
+                        {
+                            retrieved.AWSEC2Reference
+                        },
+                            Tags = new List<Tag>
+                        {
+                            new Tag("Name",Modified.ServerName)
+                        }
+                        });
+                    }
                     retrieved.Name = Modified.ServerName;
                 }
                 DescribeInstanceAttributeResponse Aresponse = await EC2Client.DescribeInstanceAttributeAsync(new DescribeInstanceAttributeRequest
