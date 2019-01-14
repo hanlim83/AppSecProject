@@ -1,35 +1,30 @@
-﻿@{
+﻿@model UserSide.Models.Team
+@{
     ViewData["Title"] = "Competition Sign Up";
 }
-
-@model UserSide.Models.TeamModel
 
 <title>@ViewData["Title"] - Competition Sign Up</title>
 
 <br>
-<div class="row">
-    <div class="col-md-8 offset-2">
+<div class="container">
+    <div class="btn-group d-flex" role="group">
+        <button type="button" class="btn btn-primary w-100">Join Group</button>
+        <button type="button" class="btn btn-primary w-100">Create Group</button>
+    </div>
+    <div>
         <section>
             <br>
             <form method="post">
-                <h2>Joining NYP Global CTF</h2>
+                <h2>Joining XXX</h2>
                 <div class="form-group">
-                    <label asp-for="Input.TeamName"></label>
-                    <input asp-for="Input.TeamName" class="form-control" />
-                    <span asp-validation-for="Input.TeamName" class="text-danger"></span>
+                    <label asp-for="TeamName"></label>
+                    <input asp-for="TeamName" class="form-control" />
+                    <span asp-validation-for="TeamName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Input.Password"></label>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label asp-for="Input.RememberMe">
-                            <input asp-for="Input.RememberMe" />
-                            @Html.DisplayNameFor(m => m.Input.RememberMe)
-                        </label>
-                    </div>
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">

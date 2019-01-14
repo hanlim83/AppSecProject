@@ -4,6 +4,7 @@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    int counter = 0;
 }
 @inject UserManager<IdentityUser> UserManager
 @{
@@ -11,39 +12,71 @@
 
 }
 
-<h1>@user.UserName</h1>
+<h1>@user.Id</h1>
 <br>
-<div class="col-md-8 offset-2">
+<div class="container">
     <h2>Ongoing CTF</h2>
     <table class="table">
         <thead>
             <tr>
                 <th>
                     @Html.DisplayNameFor(model => model.CompetitionName)
+                    Competition Name
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Status)
+                    Status
                 </th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model)
+            @foreach (var competition in Model)
             {
+                counter = 0;
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.CompetitionName)
+                        @Html.DisplayFor(modelItem => competition.CompetitionName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Status)
+                        @Html.DisplayFor(modelItem => competition.Status)
                     </td>
                     <td>
-                        <!--Collect data and determine if user has joined or not and route differently-->
-                        <!--<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
-                        <!--Assuming user already join and has team-->
-                        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Enter</button></a>
+                        @if (competition.Teams.Count == 0)
+                        {
+                            <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                            break;
+                        }
+                        else
+                        {
+                            @foreach (var team in competition.Teams)
+                            {
+                                if (counter == 0)
+                                {
+                                    @if (team.TeamUsers.Count == 0)
+                                    {
+                                        <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        @foreach (var teamUsers in team.TeamUsers)
+                                        {
+                                            if (teamUsers.UserId.Equals(user.Id))
+                                            {
+                                                <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Enter</button></a>
+                                                counter = 1;
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     </td>
                 </tr>
             }

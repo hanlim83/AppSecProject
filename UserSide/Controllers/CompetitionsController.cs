@@ -27,7 +27,25 @@ namespace UserSide.Controllers
         // GET: Competitions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Competitions.ToListAsync());
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .ToListAsync();
+
+            var teamUsers = _context.TeamUsers
+                .ToList();
+
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            //CompetitionIndexViewModel vm = new CompetitionIndexViewModel();
+            //vm.Competition = competition;
+            //vm.TeamUsers = teamUsers;
+
+            return View(competition);
+            //return View(await _context.Competitions.ToListAsync());
         }
 
         // GET: Competitions/Details/5
@@ -48,9 +66,22 @@ namespace UserSide.Controllers
             return View(competition);
         }
 
-        public IActionResult SignUp()
+        public async Task<IActionResult> SignUp(int? id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var competition = await _context.Competitions
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
             return View();
+            //return View();
         }
 
         private bool CompetitionExists(int id)
