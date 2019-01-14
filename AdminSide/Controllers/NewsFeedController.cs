@@ -45,14 +45,13 @@ namespace AdminSide.Controllers
         [HttpPost]
         public async Task<IActionResult> Index (string RSSURL)
         {
-            
             var feed = await FeedReader.ReadAsync(RSSURL); //await will wait for the feed
             RSSFeed rssfeed = new RSSFeed
             {
                 Title = feed.Title,
                 Link = feed.Link,
                 Description = feed.Description,
-               // PubDate = feed.LastUpdatedDateString
+                PubDate = feed.LastUpdatedDateString
             };
 
             List<FeedItem> feedlist = new List<FeedItem>();
@@ -62,7 +61,7 @@ namespace AdminSide.Controllers
             }
             ViewBag.RSSFeed = feedlist;
 
-            ViewBag.URL = "https://hnrss.org/newcomments";
+            ViewBag.URL = RSSURL;
             return View();
         }
     }
