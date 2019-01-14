@@ -1,4 +1,4 @@
-﻿
+﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Route>
 @{
     ViewData["Title"] = "Challenge Network - Routes";
 }
@@ -8,7 +8,38 @@
     </div>
     <div class="col-lg-9">
         <div class="row">
-            <div class="col-lg-6">
+            <div class="col-lg-12">
+                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger" role="alert">
+                                @ViewData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Convert.ToString(ViewData["Result"]) == "Successfully Deleted!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-success" role="alert">
+                                @ViewData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Convert.ToString(TempData["Result"]) == "Successfully Created!" || Convert.ToString(TempData["Result"]) == "Successfully Modified!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-success" role="alert">
+                                @TempData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                <a class="btn btn-primary" asp-action="Create" style="float:right; margin-top:20px; margin-bottom:20px;">Create New Route</a>
                 <table class="table">
                     <thead>
                         <tr>
@@ -36,7 +67,46 @@
                         </tr>
                     </thead>
                     <tbody>
-
+                        @foreach (var route in Model)
+                        {
+                            <tr>
+                                <td>@Html.ValueForModel(route.Description)</td>
+                                <td>@Html.ValueForModel(route.RouteType.ToString())</td>
+                                <td>@Html.ValueForModel(route.IPCIDR)</td>
+                                @if (route.applicability != Applicability.Custom)
+                                {
+                                    <td>@Html.ValueForModel(route.applicability.ToString())</td>
+                                }
+                                @if (route.applicability == Applicability.Custom)
+                                {
+                                    <td>
+                                        @foreach(var subnet in route.LinkedRouteTable.LinkedSubnets)
+                                        {
+                                            @subnet.Name
+                                        }
+                                    </td>
+                                }
+                                <td>@Html.ValueForModel(route.Destination)</td>
+                                <td>@Html.ValueForModel(route.Status.ToString())</td>
+                                @if (route.RouteType == RouteType.Mandatory)
+                                {
+                                    <td>You cannot modify a mandatory Route</td>
+                                }
+                                @if (route.RouteType == RouteType.Optional)
+                                {
+                                    <td>
+                                        <form asp-action="Modify" method="post">
+                                            <input type="hidden" name="routeID" value="@route.ID" />
+                                            <button type="submit" class="btn btn-info">Modify Route</button>
+                                        </form>
+                                        <form method="post">
+                                            <input type="hidden" name="routeID" value="@route.ID" />
+                                            <button type="submit" class="btn btn-danger">Delete Route</button>
+                                        </form>
+                                    </td>
+                                }
+                            </tr>
+                        }
                     </tbody>
                 </table>
             </div>

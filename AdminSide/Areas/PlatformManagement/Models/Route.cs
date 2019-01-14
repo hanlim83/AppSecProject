@@ -13,6 +13,11 @@ namespace AdminSide.Areas.PlatformManagement.Models
         OK,Blackhole
     }
 
+    public enum Applicability
+    {
+        All,Internet,Extranet,Intranet,Custom
+    }
+
     public class Route
     {
         public int ID { get; set; }
@@ -25,10 +30,10 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public Status Status { get; set; }
         [Display(Name = "IP CIDR")]
         public string IPCIDR { get; set; }
+        public Applicability applicability { get; set; }
+        public string customSubnets { get; set; }
 
         public int RouteTableID { get; set; }
-        public RouteTable LinkedRouteTable { get; set; }
-
-        public ICollection<Subnet> LinkedSubnets { get; set; }
+        public virtual RouteTable LinkedRouteTable { get; set; }
     }
 }

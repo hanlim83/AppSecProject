@@ -2,12 +2,12 @@
 {
     public enum Type
     {
-        IMPLICT_DENY,CUSTOM,HTTP,HTTPS,SSH,Telnet,FTP
+        IMPLICT_DENY,CUSTOM,HTTP,HTTPS,SSH,Telnet,FTP,ALL
     }
 
     public enum Protocol
     {
-        TCP,UDP
+        TCP,UDP,ICMP
     }
 
     public enum Direction
@@ -24,6 +24,7 @@
         public int Port { get; set; }
         public Direction Direction { get; set; }
         public int ServerID { get; set; }
-        public Server LinkedServer { get; set; }
+        public string IPCIDR { get; set; }
+        public virtual Server LinkedServer { get; set; }
     }
 }

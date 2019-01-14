@@ -2,7 +2,7 @@
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
-    internal interface IScopedRetrievalService
+    internal interface IScopedSetupService
     {
         Task DoWorkAsync();
     }

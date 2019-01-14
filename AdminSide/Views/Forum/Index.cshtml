@@ -1,4 +1,4 @@
-﻿
+﻿@model IEnumerable<AdminSide.Models.ForumCategory>
 @{
     ViewData["Title"] = "Index";
 }
@@ -83,7 +83,7 @@
                                 @foreach (var item in category.Posts)
                                 {
                                     <tr>
-                                        @*<td>
+                                        <td>
                                             @Html.DisplayFor(modelItem => item.Title)
                                         </td>
                                         <td>
@@ -94,7 +94,7 @@
                                         </td>
                                         <td>
                                             @Html.DisplayFor(modelItem => item.DT)
-                                        </td>*@
+                                        </td>
                                         <td>
                                             <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |
                                             <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |

@@ -14,14 +14,14 @@
 }
 <div class="row">
     <div class="col-lg-6 border-right">
-        <form asp-action="Modification" method="post" class="needs-validation" novalidate>
+        <form asp-action="SubmitFirewallRule" method="post" class="needs-validation" novalidate>
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
                 <input type="text" class="form-control" id="ServerName" name="ServerName" value="@Model.Name" required>
                 <div class="invalid-feedback">A server needs a name</div>
             </div>
-            <input type="hidden" name="ID" value="@Model.ID" />
+            <input type="hidden" id="ServerIDSrc" name="ID" value="@Model.ID" />
             <div class="form-group">
                 <label for="OperatingSystem">Operating System:</label>
                 <input type="text" disabled class="form-control-plaintext" id="OperatingSystem" name="OperatingSystem" value="@Html.ValueForModel(Model.OperatingSystem)" />
@@ -78,6 +78,10 @@
         </div>
         <div class="form-group">
             <p class="form-text">Server Firewall Rules</p>
+            <form asp-action="CreateFirewallRule" method="post">
+                <input type="hidden" id="ServerIDDest" name="ServerID" value="" />
+                <button type="submit" class="btn btn-secondary float-right">Modify Rule</button>
+            </form>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -105,10 +109,6 @@
                             <td>@Html.DisplayFor(modelItem => rule.Port)</td>
                             <td>
                                 <div class="btn-group" role="group">
-                                    <form asp-action="ModifyFirewallRule" method="post">
-                                        <input type="hidden" name="ID" value="@rule.ID" />
-                                        <button type="submit" class="btn btn-secondary">Modify Rule</button>
-                                    </form>
                                     <form asp-action="DeleteFirewallRule" method="post">
                                         <input type="hidden" name="ID" value="@rule.ID" />
                                         <button type="submit" class="btn btn-danger">Delete Rule</button>
@@ -149,6 +149,10 @@
     </div>
 </div>
 <script>
+    $(document).ready(function () {
+        var ID = $('#ServerIDSrc').val();
+        $('#ServerIDDest').val(ID);
+    };
     (function () {
         'use strict';
         window.addEventListener('load', function () {
