@@ -14,7 +14,7 @@
 }
 <div class="row">
     <div class="col-lg-6 border-right">
-        <form asp-action="SubmitFirewallRule" method="post" class="needs-validation" novalidate>
+        <form asp-action="Modification" method="post" class="needs-validation" novalidate>
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
@@ -49,24 +49,62 @@
             </div>
             <div class="form-group">
                 <label for="ServerStorage">Server Assigned Storage:</label>
-                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" min="8" max="1000" placeholder="Size in Gigabytes" required>
+                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" value="@Model.StorageAssigned" min="8" max="1000" placeholder="Size in Gigabytes" required>
                 <div class="invalid-feedback">A minimum Storage space of 8 Gigabytes must be assigned to the server</div>
             </div>
             <div class="form-group">
                 <label>Server Tenancy:</label>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyS" value="Shared" required>
-                    <label class="form-check-label" for="ServerTenancyS">Shared</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDI" value="Dedicated Instance">
-                    <label class="form-check-label" for="ServerTenancyDI">Dedicated Instance</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDH" value="Dedicated Hardware">
-                    <label class="form-check-label" for="ServerTenancyDH">Dedicated Hardware</label>
-                    <div class="invalid-feedback">Select the server's tenancy</div>
-                </div>
+                @if (Model.Tenancy == Tenancy.Shared)
+                {
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyS" value="Shared" checked required>
+                        <label class="form-check-label" for="ServerTenancyS">Shared</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDI" value="Dedicated Instance">
+                        <label class="form-check-label" for="ServerTenancyDI">Dedicated Instance</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDH" value="Dedicated Hardware">
+                        <label class="form-check-label" for="ServerTenancyDH">Dedicated Hardware</label>
+                        <div class="invalid-feedback">Select the server's tenancy</div>
+                    </div>
+                }
+                @if (Model.Tenancy == Tenancy.DedicatedInstance)
+                {
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyS" value="Shared" required>
+                        <label class="form-check-label" for="ServerTenancyS">Shared</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDI" value="Dedicated Instance" checked>
+                        <label class="form-check-label" for="ServerTenancyDI">Dedicated Instance</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDH" value="Dedicated Hardware">
+                        <label class="form-check-label" for="ServerTenancyDH">Dedicated Hardware</label>
+                        <div class="invalid-feedback">Select the server's tenancy</div>
+                    </div>
+                }
+                @if (Model.Tenancy == Tenancy.DedicatedHardware)
+                {
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyS" value="Shared" required>
+                        <label class="form-check-label" for="ServerTenancyS">Shared</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDI" value="Dedicated Instance">
+                        <label class="form-check-label" for="ServerTenancyDI">Dedicated Instance</label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDH" value="Dedicated Hardware" checked>
+                        <label class="form-check-label" for="ServerTenancyDH">Dedicated Hardware</label>
+                        <div class="invalid-feedback">Select the server's tenancy</div>
+                    </div>
+                }
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary float-right">Save Changes</button>
             </div>
         </form>
     </div>
@@ -80,7 +118,7 @@
             <p class="form-text">Server Firewall Rules</p>
             <form asp-action="CreateFirewallRule" method="post">
                 <input type="hidden" id="ServerIDDest" name="ServerID" value="" />
-                <button type="submit" class="btn btn-secondary float-right">Modify Rule</button>
+                <button type="submit" class="btn btn-secondary float-right">Add Rule</button>
             </form>
             <table class="table table-bordered">
                 <thead>
@@ -124,8 +162,7 @@
 </div>
 <div class="row">
     <div class="col-lg-12">
-        <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back</button>
-        <button type="submit" class="btn btn-primary float-right">Save Changes</button>
+        <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back</button>        
     </div>
 </div>
 
@@ -149,10 +186,6 @@
     </div>
 </div>
 <script>
-    $(document).ready(function () {
-        var ID = $('#ServerIDSrc').val();
-        $('#ServerIDDest').val(ID);
-    };
     (function () {
         'use strict';
         window.addEventListener('load', function () {
@@ -168,6 +201,4 @@
             });
         }, false);
     })();
-    document.getElementById("ServerWorkload").selectedIndex = -1;
-    document.getElementById("Subnet").selectedIndex = -1;
 </script>
