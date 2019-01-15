@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AdminSide.Data;
 using AdminSide.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
 
 namespace AdminSide.Controllers
 {
@@ -15,31 +17,35 @@ namespace AdminSide.Controllers
     {
 
         private readonly ForumContext context1;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public ForumController(ForumContext con)
+        public ForumController(ForumContext con, UserManager<IdentityUser> userManager)
         {
             context1 = con;
+            _userManager = userManager;
         }
 
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
-
         // GET: Forum Post
-        public async Task<IActionResult> Index(string sortOrder, string searchString/*, string currentFilter, int? page*/)
+        public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? page)
         {
+
+            //Take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            ////For username (can use it inside method also)
+            var username = user;
+
+            ViewData["CurrentSort"] = sortOrder;
             ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
             ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
 
-            //if (searchString != null)
-            //{
-            //    page = 1;
-            //}
-            //else
-            //{
-            //    searchString = currentFilter;
-            //}
+            if (searchString != null)
+            {
+                page = 1;
+            }
+            else
+            {
+                searchString = currentFilter;
+            }
 
             ViewData["CurrentFilter"] = searchString;
 
@@ -47,13 +53,13 @@ namespace AdminSide.Controllers
                         select p;
             if (!String.IsNullOrEmpty(searchString))
             {
-                posts = posts.Where(p => p.UserName.Contains(searchString) || p.Title.Contains(searchString));
+                posts = posts.Where(p => p.UserName.Contains(searchString));
             }
 
             switch (sortOrder)
             {
                 case "name_desc":
-                    posts = posts.OrderByDescending(s => s.UserName);
+                    posts = posts.OrderByDescending(p => p.UserName);
                     break;
                 case "Date":
                     posts = posts.OrderBy(p => p.DT);
@@ -62,6 +68,7 @@ namespace AdminSide.Controllers
                     posts = posts.OrderByDescending(p => p.DT);
                     break;
                 default:
+                    posts = posts.OrderBy(p => p.UserName);
                     break;
             }
 
@@ -78,9 +85,9 @@ namespace AdminSide.Controllers
             //int pageSize = 3;
 
             return View(category);
-            //return View(await PaginatedListF<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
-            //return View(await context1.Posts.AsNoTracking().ToListAsync());
+            //return View(await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
         }
+
 
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
@@ -107,21 +114,8 @@ namespace AdminSide.Controllers
         // GET: Topic/Create
         public IActionResult NewTopicF()
         {
+            PopulateCategoryDropDownList();
             return View();
-        }
-
-        // POST: Topic/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> NewTopicF([Bind("Title,Content,UserName, DT, CategoryID")] Post post)
-        {
-            if (ModelState.IsValid)
-            {
-                context1.Add(post);
-                await context1.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(post);
         }
 
         // GET: Forum/Edit
@@ -137,39 +131,7 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
-            return View(post);
-        }
-
-        // POST: Forum/Edit
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Title,Content,UserName, DT, CategoryID")] Post post)
-        {
-            if (id != post.PostID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    context1.Update(post);
-                    await context1.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PostExists(post.PostID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
+            PopulateCategoryDropDownList();
             return View(post);
         }
 
@@ -192,6 +154,70 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
+        // GET: Category/New
+        public IActionResult NewCategory()
+        {
+            return View();
+        }
+
+        // POST: Topic/New
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> NewTopicF([Bind("Title,Content,UserName, DT, CategoryID")] Post post)
+        {
+            if (ModelState.IsValid)
+            {
+                //Take in user object
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                ////For username (can use it inside method also)
+                var username = user;
+                post.UserName = user.UserName;
+                post.DT = DateTime.Now;
+
+                context1.Add(post);
+                await context1.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(post);
+        }
+
+        // POST: Forum/Edit
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Title,Content,UserName, DT, CategoryID")] Post post)
+        {
+            if (id != post.PostID)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    post.DT = DateTime.Now;
+                    // GET THE ID
+                    var userID = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                    post.UserName = userID;
+                    context1.Update(post);
+                    await context1.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PostExists(post.PostID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            return View(post);
+        }
+
         // POST: Forum/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -203,11 +229,27 @@ namespace AdminSide.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        // POST: Topic/New
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> NewCategory([Bind("CategoryName")] ForumCategory category)
+        {
+            if (ModelState.IsValid)
+            {
+                context1.Add(category);
+                await context1.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View(category);
+        }
+
+        // Checking if Post Exist
         private bool PostExists(int id)
         {
             return context1.Posts.Any(e => e.PostID == id);
         }
 
+        // Dropdown List for Category 
         private void PopulateCategoryDropDownList(object selectCategory = null)
         {
             var categoryQuery = from c in context1.ForumCategories

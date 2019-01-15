@@ -12,6 +12,8 @@ namespace UserSide.Models
         [Key]
         public int PostID { get; set; }
 
+        //public int UserID { get; set; }
+
         [Display(Name = "Posted By")]
         public string UserName { get; set; }
 

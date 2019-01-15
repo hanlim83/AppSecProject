@@ -12,6 +12,8 @@ namespace UserSide.Models
         [Key]
         public int CommentID { get; set; }
 
+        public int UserID { get; set; }
+
         public string UserName { get; set; }
 
         public string Content { get; set; }
