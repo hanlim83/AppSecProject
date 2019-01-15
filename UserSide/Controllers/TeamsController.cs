@@ -20,9 +20,23 @@ namespace UserSide.Controllers
         }
 
         // GET: Teams
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int? id)
         {
-            return View(await _context.Teams.ToListAsync());
+            if (id == null)
+            {
+                return NotFound();
+            }
+            //Prob need to do some sorting by score here before returning
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            return View(competition);
         }
 
         // GET: Teams/Details/5
@@ -92,35 +106,6 @@ namespace UserSide.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(team);
-        }
-
-        // GET: Teams/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var team = await _context.Teams
-                .FirstOrDefaultAsync(m => m.TeamID == id);
-            if (team == null)
-            {
-                return NotFound();
-            }
-
-            return View(team);
-        }
-
-        // POST: Teams/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var team = await _context.Teams.FindAsync(id);
-            _context.Teams.Remove(team);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         private bool TeamExists(int id)
