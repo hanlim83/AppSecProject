@@ -10,9 +10,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Net;
 using System.Threading.Tasks;
-using State = AdminSide.Areas.PlatformManagement.Models.State;
-using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
-using Tenancy = AdminSide.Areas.PlatformManagement.Models.Tenancy;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
@@ -28,6 +25,54 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         {
             this._context = context;
             this.EC2Client = ec2Client;
+        }
+
+        public IActionResult CreateTemplate()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateTemplate([Bind("serverID", "Name", "TemplateDescription")]ServerTemplateCreationFormModel submission)
+        {
+            Server given = await _context.Servers.FindAsync(int.Parse(submission.serverID));
+            if (given != null)
+            {
+                Template newlyCreated = new Template
+                {
+                    Name = submission.Name,
+                    TemplateDescription = submission.TemplateDescription,
+                    DateCreated = DateTime.Now,
+                    OperatingSystem = given.OperatingSystem,
+                    SpecificMinimumSize = true,
+                    MinimumStorage = given.StorageAssigned,
+                    Type = TemplateType.Custom
+                };
+                CreateImageResponse response = await EC2Client.CreateImageAsync(new CreateImageRequest
+                {
+                    BlockDeviceMappings = new List<BlockDeviceMapping> {
+                        new BlockDeviceMapping {
+                            DeviceName = "/dev/xvda",
+                            Ebs = new EbsBlockDevice { VolumeSize = given.StorageAssigned }
+                        }
+                    },
+                    Name = submission.Name + " - Created on Platform",
+                    Description = submission.TemplateDescription,
+                    NoReboot = false,
+                    InstanceId = given.AWSEC2Reference
+                });
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    newlyCreated.AWSAMIReference = response.ImageId;
+                    _context.Templates.Add(newlyCreated);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("");
+                }
+                else
+                    return StatusCode(500);
+            }
+            else
+                return StatusCode(500);
         }
 
         public async Task<IActionResult> Index()
@@ -94,12 +139,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     await _context.SaveChangesAsync();
                     ViewData["Result"] = "Deleted Sucessfully!";
                     return RedirectToAction("");
-                } else
+                }
+                else
                 {
                     ViewData["Result"] = "Delete Failed!";
                     return RedirectToAction("");
                 }
-            } else
+            }
+            else
             {
                 return NotFound();
             }
@@ -109,199 +156,6 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-
-        //Imported From Challenge Servers
-
-        public IActionResult SpecifySettings()
-        {
-            return RedirectToAction("");
-        }
-
-        public IActionResult VerifySettings()
-        {
-            return RedirectToAction("");
-        }
-
-        [HttpPost]
-
-        public async Task<IActionResult> SpecifySettings(String selectedTemplate)
-        {
-            if (selectedTemplate != null)
-            {
-                TempData["selectedTemplate"] = selectedTemplate;
-                return View(await _context.Subnets.ToListAsync());
-            }
-            else
-                return NotFound();
-        }
-
-        [HttpPost]
-
-        public async Task<IActionResult> VerifySettings(String ServerName, String ServerWorkload, String SelectedTemplate, String ServerStorage, String ServerTenancy, String ServerSubnet)
-        {
-            creationReference = new ChallengeServersCreationFormModel
-            {
-                ServerName = ServerName,
-                ServerWorkload = ServerWorkload,
-                selectedTemplate = await _context.Templates.FindAsync(Int32.Parse(SelectedTemplate)),
-                ServerStorage = Int32.Parse(ServerStorage),
-                ServerTenancy = ServerTenancy,
-                ServerSubnet = await _context.Subnets.FindAsync(Int32.Parse(ServerSubnet))
-            };
-            TempData["TemplateID"] = creationReference.selectedTemplate.ID;
-            TempData["SubnetID"] = creationReference.ServerSubnet.ID;
-            return View(creationReference);
-        }
-
-        [HttpPost]
-
-        public async Task<IActionResult> Submission([Bind("TemplateName,OperatingSystem,ServerName,ServerWorkload,ServerStorage,ServerTenancy,SubnetCIDR,TemplateID,SubnetID")] ChallengeServersCreationFormModel Model2)
-        {
-            Template selectedT = await _context.Templates.FindAsync(Int32.Parse(Model2.TemplateID));
-            Subnet selectedS = await _context.Subnets.FindAsync(Int32.Parse(Model2.SubnetID));
-            RunInstancesRequest request = new RunInstancesRequest
-            {
-                BlockDeviceMappings = new List<BlockDeviceMapping> {
-                        new BlockDeviceMapping {
-                            DeviceName = "/dev/xvda",
-                            Ebs = new EbsBlockDevice { VolumeSize = Model2.ServerStorage }
-                        }
-                    },
-                ImageId = selectedT.AWSAMIReference,
-                KeyName = "ASPJ Instances Master Key Pair",
-                MaxCount = 1,
-                MinCount = 1,
-                SubnetId = selectedS.AWSVPCSubnetReference
-            };
-            if (Model2.ServerWorkload.Equals("Low"))
-            {
-                request.InstanceType = "t2.micro";
-                if (Model2.ServerTenancy.Equals("Dedicated Instance"))
-                {
-                    request.Placement = new Placement
-                    {
-                        Tenancy = Amazon.EC2.Tenancy.Dedicated
-                    };
-                }
-                else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
-                {
-                    request.Placement = new Placement
-                    {
-                        Tenancy = Amazon.EC2.Tenancy.Host
-                    };
-                }
-            }
-            else if (Model2.ServerWorkload.Equals("Medium"))
-            {
-                request.InstanceType = "t2.medium";
-                if (Model2.ServerTenancy.Equals("Dedicated Instance"))
-                {
-                    request.Placement = new Placement
-                    {
-                        Tenancy = Amazon.EC2.Tenancy.Dedicated
-                    };
-                }
-                else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
-                {
-                    request.Placement = new Placement
-                    {
-                        Tenancy = Amazon.EC2.Tenancy.Host
-                    };
-                }
-            }
-            else if (Model2.ServerWorkload.Equals("Large"))
-            {
-                request.InstanceType = "t2.xlarge";
-                if (Model2.ServerTenancy.Equals("Dedicated Instance"))
-                {
-                    request.Placement = new Placement
-                    {
-                        Tenancy = Amazon.EC2.Tenancy.Dedicated
-                    };
-                }
-                else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
-                {
-                    request.Placement = new Placement
-                    {
-                        Tenancy = Amazon.EC2.Tenancy.Host
-                    };
-                }
-            }
-            try
-            {
-                RunInstancesResponse response = await EC2Client.RunInstancesAsync(request);
-                if (response.HttpStatusCode.Equals(HttpStatusCode.OK))
-                {
-                    await EC2Client.CreateTagsAsync(new CreateTagsRequest
-                    {
-                        Resources = new List<string>
-                        {
-                            response.Reservation.Instances[0].InstanceId
-                        },
-                        Tags = new List<Tag>
-                        {
-                            new Tag("Name",Model2.ServerName)
-                        }
-                    });
-                    Server newlyCreated = new Server
-                    {
-                        Name = Model2.ServerName,
-                        OperatingSystem = selectedT.OperatingSystem,
-                        StorageAssigned = Model2.ServerStorage,
-                        DateCreated = DateTime.Now,
-                        AWSEC2Reference = response.Reservation.Instances[0].InstanceId,
-                        AWSSecurityGroupReference = response.Reservation.Instances[0].SecurityGroups[0].GroupId,
-                        LinkedSubnet = selectedS,
-                        SubnetID = selectedS.ID
-                    };
-                    if (Model2.ServerWorkload.Equals("Low"))
-                        newlyCreated.Workload = Workload.Low;
-                    else if (Model2.ServerWorkload.Equals("Medium"))
-                        newlyCreated.Workload = Workload.Medium;
-                    else if (Model2.ServerWorkload.Equals("Large"))
-                        newlyCreated.Workload = Workload.Large;
-                    if (selectedS.Type == SubnetType.Internet)
-                    {
-                        newlyCreated.IPAddress = response.Reservation.Instances[0].PublicIpAddress;
-                        newlyCreated.DNSHostname = response.Reservation.Instances[0].PublicDnsName;
-                        newlyCreated.Visibility = Visibility.Internet;
-                    }
-                    else
-                    {
-                        newlyCreated.IPAddress = response.Reservation.Instances[0].PrivateIpAddress;
-                        newlyCreated.DNSHostname = response.Reservation.Instances[0].PrivateDnsName;
-                        if (selectedS.Type == SubnetType.Extranet)
-                            newlyCreated.Visibility = Visibility.Extranet;
-                        else
-                            newlyCreated.Visibility = Visibility.Intranet;
-                    }
-                    if (response.Reservation.Instances[0].State.Code == 0)
-                        newlyCreated.State = State.Starting;
-                    else if (response.Reservation.Instances[0].State.Code == 16)
-                        newlyCreated.State = State.Running;
-                    if (Model2.ServerTenancy.Equals("Shared"))
-                        newlyCreated.Tenancy = Tenancy.Shared;
-                    else if (Model2.ServerTenancy.Equals("Dedicated Instance"))
-                        newlyCreated.Tenancy = Tenancy.DedicatedInstance;
-                    else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
-                        newlyCreated.Tenancy = Tenancy.DedicatedHardware;
-                    _context.Servers.Add(newlyCreated);
-                    _context.SaveChanges();
-                    ViewData["ServerName"] = newlyCreated.Name;
-                    return View(response.Reservation.Instances[0]);
-                }
-                else
-                {
-                    ViewData["Exception"] = "An error occured!";
-                    return View(new Instance());
-                }
-            }
-            catch (AmazonEC2Exception e)
-            {
-                ViewData["Exception"] = e.Message;
-                return View(new Instance());
-            }
         }
     }
 }
