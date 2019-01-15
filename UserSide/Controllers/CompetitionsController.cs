@@ -12,6 +12,7 @@ using UserSide.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace UserSide.Controllers
 {
@@ -96,6 +97,9 @@ namespace UserSide.Controllers
             //Need to get user.Id
             var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            //var username = user.UserName;
+
             foreach (var Team in competition.Teams)
             {
                 foreach (var TeamUser in Team.TeamUsers)
@@ -103,10 +107,6 @@ namespace UserSide.Controllers
                     if (TeamUser.UserId.Equals(userId))
                     {
                         return RedirectToAction("Index", "Competitions");
-                    }
-                    else
-                    {
-                        return View();
                     }
                 }
             }
@@ -134,6 +134,53 @@ namespace UserSide.Controllers
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index", "Competitions");
+        }
+
+        public async Task<IActionResult> Join(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["CompetitionID"] = id;
+
+            TeamCreateViewModel teamCreateViewModel = new TeamCreateViewModel();
+            teamCreateViewModel.Competition = competition;
+
+            //Need to get user.Id
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            //var username = user.UserName;
+            var dictionary = new Dictionary<string, string>
+            {
+
+            };
+            
+            foreach (var Team in competition.Teams)
+            {
+                dictionary.Add(Team.TeamName, Team.TeamName);
+                foreach (var TeamUser in Team.TeamUsers)
+                {
+                    if (TeamUser.UserId.Equals(userId))
+                    {
+                        return RedirectToAction("Index", "Competitions");
+                    }
+                }
+            }
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+            return View();
+            //return View();
         }
 
         private bool CompetitionExists(int id)
