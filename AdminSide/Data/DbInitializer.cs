@@ -13,126 +13,6 @@ namespace AdminSide.Data
         public static void InitializePlatformResources(PlatformResourcesContext context)
         {
             context.Database.EnsureCreated();
-            if (!context.RouteTables.Any() && !context.Routes.Any())
-            {
-                var defaultRouteTables = new RouteTable[]
-                {
-                    new RouteTable
-                    {
-                        AWSVPCRouteTableReference = "rtb-087bb7bba0f0c4eee"
-                    },
-                    new RouteTable
-                    {
-                        AWSVPCRouteTableReference = "rtb-0fe88d50b748fd6e9"
-                    },
-                    new RouteTable
-                    {
-                        AWSVPCRouteTableReference = "rtb-0f051204240351aee"
-                    }
-                };
-                foreach (RouteTable rt in defaultRouteTables)
-                {
-                    context.RouteTables.Add(rt);
-                }
-                var defaultRoutes = new Route[]
-                {
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "172.30.0.0/16",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "2406:da18:456:f300::/56",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "0.0.0.0/0",
-                        Destination = "Internet Gateway",
-                        Description = "Route to the Internet (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-087bb7bba0f0c4eee").ID,
-                        IPCIDR = "::/80",
-                        Destination = "Internet Gateway",
-                        Description = "Route to the Internet (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "172.30.0.0/16",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "2406:da18:456:f300::/56",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "0.0.0.0/0",
-                        Destination = "NAT Gateway",
-                        Description = "Route to the Internet (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0fe88d50b748fd6e9").ID,
-                        IPCIDR = "::/80",
-                        Destination = "One-Way Internet Gateway",
-                        Description = "Route to the Internet (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0f051204240351aee").ID,
-                        IPCIDR = "172.30.0.0/16",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv4)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    },
-                    new Route
-                    {
-                        RouteTableID = defaultRouteTables.Single(rt => rt.AWSVPCRouteTableReference == "rtb-0f051204240351aee").ID,
-                        IPCIDR = "2406:da18:456:f300::/56",
-                        Destination = "Challenge Network",
-                        Description = "Route to Challenge Network (IPv6)",
-                        Status = Status.OK,
-                        RouteType = RouteType.Mandatory
-                    }
-                };
-                foreach (Route r in defaultRoutes)
-                {
-                    context.Routes.Add(r);
-                }
-                context.SaveChanges();
-            }
             if (!context.Templates.Any())
             {
                 var defaultTemplates = new Template[]
@@ -348,15 +228,26 @@ namespace AdminSide.Data
 
             var teams = new Team[]
             {
-            new Team{ TeamName="T0X1C V4P04", Password="Pass123!", CompetitionID=1},
-            new Team{ TeamName="Team 1", Password="Pass123!", CompetitionID=1},
-            new Team{ TeamName="Team 2", Password="Pass123!", CompetitionID=1},
-            new Team{ TeamName="Team 3", Password="Pass123!", CompetitionID=1},
+            new Team{ TeamName="T0X1C V4P04", Password="Pass123!", Score=100, CompetitionID=1},
+            new Team{ TeamName="Team 1", Password="Pass123!", Score=80, CompetitionID=1},
+            new Team{ TeamName="Team 2", Password="Pass123!", Score=50, CompetitionID=1},
+            new Team{ TeamName="Team 3", Password="Pass123!", Score=20, CompetitionID=1},
             };
 
             foreach (Team t in teams)
             {
                 context.Teams.Add(t);
+            }
+            context.SaveChanges();
+
+            var teamUsers = new TeamUser[]
+            {
+            new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f"}
+            };
+
+            foreach (TeamUser tu in teamUsers)
+            {
+                context.TeamUsers.Add(tu);
             }
             context.SaveChanges();
         }

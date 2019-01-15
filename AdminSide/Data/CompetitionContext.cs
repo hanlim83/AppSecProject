@@ -19,6 +19,8 @@ namespace AdminSide.Data
         public DbSet<CategoryDefault> CategoryDefault { get; set; }
         public DbSet<Challenge> Challenges { get; set; }
         public DbSet<Team> Teams { get; set; }
+        public DbSet<TeamUser> TeamUsers { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -30,6 +32,9 @@ namespace AdminSide.Data
             modelBuilder.Entity<CategoryDefault>().ToTable("CategoryDefault");
             modelBuilder.Entity<Challenge>().ToTable("Challenges");
             modelBuilder.Entity<Team>().ToTable("Teams");
+                //.HasMany<TeamUser>(t => t.);
+            modelBuilder.Entity<TeamUser>().ToTable("TeamUsers");
+
         }
     }
 }

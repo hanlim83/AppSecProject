@@ -1,39 +1,41 @@
-﻿@{
+﻿@model UserSide.Models.TeamCreateViewModel
+@using Microsoft.AspNetCore.Identity
+@{
     ViewData["Title"] = "Competition Sign Up";
 }
 
-@model UserSide.Models.TeamModel
-
 <title>@ViewData["Title"] - Competition Sign Up</title>
+@inject UserManager<IdentityUser> UserManager
+@{
+    var user = await UserManager.GetUserAsync(User);
+}
 
 <br>
-<div class="row">
-    <div class="col-md-8 offset-2">
+<div class="container">
+    <div class="btn-group d-flex" role="group">
+        <button type="button" class="btn btn-primary w-100">Join Group</button>
+        <button type="button" class="btn btn-primary w-100">Create Group</button>
+    </div>
+    <div>
         <section>
             <br>
             <form method="post">
-                <h2>Joining NYP Global CTF</h2>
+                <h2>Joining XXX</h2>
                 <div class="form-group">
-                    <label asp-for="Input.TeamName"></label>
-                    <input asp-for="Input.TeamName" class="form-control" />
-                    <span asp-validation-for="Input.TeamName" class="text-danger"></span>
+                    <label asp-for="Team.TeamName"></label>
+                    <input asp-for="Team.TeamName" class="form-control" />
+                    <span asp-validation-for="Team.TeamName" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="Input.Password"></label>
-                    <input asp-for="Input.Password" class="form-control" />
-                    <span asp-validation-for="Input.Password" class="text-danger"></span>
+                    <label asp-for="Team.Password"></label>
+                    <input asp-for="Team.Password" class="form-control" />
+                    <span asp-validation-for="Team.Password" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <div class="checkbox">
-                        <label asp-for="Input.RememberMe">
-                            <input asp-for="Input.RememberMe" />
-                            @Html.DisplayNameFor(m => m.Input.RememberMe)
-                        </label>
-                    </div>
-                </div>
+                <input type="hidden" asp-for="Team.CompetitionID" value="@ViewData["CompetitionID"]" />
+                <input type="hidden" asp-for="TeamUser.UserId" value="@user.Id" />
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-default">Create/Join</button>
+                    <button type="submit" class="btn btn-default">Create</button>
                 </div>
             </form>
         </section>

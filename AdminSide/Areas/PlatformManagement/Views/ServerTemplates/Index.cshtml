@@ -1,12 +1,92 @@
-﻿
+﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Template>
 @{
     ViewData["Title"] = "Server Templates";
 }
 <div class="row">
     <div class="col-lg-3">
-        <partial name="../_MainNav.cshtml"/>
+        <partial name="../_MainNav.cshtml" />
     </div>
     <div class="col-lg-9">
-
+        <div class="row">
+            <div class="col-lg-12">
+                @if (Convert.ToString(ViewData["Result"]) == "Successfully Deleted!" || Convert.ToString(ViewData["Result"]) == "Successfully Stopped!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-success" role="alert">
+                                @ViewData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!" && Convert.ToString(ViewData["Result"]) != "Successfully Stopped!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger" role="alert">
+                                @ViewData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                <div class="row">
+                    <div class="col-lg-12">
+                        <a href="#" class="btn btn-primary" style="float:right; margin-top:20px; margin-bottom:20px;">Create New Template From Exisiting Server</a>
+                    </div>
+                </div>
+                @foreach (var template in Model)
+                {
+                    @if (template.Type == TemplateType.Custom)
+                    {
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        @if (template.OperatingSystem.Contains("Amazon Linux"))
+                                        {
+                                            <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/AWSLinux.png);">
+                                            </div>
+                                        }
+                                        @if (template.OperatingSystem.Contains("Red Hat"))
+                                        {
+                                            <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/RedHatLinux.png);">
+                                            </div>
+                                        }
+                                        @if (template.OperatingSystem.Contains("SUSE"))
+                                        {
+                                            <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/SUSELinux.png);">
+                                            </div>
+                                        }
+                                        @if (template.OperatingSystem.Contains("Ubuntu"))
+                                        {
+                                            <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/UbuntuLinux.png);">
+                                            </div>
+                                        }
+                                        @if (template.OperatingSystem.Contains("Windows"))
+                                        {
+                                            <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/Windows.png);">
+                                            </div>
+                                        }
+                                        @if (template.OperatingSystem.Contains("Kali Linux"))
+                                        {
+                                            <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/KaliLinux.png);">
+                                            </div>
+                                        }
+                                        <h5 class="card-title" style="position: relative; left: 10px;">@Html.ValueForModel(template.Name)</h5>
+                                        <p class="card-text" style="position: relative; left: 10px;">Operating System: @Html.ValueForModel(Convert.ToString(template.OperatingSystem))</p>
+                                        <p class="card-text" style="position: relative; left: 10px;">Date Created: @Html.ValueForModel(Convert.ToString(template.DateCreated))</p>
+                                        @if (template.TemplateDescription != null)
+                                        {
+                                            <p class="card-text" style="position: relative; left: 10px;">@Html.ValueForModel(String.Format(template.TemplateDescription))</p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                    }
+                }
+            </div>
+        </div>
     </div>
 </div>
