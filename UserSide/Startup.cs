@@ -95,6 +95,17 @@ namespace UserSide
             return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
         }
 
+        private string GetRdsConnectionStringChat()
+        {
+            string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
+            string port = Configuration.GetValue<string>("RDS_PORT");
+            string dbname = "Chat";
+            string username = Configuration.GetValue<string>("RDS_USERNAME");
+            string password = Configuration.GetValue<string>("RDS_PASSWORD");
+
+            return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
+        }
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -128,6 +139,11 @@ namespace UserSide
             services.AddDbContext<ForumContext>(options =>
             options.UseSqlServer(
             GetRdsConnectionStringForum()));
+
+            //Chat DB Context
+            services.AddDbContext<ChatContext>(options =>
+            options.UseSqlServer(
+            GetRdsConnectionStringChat()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
         .AddRazorPagesOptions(options =>

@@ -6,16 +6,14 @@ using System.Threading.Tasks;
 
 namespace UserSide.Models
 {
-    public class LiveChat
+    public class UserChat
     {
         [Key]
-        public int ChatID { get; set; }
-
-        public DateTime dateTime { get; set; }
-        public string Username { get; set; }
         public string UserID { get; set; }
+            
+        public string UserName { get; set; }
+        public int GroupID { get; set; }
 
-
-
+        public ICollection<Chats> Chats { get; set; }
     }
 }

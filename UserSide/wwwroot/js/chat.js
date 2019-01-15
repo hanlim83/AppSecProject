@@ -8,6 +8,7 @@ connection.on("ReceiveMessage", function ( message) {
     var li = document.createElement("li");
     li.textContent = encodedMsg;
     document.getElementById("messagesList").appendChild(li);
+    document.getElementById('messageInput').value = "";
 });
 
 connection.start().catch(function (err) {
