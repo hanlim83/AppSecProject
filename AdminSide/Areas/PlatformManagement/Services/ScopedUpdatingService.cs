@@ -261,19 +261,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     });
                 }
                 _logger.LogInformation("Update Background Service is getting RSS Feeds");
-                var feed = await FeedReader.ReadAsync("https://hnrss.org/newest");
-                RSSFeed mainFeed = new RSSFeed
-                {
-                    Title = feed.Title,
-                    Link = feed.Link,
-                    Description = feed.Description,
-                    PubDate = feed.LastUpdatedDateString,
-                    main = true
-                };
-                NewsFeedcontext.Feeds.Add(mainFeed);
+                var feed = await FeedReader.ReadAsync("https://hnrss.org/newcomments");
                 foreach (FeedItem var in feed.Items)
                 {
-                    RSSFeed subFeed = new RSSFeed
+                    RSSFeed Feed = new RSSFeed
                     {
                         Title = var.Title,
                         Link = var.Link,
@@ -281,7 +272,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         PubDate = var.PublishingDateString,
                         main = false
                     };
-                    NewsFeedcontext.Feeds.Add(subFeed);
+                    NewsFeedcontext.Feeds.Add(Feed);
                 }
                 await NewsFeedcontext.SaveChangesAsync();
                 _logger.LogInformation("Update Background Service has completed!");
