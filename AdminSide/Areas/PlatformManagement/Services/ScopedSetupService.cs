@@ -265,7 +265,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         }
                             });
                             newSubnet.Name = "Intranet Subnet - Autocreated";
-                            newSubnet.Type = SubnetType.Internet;
+                            newSubnet.Type = SubnetType.Intranet;
                         }
                         else if (i == 1)
                         {
@@ -296,8 +296,18 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             new Tag("Name","Internet Subnet - Autocreated")
                         }
                             });
+                            await ec2Client.ModifySubnetAttributeAsync(new ModifySubnetAttributeRequest
+                            {
+                                SubnetId = responseCreateSubnet.Subnet.SubnetId,
+                                MapPublicIpOnLaunch = true
+                            });
+                            await ec2Client.ModifySubnetAttributeAsync(new ModifySubnetAttributeRequest
+                            {
+                                SubnetId = responseCreateSubnet.Subnet.SubnetId,
+                                AssignIpv6AddressOnCreation = true
+                            });
                             newSubnet.Name = "Internet Subnet - Autocreated";
-                            newSubnet.Type = SubnetType.Intranet;
+                            newSubnet.Type = SubnetType.Internet;
                         }
                         context.Subnets.Add(newSubnet);
                     }
