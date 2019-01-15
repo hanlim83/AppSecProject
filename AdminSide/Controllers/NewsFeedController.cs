@@ -8,11 +8,21 @@ using System.Xml.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using CodeHollow.FeedReader;
+using AdminSide.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdminSide.Controllers
 {
     public class NewsFeedController : Controller
     {
+
+        private readonly NewsFeedContext context;
+
+        public NewsFeedController(NewsFeedContext context)
+        {
+            this.context = context;
+        }
+
         public IActionResult Index()
         {
             return View();
@@ -43,7 +53,7 @@ namespace AdminSide.Controllers
             return View();
         }*/
         [HttpPost]
-        public async Task<IActionResult> Index (string RSSURL)
+        public async Task<IActionResult> Index(string RSSURL)
         {
             var feed = await FeedReader.ReadAsync(RSSURL); //await will wait for the feed
             RSSFeed rssfeed = new RSSFeed
@@ -63,6 +73,11 @@ namespace AdminSide.Controllers
 
             ViewBag.URL = RSSURL;
             return View();
+        }
+
+        public async Task<IActionResult> test()
+        {
+            return View(await context.Feeds.ToListAsync());
         }
     }
 }

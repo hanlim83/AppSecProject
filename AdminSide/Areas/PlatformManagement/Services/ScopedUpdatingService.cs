@@ -14,32 +14,37 @@ using System.Data.SqlClient;
 using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
+using AdminSide.Data;
+using CodeHollow.FeedReader;
+using AdminSide.Models;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
     internal class ScopedUpdatingService : IScopedUpdatingService
     {
         private readonly ILogger _logger;
-        private readonly PlatformResourcesContext context;
+        private readonly PlatformResourcesContext PRcontext;
+        private readonly NewsFeedContext NewsFeedcontext;
         private readonly IAmazonEC2 ec2Client;
         private readonly IAmazonCloudWatch cwClient;
         private readonly IAmazonCloudWatchEvents cweClient;
         private readonly IAmazonCloudWatchLogs cwlClient;
 
-        public ScopedUpdatingService(ILogger<ScopedUpdatingService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient)
+        public ScopedUpdatingService(ILogger<ScopedUpdatingService> logger, PlatformResourcesContext PRcontext, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient, NewsFeedContext newsFeedContext)
         {
             _logger = logger;
-            context = Context;
+            this.PRcontext = PRcontext;
             ec2Client = EC2Client;
             cwClient = cloudwatchClient;
             cweClient = cloudwatcheventsClient;
             cwlClient = cloudwatchlogsClient;
+            NewsFeedcontext = newsFeedContext;
         }
 
         public async Task DoWorkAsync()
         {
             _logger.LogInformation("Update Background Service is running.");
-            VPC vpc = await context.VPCs.FindAsync(1);
+            VPC vpc = await PRcontext.VPCs.FindAsync(1);
             try
             {
                 //if (context.Subnets.Any())
@@ -184,10 +189,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 //    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
                 //    context.Database.CloseConnection();
                 //}
-                if (context.Servers.Any())
+                if (PRcontext.Servers.Any())
                 {
                     _logger.LogInformation("Update Background Service is checking servers");
-                    List<Server> servers = await context.Servers.ToListAsync();
+                    List<Server> servers = await PRcontext.Servers.ToListAsync();
                     DescribeInstancesResponse response = await ec2Client.DescribeInstancesAsync(new DescribeInstancesRequest
                     {
                         Filters = new List<Filter>
@@ -237,13 +242,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         Flag = true;
                                     }
                                     if (Flag == true)
-                                        context.Servers.Update(server);
+                                        PRcontext.Servers.Update(server);
                                     break;
                                 }
                             }
                         }
                     }
-                    context.SaveChanges();
+                    PRcontext.SaveChanges();
                 }
                 else
                 {
@@ -255,6 +260,30 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 }
                     });
                 }
+                _logger.LogInformation("Update Background Service is getting RSS Feeds");
+                var feed = await FeedReader.ReadAsync("https://hnrss.org/newest");
+                RSSFeed mainFeed = new RSSFeed
+                {
+                    Title = feed.Title,
+                    Link = feed.Link,
+                    Description = feed.Description,
+                    PubDate = feed.LastUpdatedDateString,
+                    main = true
+                };
+                NewsFeedcontext.Feeds.Add(mainFeed);
+                foreach (FeedItem var in feed.Items)
+                {
+                    RSSFeed subFeed = new RSSFeed
+                    {
+                        Title = var.Title,
+                        Link = var.Link,
+                        Description = var.Description,
+                        PubDate = var.PublishingDateString,
+                        main = false
+                    };
+                    NewsFeedcontext.Feeds.Add(subFeed);
+                }
+                await NewsFeedcontext.SaveChangesAsync();
                 _logger.LogInformation("Update Background Service has completed!");
             } catch (SqlException)
             {
