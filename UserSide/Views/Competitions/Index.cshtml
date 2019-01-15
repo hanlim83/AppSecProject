@@ -5,6 +5,7 @@
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout.cshtml";
     int counter = 0;
+    int counter2 = 0;
 }
 @inject UserManager<IdentityUser> UserManager
 @{
@@ -20,11 +21,9 @@
             <tr>
                 <th>
                     @Html.DisplayNameFor(model => model.CompetitionName)
-                    Competition Name
                 </th>
                 <th>
                     @Html.DisplayNameFor(model => model.Status)
-                    Status
                 </th>
                 <th></th>
             </tr>
@@ -33,6 +32,7 @@
             @foreach (var competition in Model)
             {
                 counter = 0;
+                counter2 = competition.Teams.Count() - 1;
                 <tr>
                     <td>
                         @Html.DisplayFor(modelItem => competition.CompetitionName)
@@ -55,6 +55,7 @@
                                     @if (team.TeamUsers.Count == 0)
                                     {
                                         <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                                        counter = 1;
                                         //break;
                                     }
                                     else
@@ -63,13 +64,17 @@
                                         {
                                             if (teamUsers.UserId.Equals(user.Id))
                                             {
-                                                <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Enter</button></a>
+                                                <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">View</button></a>
                                                 counter = 1;
                                                 break;
                                             }
                                             else
                                             {
-                                                <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                                                if (counter2 == 0)
+                                                {
+                                                    <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                                                }
+                                                counter2--;
                                             }
                                         }
                                     }
