@@ -10,6 +10,8 @@ using UserSide.Data;
 using UserSide.Models;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using System.Security.Claims;
 
 namespace UserSide.Controllers
 {
@@ -18,16 +20,36 @@ namespace UserSide.Controllers
     public class CompetitionsController : Controller
     {
         private readonly CompetitionContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public CompetitionsController(CompetitionContext context)
+        public CompetitionsController(CompetitionContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Competitions
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Competitions.ToListAsync());
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .ToListAsync();
+
+            var teamUsers = _context.TeamUsers
+                .ToList();
+
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            //CompetitionIndexViewModel vm = new CompetitionIndexViewModel();
+            //vm.Competition = competition;
+            //vm.TeamUsers = teamUsers;
+
+            return View(competition);
+            //return View(await _context.Competitions.ToListAsync());
         }
 
         // GET: Competitions/Details/5
@@ -47,10 +69,65 @@ namespace UserSide.Controllers
 
             return View(competition);
         }
-
-        public IActionResult SignUp()
+        
+        public async Task<IActionResult> SignUp(int? id)
         {
-            return View();
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["CompetitionID"] = id;
+
+            TeamCreateViewModel teamCreateViewModel = new TeamCreateViewModel();
+            teamCreateViewModel.Competition = competition;
+
+            //Need to get user.Id
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            //var user = await _userManager.FindByNameAsync(userName);
+            foreach (var Team in competition.Teams)
+            {
+                foreach (var TeamUser in Team.TeamUsers)
+                {
+                    if (TeamUser.UserId.Equals(userId))
+                    {
+                        return RedirectToAction("Index", "Competitions");
+                    }
+                    else
+                    {
+                        return View(teamCreateViewModel);
+                    }
+                }
+            }
+            return View(teamCreateViewModel);
+            //return View();
+        }
+
+        // POST: Competitions/Create
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SignUp(TeamCreateViewModel teamCreateViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                //teamCreateViewModel.Team.TeamUsers.Add(new TeamUser { TeamId = teamCreateViewModel.Team.TeamID, UserId = teamCreateViewModel.UserID });
+                _context.Add(teamCreateViewModel.Team);
+                teamCreateViewModel.TeamUser.TeamId = teamCreateViewModel.Team.TeamID;
+                _context.Add(teamCreateViewModel.TeamUser);
+                await _context.SaveChangesAsync();
+            }
+            return RedirectToAction("Index", "Competitions");
         }
 
         private bool CompetitionExists(int id)

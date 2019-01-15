@@ -3,6 +3,7 @@
     ViewBag.Title = "Index";
 }
 <br />
+<div class="container">
 <h2>RSS Feed Reader</h2>
 <hr />
 <br />
@@ -26,13 +27,14 @@
         {
             foreach (var item in ViewBag.RSSFeed)
             {
-                <tr>
-                    <td>@item.Title</td>
-                    <td><a href="@item.Link">@item.Link</a></td>
-                    <td>@item.Description</td>
-                    <td>@item.PubDate</td>
-                </tr>
+        <tr>
+            <td>@item.Title</td>
+            <td><a href="@item.Link">@item.Link</a></td>
+            <td>@item.Description</td>
+            
+        </tr>
             }
         }
     </tbody>
 </table>  
+</div>

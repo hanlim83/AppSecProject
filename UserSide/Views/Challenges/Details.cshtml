@@ -4,45 +4,53 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
-
-<div>
-    <h4>Challenge</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Value)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Value)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Flag)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Flag)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.CompetitionCategoryID)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.CompetitionCategoryID)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+<br>
+<div class="container">
+    <div>
+        <h4>Challenge</h4>
+        <!--Probably rename header to challenge name-->
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Value)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Value)
+            </dd>
+        </dl>
+        <form method="get" action="@ViewData["FileLink"]">
+            <button class="btn btn-dark" type="submit"><i class="fa fa-download"></i>Download</button>
+        </form>
+        <br>
+    </div>
+    <div>
+        <form method="post" asp-action="Details">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="row">
+                <div class="form-group col-md-9">
+                    @*<label asp-for="Flag" class="control-label"></label>*@
+                    <input asp-for="Flag" class="form-control" placeholder="Flag" />
+                    <span asp-validation-for="Flag" class="text-danger"></span>
+                </div>
+                <div class="form-group col-md-3">
+                    <input type="submit" value="Submit" class="btn btn-default" asp-route-id="@Model.ID" />
+                </div>
+            </div>
+        </form>
+    </div>
+    <div>
+        <a asp-action="Index" asp-route-id="@Model.CompetitionID">Back to List</a>
+    </div>
 </div>

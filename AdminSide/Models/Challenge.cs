@@ -13,8 +13,6 @@ namespace AdminSide.Models
         public int ID { get; set; }
         [Required]
         public string Name { get; set; }
-        //public string Category { get; set; }
-        //To check if this^ is needed as it can be dynamically retrieved to the binded category
         [Required]
         public string Description { get; set; }
         [Required]
