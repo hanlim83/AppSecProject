@@ -53,7 +53,14 @@ namespace AdminSide.Controllers
                 Description = feed.Description,
                 PubDate = feed.LastUpdatedDateString
             };
-            ViewBag.RSSFeed = feed;
+
+            List<FeedItem> feedlist = new List<FeedItem>();
+            foreach (var item in feed.Items)
+            {
+                feedlist.Add(item);
+            }
+            ViewBag.RSSFeed = feedlist;
+
             ViewBag.URL = RSSURL;
             return View();
         }
