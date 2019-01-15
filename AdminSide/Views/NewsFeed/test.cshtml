@@ -1,44 +1,45 @@
 ﻿@model IEnumerable<AdminSide.Models.RSSFeed>
 
 @{
-    ViewData["Title"] = "test";
+    ViewData["Title"] = "NewsFeed";
 }
+<div class="container">
+    <h2>NewsFeed</h2>
+    @using (Html.BeginForm())
+    {
+        <input type="Search" name="Search" placeholder="Search Content..." class="form-control" value="" style="min-width:50%" />
+        <br />
+        <input type="submit" class="btn btn-danger" />
+    }
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Link</th>
+                <th>Description</th>
+                <th>Published Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </td>
+                    <td>
+                        <a href="@item.Link"/>
+                            @Html.DisplayFor(modelItem => item.Link)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Description)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.PubDate)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 
-<h2>test</h2>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Link)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Description)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.PubDate)
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Link)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PubDate)
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
