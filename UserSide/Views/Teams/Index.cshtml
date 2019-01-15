@@ -1,56 +1,47 @@
-﻿@{
-    ViewData["Title"] = "Teams";
+﻿@model IEnumerable<UserSide.Models.Team>
+
+@{
+    ViewData["Title"] = "Index";
 }
 
-<title>@ViewData["Title"] - Teams</title>
+<h2>Index</h2>
 
-<h2>Teams test</h2>
-
-<p>Hello from our Teams page!</p>
-
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 <table class="table">
     <thead>
         <tr>
-            <th scope="col">Team Name</th>
-            <th scope="col">Others</th>
+            <th>
+                @Html.DisplayNameFor(model => model.TeamName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Password)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Score)
+            </th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
+@foreach (var item in Model) {
         <tr>
-            <td><a asp-area="" asp-controller="Teams" asp-action="Team" class="nav-link">T0X1C V4P0R</a></td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TeamName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Password)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Score)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.TeamID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.TeamID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.TeamID">Delete</a>
+            </td>
         </tr>
-        <tr>
-            <td>Team 1</td>
-        </tr>
-        <tr>
-            <td>Team 2</td>
-        </tr>
-        <tr>
-            <td>Team 3</td>
-        </tr>
-        <tr>
-            <td>Team 4</td>
-        </tr>
-        <tr>
-            <td>Team 5</td>
-        </tr>
-        <tr>
-            <td>Team 6</td>
-        </tr>
-        <tr>
-            <td>Team 7</td>
-        </tr>
-        <tr>
-            <td>Team 8</td>
-        </tr>
-        <tr>
-            <td>Team 9</td>
-        </tr>
-        <tr>
-            <td>Team 10</td>
-        </tr>
-        <tr>
-            <td>Team 11</td>
-        </tr>
+}
     </tbody>
 </table>

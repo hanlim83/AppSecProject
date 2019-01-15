@@ -69,9 +69,7 @@ namespace UserSide.Controllers
 
             return View(competition);
         }
-
         
-
         public async Task<IActionResult> SignUp(int? id)
         {
             if (id == null)
@@ -129,7 +127,7 @@ namespace UserSide.Controllers
                 _context.Add(teamCreateViewModel.TeamUser);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction("Index", "Competitions", new { id = teamCreateViewModel.Team.CompetitionID });
+            return RedirectToAction("Index", "Competitions");
         }
 
         private bool CompetitionExists(int id)
