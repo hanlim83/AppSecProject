@@ -5,9 +5,11 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 connection.on("ReceiveMessage", function ( message) {
     var msg = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     var encodedMsg = msg;
+    var ul = document.getElementById("messageList");
     var li = document.createElement("li");
     li.textContent = encodedMsg;
-    document.getElementById("messagesList").appendChild(li);
+    ul.appendChild(li);
+   //document.getElementById("messagesList")
     document.getElementById('messageInput').value = "";
 });
 

@@ -16,6 +16,6 @@ namespace UserSide.Models
         public string GroupName { get; set; }
 
         public ICollection<Chats> Chats { get; set; }
-        public ICollection<UserChat> userChats { get; set; }
+        public ICollection<UserChat> UserChats { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<UserSide.Models.GroupChat>
+
 @{
     ViewData["Title"] = "LIVE CHAT";
 }
@@ -12,8 +13,6 @@
             margin-top: 30px;
             text-align: center;
         }
-       
-      
     </style>
 
 </head>
@@ -24,11 +23,44 @@
 
     <!--Individual-->
 
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.GroupName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.GroupID)
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GroupID)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.GroupName)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.UserID">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.UserID">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.UserID">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+        <tbody>
+    </table>
+
     <div class="container">
         <div class="table-responsive table table-hover">
             <table class="table">
                 <tbody>
-                    <tr>
+                    <tr  asp-action="TalkView">
                         <th scope="row">Mark</th>
                         <td>Online</td>
                         <td>0</td>
@@ -78,7 +110,7 @@
                 </div>
                 <div class="col-auto">
                     <button type="submit" class="btn btn-dark"><i class="material-icons">search</i></button>
-                    <button type="submit" class="btn btn-dark"><i class="material-icons">group_add</i></button>
+                    <button type="submit" class="btn btn-dark" asp-action="Create"><i class="material-icons">group_add</i></button>
                     <button type="button" class="btn btn-dark"><i class="material-icons">chat</i></button>
                 </div>
             </div>

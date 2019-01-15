@@ -26,7 +26,7 @@ using Amazon.ElasticBeanstalk;
 using UserSide.Areas.Identity.Services;
 using Amazon.SimpleSystemsManagement;
 using UserSide.Hubs;
-
+using Microsoft.AspNetCore.SignalR;
 
 namespace UserSide
 {
@@ -193,6 +193,9 @@ namespace UserSide
 
             //Chat Signalr
             services.AddSignalR();
+
+            //User 
+           // services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -3,8 +3,7 @@
     ViewData["Title"] = "TalkView";
 }
 
-@using Microsoft.AspNetCore.Identity
-@model IEnumerable<UserSide.Models.Competition>
+
 
 <!DOCTYPE html>
 <html>
@@ -74,34 +73,27 @@
 </head>
 <body>
 
-    @inject UserManager<IdentityUser> UserManager
-    @{
-        var user = await UserManager.GetUserAsync(User);
-
-    }
-
-    <h1>@user.UserName</h1>
-
+    
     <div class="container">
         <div class="chat_window">
             <div class="top_menu">
 
                 <div class="title">Chat</div>
-                <div class="messages"></div>
+            </div>
+            <div class="messages">
+                <ul class="list-group" id="messageList"></ul>
+            </div>
 
-                <ul class="list-group">
-                    <li class="list-group-item list-group-item-dark" id="messagesList"></li>
-                </ul>
 
-                <div class="bottom_wrapper clearfix">
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="messageInput" placeholder="Type messages here..." aria-label="Recipient's username" aria-describedby="button-addon2">
-                        <div class="input-group-append">
-                            <button class="btn btn-outline-secondary" type="button" id="sendButton" value="Send Message">Send</button>
-                        </div>
+            <div class="bottom_wrapper clearfix">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="messageInput" placeholder="Type messages here..." aria-label="Recipient's username" aria-describedby="button-addon2">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="sendButton" value="Send Message">Send</button>
                     </div>
                 </div>
             </div>
+
         </div>
 
 
