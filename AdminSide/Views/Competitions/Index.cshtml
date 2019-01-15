@@ -14,7 +14,11 @@
         <a asp-action="Create"><button type="button" class="btn btn-primary">New CTF</button></a>
     </div>
     <br>
+    <h2>Upcoming CTF</h2>
+    <hr>
     <br>
+    <h2>Ongoing CTF</h2>
+    <hr>
     <div>
         <table class="table">
             <thead>
@@ -42,6 +46,8 @@
                             <!--<a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
                             <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
                             <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>-->
+
+
                             <a asp-action="Details" asp-route-id="@item.ID"><button type="button" class="btn btn-default">View Details</button></a>
                             <!--To shift 2 buttons below inside Details page next time-->
                             <a asp-action="Edit" asp-route-id="@item.ID"><button type="button" class="btn btn-default">Edit</button></a>
@@ -52,5 +58,8 @@
             </tbody>
         </table>
     </div>
+    <br>
+    <h2>Past CTF</h2>
+    <hr>
 </div>
 @*</div>*@
