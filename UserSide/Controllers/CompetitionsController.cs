@@ -61,6 +61,8 @@ namespace UserSide.Controllers
             }
 
             var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
             {
@@ -93,7 +95,7 @@ namespace UserSide.Controllers
 
             //Need to get user.Id
             var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            //var user = await _userManager.FindByNameAsync(userName);
+
             foreach (var Team in competition.Teams)
             {
                 foreach (var TeamUser in Team.TeamUsers)
@@ -104,11 +106,11 @@ namespace UserSide.Controllers
                     }
                     else
                     {
-                        return View(teamCreateViewModel);
+                        return View();
                     }
                 }
             }
-            return View(teamCreateViewModel);
+            return View();
             //return View();
         }
 
@@ -117,14 +119,18 @@ namespace UserSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignUp(TeamCreateViewModel teamCreateViewModel)
+        public async Task<IActionResult> SignUp([Bind("TeamName, Password, CompetitionID")]Team team)
         {
             if (ModelState.IsValid)
             {
-                //teamCreateViewModel.Team.TeamUsers.Add(new TeamUser { TeamId = teamCreateViewModel.Team.TeamID, UserId = teamCreateViewModel.UserID });
-                _context.Add(teamCreateViewModel.Team);
-                teamCreateViewModel.TeamUser.TeamId = teamCreateViewModel.Team.TeamID;
-                _context.Add(teamCreateViewModel.TeamUser);
+                _context.Add(team);
+                //get userId
+                var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                TeamUser teamUser = new TeamUser();
+                teamUser.UserId = userId;
+
+                teamUser.TeamId = team.TeamID;
+                _context.Add(teamUser);
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction("Index", "Competitions");
