@@ -69,9 +69,7 @@ namespace UserSide.Controllers
 
             return View(competition);
         }
-
         
-
         public async Task<IActionResult> SignUp(int? id)
         {
             if (id == null)
@@ -94,14 +92,13 @@ namespace UserSide.Controllers
             teamCreateViewModel.Competition = competition;
 
             //Need to get user.Id
-            // var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var userName = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             //var user = await _userManager.FindByNameAsync(userName);
             foreach (var Team in competition.Teams)
             {
                 foreach (var TeamUser in Team.TeamUsers)
                 {
-                    if (TeamUser.UserId.Equals(userName))
+                    if (TeamUser.UserId.Equals(userId))
                     {
                         return RedirectToAction("Index", "Competitions");
                     }
@@ -130,7 +127,7 @@ namespace UserSide.Controllers
                 _context.Add(teamCreateViewModel.TeamUser);
                 await _context.SaveChangesAsync();
             }
-            return RedirectToAction("Index", "Competitions", new { id = teamCreateViewModel.Team.CompetitionID });
+            return RedirectToAction("Index", "Competitions");
         }
 
         private bool CompetitionExists(int id)
