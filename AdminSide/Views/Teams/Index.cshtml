@@ -7,7 +7,7 @@
 <br>
 <div class="container">
     <div class="float-right">
-        <a asp-controller="Teams" asp-action="Create" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Create New</button></a>
+        <a asp-controller="Teams" asp-action="Create" asp-route-id="@Model.ID"><input type="button" value="Create New" class="btn btn btn-default"></a>
     </div>
     <br>
     <br>
@@ -44,4 +44,5 @@
             }
         </tbody>
     </table>
+    <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID"><input type="button" value="Back to Competition Details" class="btn btn btn-default"></a>
 </div>
