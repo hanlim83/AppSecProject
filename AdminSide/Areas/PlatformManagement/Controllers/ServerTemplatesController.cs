@@ -26,13 +26,15 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             this.EC2Client = ec2Client;
         }
 
-        public IActionResult CreateTemplate()
+        [HttpPost]
+        public IActionResult CreateTemplate(string ServerID)
         {
+            ViewData["serverID"] = ServerID;
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTemplate([Bind("serverID", "Name", "TemplateDescription")]ServerTemplateCreationFormModel submission)
+        public async Task<IActionResult> SubmitCreateTemplate([Bind("serverID", "Name", "TemplateDescription")]ServerTemplateCreationFormModel submission)
         {
             Server given = await _context.Servers.FindAsync(int.Parse(submission.serverID));
             if (given != null)

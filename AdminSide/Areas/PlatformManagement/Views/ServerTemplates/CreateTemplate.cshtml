@@ -4,7 +4,7 @@
     ViewData["Title"] = "CreateTemplate";
 }
 
-<h2>CreateTemplate</h2>
+<h2>Create</h2>
 
 <h4>Template</h4>
 <hr />
@@ -13,7 +13,7 @@
 </div>
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="CreateTemplate">
+        <form asp-action="SubmitCreateTemplate">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="serverID" value="@ViewData["serverID"]"/>
             <div class="form-group">
