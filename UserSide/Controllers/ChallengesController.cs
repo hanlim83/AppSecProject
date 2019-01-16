@@ -55,10 +55,6 @@ namespace UserSide.Controllers
                     {
                         return View(competition);
                     }
-                    else
-                    {
-                        return RedirectToAction("Index", "Competitions");
-                    }
                 }
             }
             return RedirectToAction("Index", "Competitions");

@@ -8,8 +8,8 @@
 <br>
 <div class="container">
     <div class="btn-group d-flex" role="group">
-        <button type="button" class="btn btn-primary w-100">Join Group</button>
-        <button type="button" class="btn btn-primary w-100">Create Group</button>
+        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@ViewData["CompetitionID"]" class="w-100"><input type="button" value="Join Group" class="btn btn btn-outline-primary w-100"></a>
+        <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@ViewData["CompetitionID"]" class="w-100"><input type="button" value="Create Group" class="btn btn btn-outline-primary w-100 active"></a>
     </div>
     <div>
         <section>
