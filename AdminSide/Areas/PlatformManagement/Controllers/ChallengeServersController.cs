@@ -55,6 +55,20 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return View(creationReference);
         }
 
+        public async Task<IActionResult> RedirectServerCreation(String selectedTemplate)
+        {
+            if (selectedTemplate != null)
+            {
+                Template selected = await _context.Templates.FindAsync(int.Parse(selectedTemplate));
+                if (selected != null)
+                    return await SpecifySettings(Convert.ToString(selected.ID));
+                else
+                    return RedirectToAction("", "ServerTemplates", "");
+            }
+            else
+                return RedirectToAction("", "ServerTemplates", "");
+        }
+
         [HttpPost]
 
         public async Task<IActionResult> SpecifySettings(String selectedTemplate)
@@ -165,6 +179,17 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 RunInstancesResponse response = await EC2Client.RunInstancesAsync(request);
                 if (response.HttpStatusCode.Equals(HttpStatusCode.OK))
                 {
+                    await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                    {
+                        Resources = new List<string>
+                        {
+                            response.Reservation.Instances[0].InstanceId
+                        },
+                        Tags = new List<Tag>
+                        {
+                            new Tag("Name",Model2.ServerName)
+                        }
+                    });
                     Server newlyCreated = new Server
                     {
                         Name = Model2.ServerName,
@@ -270,32 +295,62 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         public async Task<IActionResult> ModifyServer(String serverID)
         {
             Server selected = await _context.Servers.FindAsync(Int32.Parse(serverID));
-            StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+            if (selected != null)
             {
-                InstanceIds = new List<string> {
+                StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+                {
+                    InstanceIds = new List<string> {
                     selected.AWSEC2Reference
             }
-            });
-            if (response.HttpStatusCode == HttpStatusCode.OK)
-                return View(selected);
+                });
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                    return View(selected);
+                else
+                    return StatusCode(500);
+            }
             else
-                return StatusCode(500);
+                return NotFound(); 
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> Modification([Bind("ID,ServerName,ServerWorkload,ServerStorage,ServerTenancy")] ChallengeServersModificationFormModel Modified)
+        public async Task<IActionResult> Modification(String ServerName, String ID, String ServerWorkload, int ServerStorage, String ServerTenancy)
         {
-            Server retrieved = await _context.Servers.FindAsync(Int32.Parse(Modified.ID));
+            Server retrieved = await _context.Servers.FindAsync(Int32.Parse(ID));
             if (retrieved == null)
             {
-                return RedirectToAction("");
+                return NotFound();
             }
             else
             {
-                if (!retrieved.Name.Equals(Modified.ServerName))
+                if (!retrieved.Name.Equals(ServerName))
                 {
-                    retrieved.Name = Modified.ServerName;
+                    DeleteTagsResponse responseDeleteTag = await EC2Client.DeleteTagsAsync(new DeleteTagsRequest
+                    {
+                        Resources = new List<string>
+                        {
+                            retrieved.AWSEC2Reference
+                        },
+                        Tags = new List<Tag>
+                        {
+                            new Tag("Name")
+                        }
+                    });
+                    if (responseDeleteTag.HttpStatusCode == HttpStatusCode.OK)
+                    {
+                        await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                        {
+                            Resources = new List<string>
+                        {
+                            retrieved.AWSEC2Reference
+                        },
+                            Tags = new List<Tag>
+                        {
+                            new Tag("Name",ServerName)
+                        }
+                        });
+                    }
+                    retrieved.Name = ServerName;
                 }
                 DescribeInstanceAttributeResponse Aresponse = await EC2Client.DescribeInstanceAttributeAsync(new DescribeInstanceAttributeRequest
                 {
@@ -314,37 +369,37 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     InstanceId = retrieved.AWSEC2Reference
                 };
-                if (Modified.ServerWorkload.Equals("Low") && retrieved.Workload != Workload.Low)
+                if (ServerWorkload.Equals("Low") && retrieved.Workload != Workload.Low)
                 {
                     Irequest.InstanceType = "t2.micro";
                     retrieved.Workload = Workload.Low;
                 }
-                else if (Modified.ServerWorkload.Equals("Medium") && retrieved.Workload != Workload.Medium)
+                else if (ServerWorkload.Equals("Medium") && retrieved.Workload != Workload.Medium)
                 {
                     Irequest.InstanceType = "t2.medium";
                     retrieved.Workload = Workload.Medium;
                 }
-                else if (Modified.ServerWorkload.Equals("Large") && retrieved.Workload != Workload.Large)
+                else if (ServerWorkload.Equals("Large") && retrieved.Workload != Workload.Large)
                 {
                     Irequest.InstanceType = "t2.xlarge";
                     retrieved.Workload = Workload.Large;
                 }
-                if (retrieved.StorageAssigned != Modified.ServerStorage && Modified.ServerStorage > retrieved.StorageAssigned)
+                if (retrieved.StorageAssigned != ServerStorage && ServerStorage > retrieved.StorageAssigned)
                 {
-                    Vrequest.Size = Modified.ServerStorage;
-                    retrieved.StorageAssigned = Modified.ServerStorage;
+                    Vrequest.Size = ServerStorage;
+                    retrieved.StorageAssigned = ServerStorage;
                 }
                 else
                 {
 
                 }
                 Tenancy previous = retrieved.Tenancy;
-                if (Modified.ServerTenancy.Equals("Dedicated Instance") && retrieved.Tenancy != Tenancy.DedicatedInstance)
+                if (ServerTenancy.Equals("Dedicated Instance") && retrieved.Tenancy != Tenancy.DedicatedInstance)
                 {
                     Prequest.Tenancy = HostTenancy.Dedicated;
                     retrieved.Tenancy = Tenancy.DedicatedInstance;
                 }
-                else if (Modified.ServerTenancy.Equals("Dedicated Hardware") && retrieved.Tenancy != Tenancy.DedicatedHardware)
+                else if (ServerTenancy.Equals("Dedicated Hardware") && retrieved.Tenancy != Tenancy.DedicatedHardware)
                 {
                     Prequest.Tenancy = HostTenancy.Host;
                     retrieved.Tenancy = Tenancy.DedicatedHardware;
@@ -383,24 +438,31 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     {
                         ModifyInstancePlacementResponse response = await EC2Client.ModifyInstancePlacementAsync(Prequest);
                     }
+                    await EC2Client.StartInstancesAsync(new StartInstancesRequest
+                    {
+                        InstanceIds = new List<string>
+                        {
+                            retrieved.AWSEC2Reference
+                        }
+                    });
                     return RedirectToAction("");
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    retrieved = await _context.Servers.FindAsync(Int32.Parse(Modified.ID));
+                    retrieved = await _context.Servers.FindAsync(Int32.Parse(ID));
                     if (Irequest.InstanceType != null)
                     {
-                        if (Modified.ServerWorkload.Equals("Low"))
+                        if (ServerWorkload.Equals("Low"))
                         {
                             Irequest.InstanceType = "t2.micro";
                             retrieved.Workload = Workload.Low;
                         }
-                        else if (Modified.ServerWorkload.Equals("Medium"))
+                        else if (ServerWorkload.Equals("Medium"))
                         {
                             Irequest.InstanceType = "t2.medium";
                             retrieved.Workload = Workload.Medium;
                         }
-                        else if (Modified.ServerWorkload.Equals("Large"))
+                        else if (ServerWorkload.Equals("Large"))
                         {
                             Irequest.InstanceType = "t2.xlarge";
                             retrieved.Workload = Workload.Large;
@@ -416,12 +478,58 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
                 catch (AmazonEC2Exception)
                 {
-                    retrieved = await _context.Servers.FindAsync(Int32.Parse(Modified.ID));
+                    retrieved = await _context.Servers.FindAsync(Int32.Parse(ID));
                     retrieved.Tenancy = previous;
                     _context.Servers.Update(retrieved);
                     await _context.SaveChangesAsync();
                     return RedirectToAction("");
                 }
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeState(string serverID, string action)
+        {
+            Server retrieved = await _context.Servers.FindAsync(int.Parse(serverID));
+            if (retrieved != null && action.Equals("Run"))
+            {
+                StartInstancesResponse response = await EC2Client.StartInstancesAsync(new StartInstancesRequest
+                {
+                    InstanceIds = new List<string>
+                    {
+                        retrieved.AWSEC2Reference
+                    }
+                });
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    retrieved.State = State.Starting;
+                    _context.Servers.Update(retrieved);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("");
+                }else
+                    return StatusCode(500);
+            } else if (retrieved != null && action.Equals("Stop"))
+            {
+                StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+                {
+                    InstanceIds = new List<string>
+                    {
+                        retrieved.AWSEC2Reference
+                    }
+                });
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    retrieved.State = State.Starting;
+                    _context.Servers.Update(retrieved);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("");
+                }
+                else
+                    return StatusCode(500);
+            }
+            else
+            {
+                return NotFound();
             }
         }
 
