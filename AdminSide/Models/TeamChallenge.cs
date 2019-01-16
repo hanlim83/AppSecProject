@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace UserSide.Models
+namespace AdminSide.Models
 {
     public class TeamChallenge
     {
