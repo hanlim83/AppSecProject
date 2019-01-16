@@ -5,6 +5,7 @@ using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
@@ -44,11 +45,16 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 if (Component.Equals("RDS"))
                 {
-                    return View(await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest
+                    GetLogEventsResponse response = await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest
                     {
                         LogGroupName = "RDSOSMetrics",
                         LogStreamName = "db-74DSOXWDBQWHTVNTY7RFXWRZYE"
-                    }));
+                    });
+                    foreach (OutputLogEvent e in response.Events)
+                    {
+                        e.Message = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(e.Message),Formatting.Indented);
+                    }
+                    return View(response);
                 }
                 else
                     return View();

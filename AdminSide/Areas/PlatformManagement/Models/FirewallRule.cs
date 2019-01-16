@@ -1,4 +1,6 @@
-﻿namespace AdminSide.Areas.PlatformManagement.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AdminSide.Areas.PlatformManagement.Models
 {
     public enum Type
     {
@@ -19,11 +21,17 @@
     {
         public int ID { get; set; }
 
+        [Required]
         public Type Type { get; set; }
+        [Required]
         public Protocol Protocol { get; set; }
+        [Required]
         public int Port { get; set; }
+        [Required]
         public Direction Direction { get; set; }
         public int ServerID { get; set; }
+        [Required]
+        [Display(Name = "IP CIDR")]
         public string IPCIDR { get; set; }
         public virtual Server LinkedServer { get; set; }
     }

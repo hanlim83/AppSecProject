@@ -1,0 +1,156 @@
+﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Subnet>
+
+@{
+    ViewData["Title"] = "Create Server - Specify Settings";
+}
+
+<ul class="progress-tracker progress-tracker--text progress-tracker--center">
+    <li class="progress-step is-active">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 1</h4>
+            Specify Server Settings
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 2</h4>
+            Verify Settings
+        </span>
+    </li>
+    <li class="progress-step">
+        <span class="progress-marker"></span>
+        <span class="progress-text">
+            <h4 class="progress-title">Step 3</h4>
+            Launch Server
+        </span>
+    </li>
+</ul>
+<div class="alert alert-warning" role="alert">
+    Do not refresh this page or you will return to the Templates page
+</div>
+<form asp-action="VerifySettings" method="post" class="needs-validation" novalidate>
+    <div class="row">
+        <div class="col-lg-6 border-right">
+            <h3>Server Settings</h3>
+            <div class="form-group">
+                <label for="ServerName">Server Name:</label>
+                <input type="text" class="form-control" id="ServerName" name="ServerName" required>
+                <div class="invalid-feedback">A server needs a name</div>
+            </div>
+            <div class="form-group">
+                <label for="ServerWorkload">Server Workload</label>
+                <select class="form-control" id="ServerWorkload" name="ServerWorkload" required>
+                    <option value="Low">Low</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Large">Large</option>
+                </select>
+                <div class="invalid-feedback">Server's Workload must be selected</div>
+            </div>
+            <input type="hidden" name="selectedTemplate" value="@TempData["selectedTemplate"]" />
+            <div class="form-group">
+                <label for="ServerStorage">Server Assigned Storage:</label>
+                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" min="8" max="1000" placeholder="Size in Gigabytes" required>
+                <div class="invalid-feedback">A minimum Storage space of 8 Gigabytes must be assigned to the server</div>
+            </div>
+            <div class="form-group">
+                <label>Server Tenancy:</label>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyS" value="Shared" required>
+                    <label class="form-check-label" for="ServerTenancyS">Shared</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDI" value="Dedicated Instance">
+                    <label class="form-check-label" for="ServerTenancyDI">Dedicated Instance</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="ServerTenancy" id="ServerTenancyDH" value="Dedicated Hardware">
+                    <label class="form-check-label" for="ServerTenancyDH">Dedicated Hardware</label>
+                    <div class="invalid-feedback">Select the server's tenancy</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6 border-left">
+            <h3>Network Settings</h3>
+            <div class="form-group">
+                <label for="Subnet">Server Subnet: </label>
+                <select class="form-control" id="Subnet" name="ServerSubnet" required>
+                    @foreach (var subnet in Model)
+                    {
+                        <option aria-type="@subnet.Type" value="@subnet.ID">@subnet.Name (@subnet.IPv4CIDR / @subnet.IPv6CIDR)</option>
+                    }
+                </select>
+                <div class="invalid-feedback">Please select a subnet</div>
+            </div>
+            <div class="form-group">
+                <p class="form-text">Server Firewall Rules</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Direction</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Protocol</th>
+                            <th scope="col">Port</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="4">You can whitelist ports when the server has been launched</td>
+                        </tr>
+                        <tr>
+                            <td>Incoming and Outgoing Traffic</td>
+                            <td>IMPLICT-DENY</td>
+                            <td>TCP and UDP</td>
+                            <td>All Ports not listed above</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back and select a new template</button>
+            <button type="submit" class="btn btn-primary float-right">Continue</button>
+        </div>
+    </div>
+</form>
+<div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure that you want to go back? All current entries will be lost!
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                <a asp-action="" class="btn btn-primary">Yes</a>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    (function () {
+        'use strict';
+        window.addEventListener('load', function () {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    document.getElementById("ServerWorkload").selectedIndex = -1;
+    document.getElementById("Subnet").selectedIndex = -1;
+</script>
