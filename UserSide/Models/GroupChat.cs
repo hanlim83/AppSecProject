@@ -12,7 +12,7 @@ namespace UserSide.Models
         public int GroupID { get; set; }
         
         public string UserID { get; set; }
-        public string UserName { get; set; }
+    
         public string GroupName { get; set; }
 
         public ICollection<Chats> Chats { get; set; }
