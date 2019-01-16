@@ -4,10 +4,12 @@
     ViewData["Title"] = "Index";
 }
 
-
 <br>
 <div class="container">
-    <h2>Index</h2>
+    <div class="btn-group d-flex" role="group">
+        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Challenges" class="btn btn btn-outline-info w-100"></a>
+        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Scoreboard" class="btn btn btn-outline-info w-100 active"></a>
+    </div>
     <table class="table">
         <thead>
             <tr>
@@ -33,11 +35,11 @@
                         @Html.DisplayFor(modelItem => item.Score)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.TeamID">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.TeamID">Details</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
+    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-default"></a>
 </div>
