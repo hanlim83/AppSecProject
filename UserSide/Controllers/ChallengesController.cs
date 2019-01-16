@@ -89,14 +89,45 @@ namespace UserSide.Controllers
                 tempFileName.Replace(' ', '+');
                 ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
             }
-            
+
+            ViewData["ChallengeID"] = challenge.ID;
+
+
             return View(challenge);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Details([Bind("Flag")] Challenge challenge, int? id)
+        public async Task<IActionResult> Details([Bind("ID,Flag")] Challenge challenge, int? id)
         {
+            Team team = null;
+
+            var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .Include(c => c.Challenges)
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            var localvarchallenge = await _context.Challenges
+                .FirstOrDefaultAsync(m => m.ID == challenge.ID);
+
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            foreach (var Team in competition.Teams)
+            {
+                foreach (var TeamUser in Team.TeamUsers)
+                {
+                    if (TeamUser.UserId.Equals(userId))
+                    {
+                        team = Team;
+                        break;
+                    }
+                }
+            }
+
+
             //if (ModelState.IsValid)
             //{
             //    _context.Add(challenge);
@@ -119,6 +150,9 @@ namespace UserSide.Controllers
             {
                 //Flag is correct
                 //Add points to score and stuff
+                team.Score += localvarchallenge.Value;
+                _context.Update(team);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Challenges", new { id });
             }
             //Wrong flag
