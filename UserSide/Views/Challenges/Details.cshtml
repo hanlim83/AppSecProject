@@ -30,9 +30,12 @@
                 @Html.DisplayFor(model => model.Value)
             </dd>
         </dl>
-        <form method="get" action="@ViewData["FileLink"]">
-            <button class="btn btn-dark" type="submit"><i class="fa fa-download"></i>Download</button>
-        </form>
+        @if (Model.FileName != null)
+        {
+            <form method="get" action="@ViewData["FileLink"]">
+                <button class="btn btn-dark" type="submit"><i class="fa fa-download"></i>Download</button>
+            </form>
+        }
         <br>
     </div>
     <div>
