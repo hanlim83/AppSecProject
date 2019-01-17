@@ -40,7 +40,7 @@
     <p>
         <a asp-action="NewTopicF"> New Topic </a>
         <div class="float-right">
-            <a asp-action="NewCategory"><button type="button" class="btn btn-primary">New Category</button></a>
+            <a asp-action="NewCategory"><input type="button" class="btn btn-primary" value="New Category"></a>
         </div>
     </p>
 
@@ -100,7 +100,7 @@
                                             @Html.DisplayFor(modelItem => item.DT)
                                         </td>
                                         <td>
-                                            <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |
+                                            @*<a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |*@
                                             <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |
                                             <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
                                         </td>

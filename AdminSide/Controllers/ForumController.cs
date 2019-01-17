@@ -82,6 +82,13 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
+            //PostViewModel postViewModel = new PostViewModel();
+            //postViewModel.ForumCategory = category;
+
+            //foreach(var Category in category.Post)
+            //{
+
+            //}
             //int pageSize = 3;
 
             return View(category);

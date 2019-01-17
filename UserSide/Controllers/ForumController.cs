@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -30,6 +31,7 @@ namespace UserSide.Controllers
         //    return View();
         //}
 
+        [Authorize]
         // GET: Forum Post
         public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? page)
         {
@@ -92,7 +94,7 @@ namespace UserSide.Controllers
             return View(category);
             //return View(await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
         }
-
+        //[Authorize]
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
         {
@@ -148,58 +150,74 @@ namespace UserSide.Controllers
             return View(post);
         }
 
-        //// GET: Forum/Edit
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        [Authorize]
+        // GET: Forum/Edit
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            
+            var post = await context1.Posts
+                //.Include(p => p.UserName)
+                //    .ThenInclude(e => e.Course)
+                //.AsNoTracking()
+                .SingleOrDefaultAsync(m => m.PostID == id);
 
-        //    var post = await context1.Posts.FindAsync(id);
-        //    if (post == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (post == null)
+            {
+                return NotFound();
+            }
+            // OWASP:Authorize
+            //Take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            ////For username (can use it inside method also)
+            var username = user;
 
-        //    PopulateCategoryDropDownList();
-        //    return View(post);
-        //}
+            if (!user.UserName.Equals(post.UserName))
+            {
+                return RedirectToAction("Index");
+            }
 
-        //// POST: Forum/Edit
-        //[HttpPost, ActionName("Edit")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Title,Content,UserName, DT, CategoryID")] Post post)
-        //{
-        //    if (id != post.PostID)
-        //    {
-        //        return NotFound();
-        //    }
+            PopulateCategoryDropDownList();
+            return View(post);
+        }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            context1.Update(post);
-        //            await context1.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!PostExists(post.PostID))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    PopulateCategoryDropDownList(post.CategoryID);
+        // POST: Forum/Edit
+        [HttpPost, ActionName("Edit")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Title,Content,UserName, DT, CategoryID")] Post post)
+        {
+            if (id != post.PostID)
+            {
+                return NotFound();
+            }
 
-        //    return View(post);
-        //}
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    context1.Update(post);
+                    await context1.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!PostExists(post.PostID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            PopulateCategoryDropDownList(post.CategoryID);
+
+            return View(post);
+        }
 
         //// GET: Forum/Delete
         //public async Task<IActionResult> Delete(int? id)
