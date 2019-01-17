@@ -1,0 +1,42 @@
+﻿@model AdminSide.Areas.PlatformManagement.Models.ServerTemplateCreationFormModel
+
+@{
+    ViewData["Title"] = "CreateTemplate";
+}
+
+<h2>Create</h2>
+
+<h4>Template</h4>
+<hr />
+<div class="alert alert-info" role="alert">
+    To ensure a smooth template creation, the server will not be available for the duration of the creation process. <span style="font-weight: bold;">Please ensure that nobody is using the server before starting creation of server!</span>
+</div>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SubmitCreateTemplate">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="serverID" value="@ViewData["serverID"]"/>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="TemplateDescription" class="control-label"></label>
+                <textarea asp-for="TemplateDescription" class="form-control" rows="5"></textarea>
+                <span asp-validation-for="TemplateDescription" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <button class="btn btn-danger" asp-action="" asp-controller="ChallengeServers">Cancel Template Creation</button>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
