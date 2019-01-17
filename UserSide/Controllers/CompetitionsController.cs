@@ -30,7 +30,7 @@ namespace UserSide.Controllers
         }
 
         // GET: Competitions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool? check)
         {
             var competition = await _context.Competitions
                 .Include(c => c.Teams)
@@ -48,7 +48,14 @@ namespace UserSide.Controllers
             //CompetitionIndexViewModel vm = new CompetitionIndexViewModel();
             //vm.Competition = competition;
             //vm.TeamUsers = teamUsers;
-
+            if (check == null)
+            {
+                ViewData["ShowWrongDirectory"] = false;
+            }
+            else
+            {
+                ViewData["ShowWrongDirectory"] = true;
+            }
             return View(competition);
             //return View(await _context.Competitions.ToListAsync());
         }
@@ -106,7 +113,8 @@ namespace UserSide.Controllers
                 {
                     if (TeamUser.UserId.Equals(userId))
                     {
-                        return RedirectToAction("Index", "Competitions");
+                        ViewData["ShowWrongDirectory"] = "true";
+                        return RedirectToAction("Index", "Competitions", new { check = true });
                     }
                 }
             }
@@ -125,9 +133,13 @@ namespace UserSide.Controllers
             {
                 _context.Add(team);
                 //get userId
-                var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                //var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                //Migrating to new way to get user object
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                
                 TeamUser teamUser = new TeamUser();
-                teamUser.UserId = userId;
+                teamUser.UserId = user.Id;
+                teamUser.UserName = user.UserName;
 
                 teamUser.TeamId = team.TeamID;
                 _context.Add(teamUser);
@@ -136,7 +148,7 @@ namespace UserSide.Controllers
             return RedirectToAction("Index", "Competitions");
         }
 
-        public async Task<IActionResult> Join(int? id)
+        public async Task<IActionResult> Join(int? id, bool? check)
         {
             if (id == null)
             {
@@ -174,11 +186,19 @@ namespace UserSide.Controllers
                 {
                     if (TeamUser.UserId.Equals(userId))
                     {
-                        return RedirectToAction("Index", "Competitions");
+                        return RedirectToAction("Index", "Competitions", new { check = true });
                     }
                 }
             }
             ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+            if (check == null)
+            {
+                ViewData["Show"] = false;
+            }
+            else
+            {
+                ViewData["Show"] = true;
+            }
             return View();
             //return View();
         }
@@ -196,12 +216,14 @@ namespace UserSide.Controllers
             {
                 //if (ModelState.IsValid)
                 //{
-                //Check password match next time
-                //_context.Add(team);
                 //get userId
-                var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                //var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                //Migrate to get user object
+                var user = await _userManager.GetUserAsync(HttpContext.User);
                 TeamUser teamUser = new TeamUser();
-                teamUser.UserId = userId;
+                teamUser.UserId = user.Id;
+                teamUser.UserName = user.UserName;
 
                 teamUser.TeamId = team.TeamID;
                 _context.Add(teamUser);
@@ -211,7 +233,8 @@ namespace UserSide.Controllers
             }
             else
             {
-                return RedirectToAction("Join", "Competitions", new { id = team.CompetitionID });
+                @ViewData["Show"] = true;
+                return RedirectToAction("Join", "Competitions", new { id = team.CompetitionID, check=true });
             }
         }
 
