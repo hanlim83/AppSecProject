@@ -43,7 +43,7 @@
                     <td>
                         @if (competition.Teams.Count == 0)
                         {
-                            <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                             //break;
                         }
                         else
@@ -54,7 +54,7 @@
                                 {
                                     @if (team.TeamUsers.Count == 0)
                                     {
-                                        <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                                         counter = 1;
                                         //break;
                                     }
@@ -72,7 +72,7 @@
                                             {
                                                 if (counter2 == 0)
                                                 {
-                                                    <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                                    <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                                                 }
                                                 counter2--;
                                             }
