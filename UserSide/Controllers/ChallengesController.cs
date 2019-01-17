@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
 using System.Text.RegularExpressions;
@@ -89,7 +90,7 @@ namespace UserSide.Controllers
                 tempFileName.Replace(' ', '+');
                 ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
             }
-
+            ViewData["CompetitionID"] = challenge.CompetitionID;
             ViewData["ChallengeID"] = challenge.ID;
 
 
@@ -98,7 +99,7 @@ namespace UserSide.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Details([Bind("ID,Flag")] Challenge challenge, int? id)
+        public async Task<IActionResult> Details([Bind("ID, Flag, CompetitionID")] Challenge challenge, int? id)
         {
             Team team = null;
 
@@ -108,10 +109,7 @@ namespace UserSide.Controllers
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
                 .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ID == id);
-
-            var localvarchallenge = await _context.Challenges
-                .FirstOrDefaultAsync(m => m.ID == challenge.ID);
+                .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
 
             var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
@@ -127,6 +125,23 @@ namespace UserSide.Controllers
                 }
             }
 
+            //Get all challenges this team has solved
+            var teamChallengesList = await _context.Teams
+                .Include(t => t.TeamChallenges)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.TeamID == team.TeamID);
+
+            foreach(var teamChallenges in teamChallengesList.TeamChallenges)
+            {
+                if (teamChallenges.ChallengeId == challenge.ID)
+                {
+                    return RedirectToAction("Details", "Challenges", new { id });
+                }
+            }
+
+            var localvarchallenge = await _context.Challenges
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == challenge.ID);
 
             //if (ModelState.IsValid)
             //{
@@ -134,13 +149,13 @@ namespace UserSide.Controllers
             //    await _context.SaveChangesAsync();
             //    return RedirectToAction(nameof(Index));
             //}
-            if (id == null)
+            if (challenge.CompetitionID == null)
             {
                 return NotFound();
             }
 
             var temp_challenge = await _context.Challenges
-                .FirstOrDefaultAsync(m => m.ID == id);
+                .FirstOrDefaultAsync(m => m.ID == challenge.ID);
             if (temp_challenge == null)
             {
                 return NotFound();
@@ -149,15 +164,23 @@ namespace UserSide.Controllers
             if (challenge.Flag.Equals(temp_challenge.Flag))
             {
                 //Flag is correct
-                //Add points to score and stuff
+                //Add entry to TeamChallenge
+                TeamChallenge teamChallenge = new TeamChallenge();
+                teamChallenge.ChallengeId = localvarchallenge.ID;
+                teamChallenge.TeamId = team.TeamID;
+                _context.Add(teamChallenge);
+                await _context.SaveChangesAsync();
+
+                //Add points to team score
                 team.Score += localvarchallenge.Value;
+                //team.TeamChallenges = new Collection<TeamChallenge>();
+                //team.TeamChallenges.Add(teamChallenge);
                 _context.Update(team);
                 await _context.SaveChangesAsync();
-                return RedirectToAction("Index", "Challenges", new { id });
+                return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
             }
             //Wrong flag
             return RedirectToAction("Details", "Challenges", new { id });
-            //return View(id);
         }
 
         private bool ChallengeExists(int id)
