@@ -55,7 +55,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     scope.ServiceProvider
                         .GetRequiredService<IScopedUpdatingService>();
 
-                await scopedUpdatingService.DoWorkAsync();
+                //await scopedUpdatingService.DoWorkAsync();
             }
         }
         public Task StopAsync(CancellationToken cancellationToken)

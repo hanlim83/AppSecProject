@@ -162,14 +162,14 @@ namespace UserSide.Controllers
 
             //var user = await _userManager.GetUserAsync(HttpContext.User);
             //var username = user.UserName;
-            var dictionary = new Dictionary<string, string>
+            var dictionary = new Dictionary<int, string>
             {
 
             };
             
             foreach (var Team in competition.Teams)
             {
-                dictionary.Add(Team.TeamName, Team.TeamName);
+                dictionary.Add(Team.TeamID, Team.TeamName);
                 foreach (var TeamUser in Team.TeamUsers)
                 {
                     if (TeamUser.UserId.Equals(userId))
@@ -181,6 +181,38 @@ namespace UserSide.Controllers
             ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
             return View();
             //return View();
+        }
+
+        //Just add user to UserTeam will do
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Join([Bind("TeamID, Password, CompetitionID")]Team team)
+        {
+            var localvarTeam = await _context.Teams
+                .Include(t => t.TeamUsers)
+                .FirstOrDefaultAsync(m => m.CompetitionID == team.CompetitionID);
+
+            if (localvarTeam.Password.Equals(team.Password))
+            {
+                //if (ModelState.IsValid)
+                //{
+                //Check password match next time
+                //_context.Add(team);
+                //get userId
+                var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                TeamUser teamUser = new TeamUser();
+                teamUser.UserId = userId;
+
+                teamUser.TeamId = team.TeamID;
+                _context.Add(teamUser);
+                await _context.SaveChangesAsync();
+                //}
+                return RedirectToAction("Index", "Competitions");
+            }
+            else
+            {
+                return RedirectToAction("Join", "Competitions", new { id = team.CompetitionID });
+            }
         }
 
         private bool CompetitionExists(int id)

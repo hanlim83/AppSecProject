@@ -55,10 +55,6 @@ namespace UserSide.Controllers
                     {
                         return View(competition);
                     }
-                    else
-                    {
-                        return RedirectToAction("Index", "Competitions");
-                    }
                 }
             }
             return RedirectToAction("Index", "Competitions");
@@ -85,13 +81,15 @@ namespace UserSide.Controllers
             string bucketName = competition.BucketName;
             var category = await _context.CompetitionCategories.FindAsync(challenge.CompetitionCategoryID);
             string folderName = category.CategoryName;
-            string fileName = challenge.FileName;
-            Regex pattern = new Regex("[+]");
-            string tempFileName = pattern.Replace(fileName, "%2B");
-            tempFileName.Replace(' ', '+');
-
-            ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
-
+            if (challenge.FileName != null)
+            {
+                string fileName = challenge.FileName;
+                Regex pattern = new Regex("[+]");
+                string tempFileName = pattern.Replace(fileName, "%2B");
+                tempFileName.Replace(' ', '+');
+                ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
+            }
+            
             return View(challenge);
         }
 

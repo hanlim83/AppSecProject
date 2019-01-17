@@ -1,40 +1,53 @@
-﻿
+﻿@model IEnumerable<AdminSide.Models.RSSFeed>
+
 @{
-    ViewBag.Title = "Index";
+    ViewData["Title"] = "NewsFeed";
 }
-<br />
 <div class="container">
-<h2>RSS Feed Reader</h2>
-<hr />
-<br />
-@using (Html.BeginForm())
-{
-    <input type="URL" name="RSSURL" placeholder="Enter RSS Feed URL Here..." class="form-control" value="@ViewBag.URL" style="min-width:100%" />
-    <br />
-    <input type="submit" class="btn btn-danger" />
-}
-<table class="table table-hover">
-    <thead>
-        <tr>
-            <th>Title</th>
-            <th>Link</th>
-            <th>Description</th>
-            <th>Publish Date</th>
-        </tr>
-    </thead>
-    <tbody>
-        @if (ViewBag.RSSFeed != null)
-        {
-            foreach (var item in ViewBag.RSSFeed)
+    <h2>NewsFeed</h2>
+    <form class="form-inline" method="post">
+        <div class="form-group mx-sm-3 mb-2">
+            <label for="searchBar" class="sr-only"></label>
+            <input type="text" class="form-control" id="searchBar" placeholder="Search Query" name="searchQuery" />
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="Filter" id="titleRadio" value="Title" checked>
+            <label class="form-check-label" for="titleRadio">
+                Title
+            </label>
+        </div>
+        <button type="submit" class="btn btn-primary mb-2">Search</button>
+    </form>
+
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Link</th>
+                <th>Description</th>
+                <th>Published Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
             {
-        <tr>
-            <td>@item.Title</td>
-            <td><a href="@item.Link">@item.Link</a></td>
-            <td>@item.Description</td>
-            
-        </tr>
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    <a href="@item.Link" />
+                    @Html.DisplayFor(modelItem => item.Link)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PubDate)
+                </td>
+            </tr>
             }
-        }
-    </tbody>
-</table>  
+        </tbody>
+    </table>
 </div>
+
