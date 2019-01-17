@@ -1,0 +1,37 @@
+﻿@model UserSide.Models.Team
+@{
+    ViewData["Title"] = "Competition Sign Up";
+}
+
+<title>@ViewData["Title"] - Competition Sign Up</title>
+
+<br>
+<div class="container">
+    <div class="btn-group d-flex" role="group">
+        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@ViewData["CompetitionID"]" class="w-100"><input type="button" value="Join Group" class="btn btn btn-outline-primary w-100 active"></a>
+        <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@ViewData["CompetitionID"]" class="w-100"><input type="button" value="Create Group" class="btn btn btn-outline-primary w-100"></a>
+    </div>
+    <div>
+        <section>
+            <br>
+            <form method="post">
+                <h2>Change form data</h2>
+                <div class="form-group">
+                    <label asp-for="TeamName" class="control-label"></label>
+                    <select asp-for="TeamID" class="form-control" asp-items="ViewBag.SelectList"></select>
+                    <span asp-validation-for="TeamID" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Password"></label>
+                    <input asp-for="Password" class="form-control" />
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+                <input type="hidden" asp-for="CompetitionID" value="@ViewData["CompetitionID"]" />
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-default">Create</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>

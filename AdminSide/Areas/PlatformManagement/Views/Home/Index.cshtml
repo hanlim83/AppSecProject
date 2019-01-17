@@ -17,8 +17,18 @@
                 <div class="card-deck" style="padding-bottom: 5%;">
                     <div class="card">
                         <h5 class="card-header">Challenge Servers</h5>
+                        @if (ViewData["ServerHealth"].Equals("OK"))
+                        {
+                            <h5 class="card-title text-success">All Servers are functioning properly</h5>
+                        }
+                        @if (ViewData["ServerHealth"].Equals("NOT OK"))
+                        {
+                            <h5 class="card-title text-danger">One or more Servers are not functioning properly</h5>
+                        }
                         <div class="card-body">
-                            OVERALL STATUS
+                            <p class="card-text">Running Servers: @ViewData["ServerRunningCount"]</p>
+                            <p class="card-text">Servers With Error: @ViewData["ServerErrorCount"]</p>
+                            <p class="card-text">Total Number of Servers: @ViewData["ServerTotalCount"]</p>
                         </div>
                     </div>
                     <div class="card">
@@ -35,14 +45,72 @@
                 <div class="card-deck" style="padding-bottom: 5%;">
                     <div class="card">
                         <h5 class="card-header">Challenge Network</h5>
-                        <div class="card-body">
-                            OVERALL STATUS
-                        </div>
+                        @if (ViewData["RouteHealth"].Equals("OK"))
+                        {
+                            <h5 class="card-title text-success">Challenge Network is functioning properly</h5>
+                        }
+                        @if (ViewData["RouteHealth"].Equals("NOT OK"))
+                        {
+                            <h5 class="card-title text-warning">Challenge Network is not functioning properly due to a misconfigured route</h5>
+                        }
+                            <div class="card-body">
+                                <p class="card-text">Intranet Subnets: @ViewData["SubnetIntranetCount"]</p>
+                                <p class="card-text">Extranet Subnets: @ViewData["SubnetExtranetCount"]</p>
+                                <p class="card-text">Internet Subnets: @ViewData["SubnetInternetCount"]</p>
+                                <p class="card-text">Total Number of Subnets: @ViewData["SubnetTotalCount"]</p>
+                            </div>
                     </div>
                     <div class="card">
                         <h5 class="card-header">Platform Health</h5>
                         <div class="card-body">
-                            OVERALL STATUS
+                            @if (ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK"))
+                            {
+                                <h5 class="card-title text-success">All AWS Services required by the Platform are operating normally</h5>
+                            }
+                            @if (ViewData["CWStatus"].Equals("WARNING") || ViewData["EC2Status"].Equals("WARNING") || ViewData["EBSStatus"].Equals("WARNING") || ViewData["ELBStatus"].Equals("WARNING") || ViewData["NATStatus"].Equals("WARNING") || ViewData["RDSStatus"].Equals("WARNING") || ViewData["R53Status"].Equals("WARNING") || ViewData["SGStatus"].Equals("WARNING") || ViewData["S3Status"].Equals("WARNING") || ViewData["VPCStatus"].Equals("WARNING"))
+                            {
+                                <h5 class="card-title text-warning">One or more AWS Services required by the Platform are facing intermittent issues</h5>
+                            }
+                            @if (ViewData["CWStatus"].Equals("CRITICAL") || ViewData["EC2Status"].Equals("CRITICAL") || ViewData["EBSStatus"].Equals("CRITICAL") || ViewData["ELBStatus"].Equals("CRITICAL") || ViewData["NATStatus"].Equals("CRITICAL") || ViewData["RDSStatus"].Equals("CRITICAL") || ViewData["R53Status"].Equals("CRITICAL") || ViewData["SGStatus"].Equals("CRITICAL") || ViewData["S3Status"].Equals("CRITICAL") || ViewData["VPCStatus"].Equals("CRITICAL"))
+                            {
+                                <h5 class="card-title text-warning">One or more AWS Services required by the Platform are facing downtime</h5>
+                            }
+                            @if (ViewData["RDSStatus"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK"))
+                            {
+                                <p class="card-text">Data Access: All Systems Go!</p>
+                            }
+                            @if (ViewData["RDSStatus"].Equals("WARNING") || ViewData["SGStatus"].Equals("WARNING") && ViewData["S3Status"].Equals("WARNING"))
+                            {
+                                <p class="card-text">Data Access: May Face Performance Issues</p>
+                            }
+                            @if (ViewData["RDSStatus"].Equals("CRITICAL") || ViewData["SGStatus"].Equals("CRITICAL") && ViewData["S3Status"].Equals("CRITICAL"))
+                            {
+                                <p class="card-text">Data Access: May Face Issues In Accessing Data</p>
+                            }
+                            @if (ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["NATStatus"].Equals("OK"))
+                            {
+                                <p class="card-text">Platform and Challenge Servers: All Systems Go!</p>
+                            }
+                            @if (ViewData["EBSStatus"].Equals("WARNING") || ViewData["ELBStatus"].Equals("WARNING") || ViewData["R53Status"].Equals("WARNING") || ViewData["EC2Status"].Equals("WARNING") || ViewData["NATStatus"].Equals("WARNING"))
+                            {
+                                <p class="card-text">Platform and Challenge Servers: May Face Performance Issues</p>
+                            }
+                            @if (ViewData["EBSStatus"].Equals("CRITICAL") || ViewData["ELBStatus"].Equals("CRITICAL") || ViewData["R53Status"].Equals("CRITICAL") || ViewData["EC2Status"].Equals("CRITICAL") || ViewData["NATStatus"].Equals("CRITICAL"))
+                            {
+                                <p class="card-text">Platform and Challenge Servers: May Face Issues in Accessing The Platform</p>
+                            }
+                            @if (ViewData["CWStatus"].Equals("OK"))
+                            {
+                                <p class="card-text">Platform Logging: All Systems Go!</p>
+                            }
+                            @if (ViewData["CWStatus"].Equals("WARNING"))
+                            {
+                                <p class="card-text">Platform Logging: Increased Latency in retrieving events</p>
+                            }
+                            @if (ViewData["CWStatus"].Equals("CRITICAL"))
+                            {
+                                <p class="card-text">Platform Logging: Logging may not accurate</p>
+                            }
                         </div>
                     </div>
                 </div>

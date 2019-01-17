@@ -9,7 +9,7 @@
     <div class="col-lg-9">
         <div class="row">
             <div class="col-lg-12">
-                @if (Convert.ToString(ViewData["Result"]) == "Successfully Deleted!" || Convert.ToString(ViewData["Result"]) == "Successfully Stopped!")
+                @if (Convert.ToString(ViewData["Result"]) == "Successfully Deleted!" || Convert.ToString(ViewData["Result"]) == "Successfully Created!" || Convert.ToString(ViewData["Result"]) == "Successfully Modified!")
                 {
                     <div class="row">
                         <div class="col-lg-12">
@@ -19,7 +19,7 @@
                         </div>
                     </div>
                 }
-                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!" && Convert.ToString(ViewData["Result"]) != "Successfully Stopped!")
+                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!" && Convert.ToString(ViewData["Result"]) != "Successfully Created!" && Convert.ToString(ViewData["Result"]) != "Successfully Modified!")
                 {
                     <div class="row">
                         <div class="col-lg-12">
@@ -39,9 +39,28 @@
                     @if (template.Type == TemplateType.Custom)
                     {
                         <div class="row">
-                            <div class="col-lg-12">
+                            <div class="col-lg-10">
                                 <div class="card">
                                     <div class="card-body">
+                                        <div class="btn-group float-right">
+                                            <form asp-action="Edit" method="post">
+                                                <input type="hidden" name="TemplateID" value="@template.ID" />
+                                                <button type="submit" class="btn btn-secondary">Edit Template</button>
+                                            </form>
+                                            <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                <span class="sr-only">Toggle Dropdown</span>
+                                            </button>
+                                            <div class="dropdown-menu">
+                                                <form asp-action="SpecifySettings" asp-controller="ChallengeServers" method="post">
+                                                    <input type="hidden" name="selectedTemplate" value="@template.ID" />
+                                                    <button type="submit" class="dropdown-item">Deploy Template</button>
+                                                </form>
+                                                <form asp-action="Delete" method="post">
+                                                    <input type="hidden" name="TemplateID" value="@template.ID" />
+                                                    <button type="submit" class="dropdown-item">Delete Template</button>
+                                                </form>
+                                            </div>
+                                        </div>
                                         @if (template.OperatingSystem.Contains("Amazon Linux"))
                                         {
                                             <div class="float-left" style="display: inline-block; vertical-align: middle; width: 100px; height:100px; border-radius: 50%; background-repeat: no-repeat; background-position: center center; background-size: cover; background-image: url(/images/AWSLinux.png);">

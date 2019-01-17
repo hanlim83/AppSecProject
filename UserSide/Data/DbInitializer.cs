@@ -80,5 +80,40 @@ namespace UserSide.Data
             context.SaveChanges();
 
         }
+
+        public static void InitializeChat(ChatContext context)
+        {
+            context.Database.EnsureCreated();
+
+            if (context.UserChats.Any())
+            {
+                return;   // DB has been seeded
+            }
+
+            var Chat = new UserChat[]
+            {
+                new UserChat{UserID="100",UserName="yolo",},
+                new UserChat{UserID="101",UserName="Tamny"}
+            };
+
+            foreach (UserChat c in Chat)
+            {
+                context.UserChats.Add(c);
+            }
+            context.SaveChanges();
+
+            var Group = new GroupChat[]
+            {
+                new GroupChat{GroupID=888,GroupName="PowerMan"},
+                new GroupChat{GroupID=999,GroupName="good try"}
+            };
+
+            foreach (GroupChat c in Group)
+            {
+                context.GroupChats.Add(c);
+            }
+            context.SaveChanges();
+
+        }
     }
 }

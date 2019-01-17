@@ -5,8 +5,8 @@
 }
 
 <br>
-<div class="row">
-    <div class="col-md-8 offset-2">
+<div class="container">
+    <div>
         <h2>Edit Competiton</h2>
         <hr />
         <form asp-action="Edit">
@@ -25,14 +25,14 @@
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-default" />
             </div>
+            <input type="hidden" asp-for="BucketName" />
         </form>
+        <!--Add more fields data here-->
+    </div>
+    <div>
+        <a asp-action="Index">Back to List</a>
     </div>
 </div>
-<!--
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
--->
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

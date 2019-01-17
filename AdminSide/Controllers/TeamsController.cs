@@ -164,10 +164,16 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var team = await _context.Teams.FindAsync(id);
+            var team = await _context.Teams
+                .Include(t => t.TeamUsers)
+                .FirstOrDefaultAsync(m => m.TeamID == id);
+            foreach (var teamUser in team.TeamUsers)
+            {
+                _context.TeamUsers.Remove(teamUser);
+            }
             _context.Teams.Remove(team);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Teams", new { id = team.CompetitionID });
         }
 
         private bool TeamExists(int id)

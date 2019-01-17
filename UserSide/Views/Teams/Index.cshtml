@@ -1,56 +1,45 @@
-﻿@{
-    ViewData["Title"] = "Teams";
+﻿@model UserSide.Models.Competition
+
+@{
+    ViewData["Title"] = "Index";
 }
 
-<title>@ViewData["Title"] - Teams</title>
-
-<h2>Teams test</h2>
-
-<p>Hello from our Teams page!</p>
-
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Team Name</th>
-            <th scope="col">Others</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><a asp-area="" asp-controller="Teams" asp-action="Team" class="nav-link">T0X1C V4P0R</a></td>
-        </tr>
-        <tr>
-            <td>Team 1</td>
-        </tr>
-        <tr>
-            <td>Team 2</td>
-        </tr>
-        <tr>
-            <td>Team 3</td>
-        </tr>
-        <tr>
-            <td>Team 4</td>
-        </tr>
-        <tr>
-            <td>Team 5</td>
-        </tr>
-        <tr>
-            <td>Team 6</td>
-        </tr>
-        <tr>
-            <td>Team 7</td>
-        </tr>
-        <tr>
-            <td>Team 8</td>
-        </tr>
-        <tr>
-            <td>Team 9</td>
-        </tr>
-        <tr>
-            <td>Team 10</td>
-        </tr>
-        <tr>
-            <td>Team 11</td>
-        </tr>
-    </tbody>
-</table>
+<br>
+<div class="container">
+    <div class="btn-group d-flex" role="group">
+        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Challenges" class="btn btn btn-outline-info w-100"></a>
+        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Scoreboard" class="btn btn btn-outline-info w-100 active"></a>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @*@Html.DisplayNameFor(model => model.TeamName)*@
+                    Team Name
+                </th>
+                <th>
+                    @*@Html.DisplayNameFor(model => model.Score)*@
+                    Score
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Teams)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TeamName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Score)
+                    </td>
+                    <td>
+                        <a asp-action="Details" asp-route-id="@item.TeamID">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-default"></a>
+</div>

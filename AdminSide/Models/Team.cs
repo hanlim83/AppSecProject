@@ -16,15 +16,15 @@ namespace AdminSide.Models
         [Required]
         [DisplayName("Team Name")]
         public string TeamName { get; set; }
-
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
-
-        //[Display(Name = "Remember me?")]
-        //public bool RememberMe { get; set; }
+        public int Score { get; set; }
 
         [ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
+
+        public ICollection<TeamUser> TeamUsers { get; set; }
+
     }
 }
