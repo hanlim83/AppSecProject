@@ -12,6 +12,8 @@ namespace UserSide.Models
         [Key]
         public int TeamUserID { get; set; }
 
+        public string UserName { get; set; }
+
         [ForeignKey("TeamId")]
         public int TeamId { get; set; }
         //public Team Team { get; set; }

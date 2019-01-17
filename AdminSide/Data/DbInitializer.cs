@@ -229,9 +229,6 @@ namespace AdminSide.Data
             var teams = new Team[]
             {
             new Team{ TeamName="T0X1C V4P0R", Password="Pass123!", Score=100, CompetitionID=1},
-            new Team{ TeamName="Team 1", Password="Pass123!", Score=0, CompetitionID=1},
-            new Team{ TeamName="Team 2", Password="Pass123!", Score=0, CompetitionID=1},
-            new Team{ TeamName="Team 3", Password="Pass123!", Score=0, CompetitionID=1},
             };
 
             foreach (Team t in teams)
@@ -242,7 +239,7 @@ namespace AdminSide.Data
 
             var teamUsers = new TeamUser[]
             {
-            new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f"}
+            new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f", UserName = "hugoxyz"}
             };
 
             foreach (TeamUser tu in teamUsers)
