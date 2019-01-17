@@ -164,7 +164,7 @@ namespace AdminSide.Data
             }
         }
 
-        public static void InitializeCompetitions (CompetitionContext context)
+        public static void InitializeCompetitions(CompetitionContext context)
         {
             context.Database.EnsureCreated();
 
@@ -287,6 +287,10 @@ namespace AdminSide.Data
             }
             context.SaveChanges();
 
+        }
+        public static void InitializeNewsFeed(NewsFeedContext context)
+        {
+            context.Database.EnsureCreated();
         }
     }
 }
