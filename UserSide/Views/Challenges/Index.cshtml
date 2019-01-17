@@ -2,34 +2,89 @@
 
 @{
     ViewData["Title"] = "Challenges";
+    int counter = 0;
 }
 
 <title>@ViewData["Title"] - Challenges</title>
+@*<link href="~/StyleSheet.css" rel="stylesheet"/>*@
+<!--Using internal style sheet temporarily-->
+<style>
+    #divCompetition {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #challengeButton {
+        /*border-color: red;*/
+        margin: 10px;
+        /*height: 70px;
+        width: 200px;*/
+    }
+</style>
 
 <br>
-<div class="col-md-8 offset-md-2">
+<div class="container">
+    @*<a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">View Scoreboard</button></a>*@
+    <div class="btn-group d-flex" role="group">
+        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Challenges" class="btn btn btn-outline-info w-100 active"></a>
+        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Scoreboard" class="btn btn btn-outline-info w-100"></a>
+    </div>
+
+
     <hr>
     @foreach (var item in Model.CompetitionCategories)
     {
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
         <hr>
-        <row>
-            <!--Loop through this part dynamically-->
-            <div>
-                @foreach (var item1 in Model.Challenges)
+        <!--Loop through this part dynamically-->
+        <div class="col-md-12">
+            @{ counter = 0;}
+            @foreach (var item1 in Model.Challenges)
+            {
+                if (item1.CompetitionCategoryID == item.ID)
                 {
-                    if (item1.CompetitionCategoryID == item.ID)
-                    {
+                    <div class="col-md-3 d-inline-block">
                         <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
-                            <button type="button" class="btn btn-light">
+                            @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
+                            <button type="button" class="btn btn-light w-100" id="challengeButton" data="@item1">
                                 @Html.DisplayFor(modelItem => item1.Name)
                                 <br>
                                 @Html.DisplayFor(modelItem => item1.Value)
                             </button>
                         </a>
-                    }
+                    </div>
+                    counter++;
                 }
-            </div>
-        </row>
+            }
+            @if (counter == 0)
+            {
+                <p>This category has no challenges yet</p>
+            }
+        </div>
     }
+    <br>
+    @*<a asp-controller="Competitions" asp-action="Index"><button type="button" class="btn btn-default">Back</button></a>*@
+    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-default"></a>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                ...
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
 </div>

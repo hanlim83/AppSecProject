@@ -16,39 +16,54 @@
                 @ViewData["Exception"]
             </div>
         }
-            <form asp-action="SubmitFirewallRule">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="ID" />
-                <input type="hidden" asp-for="ServerID" value="@ViewData["ServerID"]" />
-                <div class="form-group">
-                    <label asp-for="Type" class="control-label"></label>
-                    <select asp-for="Type" class="form-control"></select>
-                    <span asp-validation-for="Type" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Protocol" class="control-label"></label>
-                    <select asp-for="Protocol" class="form-control"></select>
-                    <span asp-validation-for="Protocol" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Port" class="control-label"></label>
-                    <input asp-for="Port" class="form-control" />
-                    <span asp-validation-for="Port" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="Direction" class="control-label"></label>
-                    <select asp-for="Direction" class="form-control"></select>
-                    <span asp-validation-for="Direction" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="IPCIDR" class="control-label"></label>
-                    <input asp-for="IPCIDR" class="form-control" />
-                    <span asp-validation-for="IPCIDR" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create" class="btn btn-default" />
-                </div>
-            </form>
+        <form asp-action="SubmitFirewallRule">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ID" />
+            <input type="hidden" asp-for="ServerID" value="@ViewData["ServerID"]" />
+            <div class="form-group">
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class="form-control">
+                    <option value="HTTP">HTTP</option>
+                    <option value="HTTPS">HTTPS</option>
+                    <option value="SSH">SSH</option>
+                    <option value="FTP">FTP</option>
+                    <option value="CUSTOM">CUSTOM</option>
+
+                </select>
+                <span asp-validation-for="Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Protocol" class="control-label"></label>
+                <select asp-for="Protocol" class="form-control">
+                    <option value="TCP">TCP</option>
+                    <option value="UDP">UDP</option>
+                    <option value="ICMP">ICMP</option>
+                </select>
+                <span asp-validation-for="Protocol" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Port" class="control-label"></label>
+                <input asp-for="Port" class="form-control" />
+                <span asp-validation-for="Port" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Direction" class="control-label"></label>
+                <select asp-for="Direction" class="form-control">
+                    <option value="Incoming">Incoming</option>
+                    <option value="Outgoing">Outgoing</option>
+                    <option value="Both">Both</option>
+                </select>
+                <span asp-validation-for="Direction" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="IPCIDR" class="control-label"></label>
+                <input asp-for="IPCIDR" class="form-control" />
+                <span asp-validation-for="IPCIDR" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-default" />
+            </div>
+        </form>
     </div>
 </div>
 

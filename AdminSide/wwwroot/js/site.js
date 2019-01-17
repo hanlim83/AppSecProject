@@ -11,6 +11,7 @@
             $(this).addClass('active');
         }
     });
+        $('#CWresults').DataTable();
 });
 function deleteSubnetInput(ID) {
     $('#subnetDeletionInput').val(ID);

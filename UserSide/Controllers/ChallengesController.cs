@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amazon.S3;
@@ -35,6 +36,8 @@ namespace UserSide.Controllers
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .Include(c1 => c1.Challenges)
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
@@ -42,7 +45,19 @@ namespace UserSide.Controllers
                 return NotFound();
             }
 
-            return View(competition);
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            foreach (var Team in competition.Teams)
+            {
+                foreach (var TeamUser in Team.TeamUsers)
+                {
+                    if (TeamUser.UserId.Equals(userId))
+                    {
+                        return View(competition);
+                    }
+                }
+            }
+            return RedirectToAction("Index", "Competitions");
         }
 
         // GET: Challenges/Details/5
@@ -66,13 +81,15 @@ namespace UserSide.Controllers
             string bucketName = competition.BucketName;
             var category = await _context.CompetitionCategories.FindAsync(challenge.CompetitionCategoryID);
             string folderName = category.CategoryName;
-            string fileName = challenge.FileName;
-            Regex pattern = new Regex("[+]");
-            string tempFileName = pattern.Replace(fileName, "%2B");
-            tempFileName.Replace(' ', '+');
-
-            ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
-
+            if (challenge.FileName != null)
+            {
+                string fileName = challenge.FileName;
+                Regex pattern = new Regex("[+]");
+                string tempFileName = pattern.Replace(fileName, "%2B");
+                tempFileName.Replace(' ', '+');
+                ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
+            }
+            
             return View(challenge);
         }
 

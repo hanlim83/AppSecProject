@@ -3,15 +3,26 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using AdminSide.Areas.PlatformManagement.Data;
+using AdminSide.Areas.PlatformManagement.Models;
 using ASPJ_MVC.Models;
 using CodeHollow.FeedReader;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
     public class HomeController : Controller
     {
+
+        private readonly PlatformResourcesContext _context;
+
+        public HomeController (PlatformResourcesContext context)
+        {
+            _context = context;
+        }
+
         public async Task<IActionResult> Index()
         {
             var CloudwatchFeed = await FeedReader.ReadAsync("https://status.aws.amazon.com/rss/cloudwatch-ap-southeast-1.rss");
@@ -98,7 +109,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             var S3Feed = await FeedReader.ReadAsync("https://status.aws.amazon.com/rss/s3-ap-southeast-1.rss");
             var S3Feed1 = S3Feed.Items.ElementAt(0);
             if (S3Feed1.Title.StartsWith("Service is operating normally"))
-                ViewData["SGStatus"] = "OK";
+                ViewData["S3Status"] = "OK";
             else if (S3Feed1.Title.StartsWith("Informational message") || S3Feed1.Title.StartsWith("Performance issues"))
                 ViewData["S3Status"] = "WARNING";
             else if (S3Feed1.Title.StartsWith("Service disruption"))
@@ -113,6 +124,29 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             else if (VPCFeed1.Title.StartsWith("Service disruption"))
                 ViewData["VPCStatus"] = "CRITICAL";
 
+            List<Server> allServers = await _context.Servers.ToListAsync();
+            ViewData["ServerTotalCount"] = allServers.Count();
+            List<Server> errorServers = await _context.Servers.FromSql("SELECT * FROM dbo.Server WHERE State = 4").ToListAsync();
+            ViewData["ServerErrorCount"] = errorServers.Count();
+            List<Server> runningServers = await _context.Servers.FromSql("SELECT * FROM dbo.Server WHERE State = 1").ToListAsync();
+            ViewData["ServerRunningCount"] = runningServers.Count();
+            List<Subnet> allSubnets = await _context.Subnets.ToListAsync();
+            ViewData["SubnetTotalCount"] = allSubnets.Count();
+            if (errorServers.Count() == 0)
+                ViewData["ServerHealth"] = "OK";
+            else
+                ViewData["ServerHealth"] = "NOT OK";
+            List<Subnet> intranetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnet WHERE Type = 2").ToListAsync();
+            ViewData["SubnetIntranetCount"] = intranetSubnets.Count();
+            List<Subnet> extranetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnet WHERE Type = 1").ToListAsync();
+            ViewData["SubnetExtranetCount"] = extranetSubnets.Count();
+            List<Subnet> internetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnet WHERE Type = 0").ToListAsync();
+            ViewData["SubnetInternetCount"] = internetSubnets.Count();
+            List<Route> problemRoutes = await _context.Routes.FromSql("SELECT * FROM dbo.Route WHERE Status = 1").ToListAsync();
+            if (problemRoutes.Count() == 0)
+                ViewData["RouteHealth"] = "OK";
+            else
+                ViewData["RouteHealth"] = "NOT OK";
             return View();           
         }
 
