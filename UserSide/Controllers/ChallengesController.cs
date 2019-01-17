@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amazon.S3;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -22,11 +23,13 @@ namespace UserSide.Controllers
         IAmazonS3 S3Client { get; set; }
 
         private readonly CompetitionContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public ChallengesController(CompetitionContext context, IAmazonS3 s3Client)
+        public ChallengesController(CompetitionContext context, IAmazonS3 s3Client, UserManager<IdentityUser> userManager)
         {
             _context = context;
             this.S3Client = s3Client;
+            _userManager = userManager;
         }
 
         // GET: Challenges
@@ -49,13 +52,13 @@ namespace UserSide.Controllers
                 return NotFound();
             }
 
-            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userManager.GetUserAsync(HttpContext.User);
 
             foreach (var Team in competition.Teams)
             {
                 foreach (var TeamUser in Team.TeamUsers)
                 {
-                    if (TeamUser.UserId.Equals(userId))
+                    if (TeamUser.UserId.Equals(user.Id))
                     {
                         return View(competition);
                     }
