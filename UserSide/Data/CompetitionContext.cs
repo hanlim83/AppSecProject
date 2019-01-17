@@ -19,6 +19,7 @@ namespace UserSide.Data
         public DbSet<Challenge> Challenges { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamUser> TeamUsers { get; set; }
+        public DbSet<TeamChallenge> TeamChallenges { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,9 +27,8 @@ namespace UserSide.Data
             modelBuilder.Entity<CompetitionCategory>().ToTable("CompetitionCategory");
             modelBuilder.Entity<Challenge>().ToTable("Challenges");
             modelBuilder.Entity<Team>().ToTable("Teams");
-                //.HasMany(t => t.TeamUsers)
-                //.WithOne(e => e.Team);
             modelBuilder.Entity<TeamUser>().ToTable("TeamUsers");
+            modelBuilder.Entity<TeamChallenge>().ToTable("TeamChallenges");
         }
     }
 }
