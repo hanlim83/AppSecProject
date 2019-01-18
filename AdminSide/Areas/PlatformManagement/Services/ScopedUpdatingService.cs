@@ -14,9 +14,7 @@ using System.Data.SqlClient;
 using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
-using AdminSide.Data;
-using CodeHollow.FeedReader;
-using AdminSide.Models;
+using System.ComponentModel;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
@@ -278,9 +276,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 _logger.LogInformation("Update Background Service has completed!");
             } catch (SqlException e)
             {
-                _logger.LogInformation("Update Background Service faced an exception! "+e.Message+" | "+e.Source);
+                _logger.LogInformation("Update Background Service faced an SQL exception! "+e.Message+" | "+e.Source);
                 return;
-            }  
+            } catch (Exception e)
+            {
+                _logger.LogInformation("Update Background Service faced an exception! " + e.Message + " | " + e.Source);
+                return;
+            } 
         }
     }
 }

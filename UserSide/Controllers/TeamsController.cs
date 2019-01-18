@@ -42,7 +42,6 @@ namespace UserSide.Controllers
             {
                 return NotFound();
             }
-
             var user = await _userManager.GetUserAsync(HttpContext.User);
 
             foreach (var Team in competition.Teams)
