@@ -228,7 +228,7 @@ namespace AdminSide.Data
 
             var teams = new Team[]
             {
-            new Team{ TeamName="T0X1C V4P0R", Password="Pass123!", Score=100, CompetitionID=1},
+            new Team{ TeamName="T0X1C V4P0R", Password="", Salt="", Score=100, CompetitionID=1},
             };
 
             foreach (Team t in teams)
