@@ -144,8 +144,10 @@ namespace UserSide.Controllers
                 teamUser.TeamId = team.TeamID;
                 _context.Add(teamUser);
                 await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Competitions");
             }
-            return RedirectToAction("Index", "Competitions");
+            ViewData["CompetitionID"] = team.CompetitionID;
+            return View();
         }
 
         public async Task<IActionResult> Join(int? id, bool? check)
