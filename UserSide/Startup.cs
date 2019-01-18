@@ -106,6 +106,10 @@ namespace UserSide
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            //Using Password hasher V3
+            services.Configure<PasswordHasherOptions>(
+                 o => o.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3);
+
             SetEbConfig();
 
             //Using RDS
@@ -121,7 +125,6 @@ namespace UserSide
             services.AddDbContext<CompetitionContext>(options =>
             options.UseSqlServer(
             GetRdsConnectionStringCompetition()));
-
 
             //Forum Db Context
             services.AddDbContext<ForumContext>(options =>
@@ -142,10 +145,6 @@ namespace UserSide
                 options.LogoutPath = $"/Identity/Account/Logout";
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             });
-
-            //moved codes below
-            // using Microsoft.AspNetCore.Identity.UI.Services;
-            //services.AddSingleton<IEmailSender, EmailSender>();
 
             // requires
             services.AddSingleton<IEmailSender, EmailSender>();
@@ -213,12 +212,4 @@ namespace UserSide
             });
         }
     }
-    /*
-    public class EmailSender : IEmailSender
-    {
-        public Task SendEmailAsync(string email, string subject, string message)
-        {
-            return Task.CompletedTask;
-        }
-    }*/
 }
