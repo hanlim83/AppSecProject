@@ -33,7 +33,7 @@ namespace UserSide.Controllers
         }
 
         // GET: Challenges
-        public async Task<IActionResult> Index(int? id)
+        public async Task<IActionResult> Index(int id)
         {
             if (id == null)
             {
@@ -51,20 +51,15 @@ namespace UserSide.Controllers
             {
                 return NotFound();
             }
-
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-
-            foreach (var Team in competition.Teams)
+            
+            if (ValidateUserJoined(id).Result == true)
             {
-                foreach (var TeamUser in Team.TeamUsers)
-                {
-                    if (TeamUser.UserId.Equals(user.Id))
-                    {
-                        return View(competition);
-                    }
-                }
+                return View(competition);
             }
-            return RedirectToAction("Index", "Competitions");
+            else
+            {
+                return RedirectToAction("Index", "Competitions");
+            }
         }
 
         // GET: Challenges/Details/5
@@ -98,9 +93,15 @@ namespace UserSide.Controllers
             }
             ViewData["CompetitionID"] = challenge.CompetitionID;
             ViewData["ChallengeID"] = challenge.ID;
-
-
-            return View(challenge);
+            
+            if (ValidateUserJoined(challenge.CompetitionID).Result == true)
+            {
+                return View(challenge);
+            }
+            else
+            {
+                return RedirectToAction("Index", "Competitions");
+            }
         }
 
         [HttpPost]
@@ -137,7 +138,7 @@ namespace UserSide.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.TeamID == team.TeamID);
 
-            foreach(var teamChallenges in teamChallengesList.TeamChallenges)
+            foreach (var teamChallenges in teamChallengesList.TeamChallenges)
             {
                 if (teamChallenges.ChallengeId == challenge.ID)
                 {
@@ -187,6 +188,29 @@ namespace UserSide.Controllers
             }
             //Wrong flag
             return RedirectToAction("Details", "Challenges", new { id });
+        }
+
+        private async Task<bool> ValidateUserJoined(int id)
+        {
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+
+            foreach (var Team in competition.Teams)
+            {
+                foreach (var TeamUser in Team.TeamUsers)
+                {
+                    if (TeamUser.UserId.Equals(user.Id))
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         private bool ChallengeExists(int id)
