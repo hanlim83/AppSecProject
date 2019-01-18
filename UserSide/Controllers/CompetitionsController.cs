@@ -103,10 +103,8 @@ namespace UserSide.Controllers
 
             //Need to get user.Id
             var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-
             //var user = await _userManager.GetUserAsync(HttpContext.User);
             //var username = user.UserName;
-
             foreach (var Team in competition.Teams)
             {
                 foreach (var TeamUser in Team.TeamUsers)
