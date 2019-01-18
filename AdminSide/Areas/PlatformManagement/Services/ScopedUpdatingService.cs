@@ -21,22 +21,20 @@ namespace AdminSide.Areas.PlatformManagement.Services
     internal class ScopedUpdatingService : IScopedUpdatingService
     {
         private readonly ILogger _logger;
-        private readonly PlatformResourcesContext PRcontext;
-        private readonly NewsFeedContext NewsFeedcontext;
+        private readonly PlatformResourcesContext context;
         private readonly IAmazonEC2 ec2Client;
         private readonly IAmazonCloudWatch cwClient;
         private readonly IAmazonCloudWatchEvents cweClient;
         private readonly IAmazonCloudWatchLogs cwlClient;
 
-        public ScopedUpdatingService(ILogger<ScopedUpdatingService> logger, PlatformResourcesContext PRcontext, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient, NewsFeedContext newsFeedContext)
+        public ScopedUpdatingService(ILogger<ScopedUpdatingService> logger, PlatformResourcesContext context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient)
         {
             _logger = logger;
-            this.PRcontext = PRcontext;
+            this.context = context;
             ec2Client = EC2Client;
             cwClient = cloudwatchClient;
             cweClient = cloudwatcheventsClient;
             cwlClient = cloudwatchlogsClient;
-            NewsFeedcontext = newsFeedContext;
         }
 
         public async Task DoWorkAsync()
@@ -187,10 +185,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 //    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnet OFF");
                 //    context.Database.CloseConnection();
                 //}
-                if (PRcontext.Servers.Any())
+                if (context.Servers.Any())
                 {
                     _logger.LogInformation("Update Background Service is checking servers");
-                    List<Server> servers = await PRcontext.Servers.ToListAsync();
+                    List<Server> servers = await context.Servers.ToListAsync();
                     DescribeInstancesResponse response = await ec2Client.DescribeInstancesAsync(new DescribeInstancesRequest
                     {
                         Filters = new List<Filter>
@@ -240,13 +238,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         Flag = true;
                                     }
                                     if (Flag == true)
-                                        PRcontext.Servers.Update(server);
+                                        context.Servers.Update(server);
                                     break;
                                 }
                             }
                         }
                     }
-                    PRcontext.SaveChanges();
+                    context.SaveChanges();
                 }
                 else
                 {
