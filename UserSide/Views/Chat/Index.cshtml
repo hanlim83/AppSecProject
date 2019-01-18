@@ -1,4 +1,5 @@
-﻿
+﻿@model IEnumerable<UserSide.Models.GroupChat>
+
 @{
     ViewData["Title"] = "LIVE CHAT";
 }
@@ -12,8 +13,6 @@
             margin-top: 30px;
             text-align: center;
         }
-       
-      
     </style>
 
 </head>
@@ -23,65 +22,109 @@
     <h2>@ViewData["Title"]</h2>
 
     <!--Individual-->
+
     <div class="table-responsive table table-hover">
         <table class="table">
-            <tbody>
+            <thead>
                 <tr>
-                    <th scope="row">Mark</th>
-                    <td>Online</td>
-                    <td>0</td>
-                </tr>
-                <tr>
-                    <th scope="row">Tom</th>
-                    <td>Offline</td>
-                    <td></td>
+                    <th>
+                        @Html.DisplayNameFor(model => model.GroupName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.GroupID)
+                    </th>
+                    <th>
 
+                    </th>
                 </tr>
-                <tr>
-                    <th scope="row">GOD</th>
-                    <td colspan="2">Larry the Bird</td>
-                    <td></td>
-                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.GroupID)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.GroupName)
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.UserID">Edit</a> |
+                            <a asp-action="Details" asp-route-id="@item.UserID">Details</a> |
+                            <a asp-action="Delete" asp-route-id="@item.UserID">Delete</a>
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>
 
-    <!--Team-->
-    <div class="table-responsive table table-hover">
-        <table class="table">
-            <tbody>
-                <tr>
-                    <th scope="row">BatPower</th>
-                    <td>0/5</td>
-                    <td></td>
-                </tr>
-                <tr>
-                    <th scope="row">asdfghjkl</th>
-                    <td>0/4</td>
-                    <td></td>
+        <div class="container">
+            <div class="table-responsive table table-hover">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">Mark</th>
+                            <td>Online</td>
+                            <td>0</td>
+                            <td>
+                                <form>
+                                    <button type="submit" class="btn btn-default" asp-action="TalkView" >Chat</button>
+                                </form>
+                            </td>
+                        </tr>
 
-                </tr>
-                <tr>
-                    <th scope="row">3</th>
-                    <td colspan="2">Larry the Bird</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
+                        <tr>
+                            <th scope="row">Tom</th>
+                            <td>Offline</td>
+                            <td></td>
 
-    <form>
-        <div class="form-row">
-            <div class="col-7">
-                <input type="text" class="form-control" placeholder="Search">
+                        </tr>
+                        <tr>
+                            <th scope="row">GOD</th>
+                            <td colspan="2">Larry the Bird</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-dark"><i class="material-icons">search</i></button>
-                <button type="submit" class="btn btn-dark"><i class="material-icons">group_add</i></button>
-                <button type="button" class="btn btn-dark"><i class="material-icons">chat</i></button>
+
+            <!--Team-->
+            <div class="table-responsive table table-hover">
+                <table class="table">
+                    <tbody>
+                        <tr>
+                            <th scope="row">BatPower</th>
+                            <td>0/5</td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">asdfghjkl</th>
+                            <td>0/4</td>
+                            <td></td>
+
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td colspan="2">Larry the Bird</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
+            <form>
+                <div class="form-row">
+                    <div class="col-7">
+                        <input type="text" class="form-control" placeholder="Search">
+                    </div>
+                    <div class="col-auto">
+                        <button type="submit" class="btn btn-dark"><i class="material-icons">search</i></button>
+                        <button type="submit" class="btn btn-dark" asp-action="Create"><i class="material-icons">group_add</i></button>
+                        <button type="submit" class="btn btn-dark"><i class="material-icons">chat</i></button>
+                    </div>
+                </div>
+            </form>
+
         </div>
-            
-    </form>
-
 </body>
 </html>

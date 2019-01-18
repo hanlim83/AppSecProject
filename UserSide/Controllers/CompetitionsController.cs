@@ -12,6 +12,7 @@ using UserSide.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace UserSide.Controllers
 {
@@ -29,7 +30,7 @@ namespace UserSide.Controllers
         }
 
         // GET: Competitions
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(bool? check)
         {
             var competition = await _context.Competitions
                 .Include(c => c.Teams)
@@ -47,7 +48,14 @@ namespace UserSide.Controllers
             //CompetitionIndexViewModel vm = new CompetitionIndexViewModel();
             //vm.Competition = competition;
             //vm.TeamUsers = teamUsers;
-
+            if (check == null)
+            {
+                ViewData["ShowWrongDirectory"] = false;
+            }
+            else
+            {
+                ViewData["ShowWrongDirectory"] = true;
+            }
             return View(competition);
             //return View(await _context.Competitions.ToListAsync());
         }
@@ -61,6 +69,8 @@ namespace UserSide.Controllers
             }
 
             var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
             {
@@ -93,22 +103,20 @@ namespace UserSide.Controllers
 
             //Need to get user.Id
             var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            //var user = await _userManager.FindByNameAsync(userName);
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            //var username = user.UserName;
             foreach (var Team in competition.Teams)
             {
                 foreach (var TeamUser in Team.TeamUsers)
                 {
                     if (TeamUser.UserId.Equals(userId))
                     {
-                        return RedirectToAction("Index", "Competitions");
-                    }
-                    else
-                    {
-                        return View(teamCreateViewModel);
+                        ViewData["ShowWrongDirectory"] = "true";
+                        return RedirectToAction("Index", "Competitions", new { check = true });
                     }
                 }
             }
-            return View(teamCreateViewModel);
+            return View();
             //return View();
         }
 
@@ -117,17 +125,117 @@ namespace UserSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SignUp(TeamCreateViewModel teamCreateViewModel)
+        public async Task<IActionResult> SignUp([Bind("TeamName, Password, CompetitionID")]Team team)
         {
             if (ModelState.IsValid)
             {
-                //teamCreateViewModel.Team.TeamUsers.Add(new TeamUser { TeamId = teamCreateViewModel.Team.TeamID, UserId = teamCreateViewModel.UserID });
-                _context.Add(teamCreateViewModel.Team);
-                teamCreateViewModel.TeamUser.TeamId = teamCreateViewModel.Team.TeamID;
-                _context.Add(teamCreateViewModel.TeamUser);
+                _context.Add(team);
+                //get userId
+                //var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                //Migrating to new way to get user object
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                
+                TeamUser teamUser = new TeamUser();
+                teamUser.UserId = user.Id;
+                teamUser.UserName = user.UserName;
+
+                teamUser.TeamId = team.TeamID;
+                _context.Add(teamUser);
                 await _context.SaveChangesAsync();
+                return RedirectToAction("Index", "Competitions");
             }
-            return RedirectToAction("Index", "Competitions");
+            ViewData["CompetitionID"] = team.CompetitionID;
+            return View();
+        }
+
+        public async Task<IActionResult> Join(int? id, bool? check)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var competition = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .FirstOrDefaultAsync(m => m.ID == id);
+            if (competition == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["CompetitionID"] = id;
+
+            TeamCreateViewModel teamCreateViewModel = new TeamCreateViewModel();
+            teamCreateViewModel.Competition = competition;
+
+            //Need to get user.Id
+            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            //var user = await _userManager.GetUserAsync(HttpContext.User);
+            //var username = user.UserName;
+            var dictionary = new Dictionary<int, string>
+            {
+
+            };
+            
+            foreach (var Team in competition.Teams)
+            {
+                dictionary.Add(Team.TeamID, Team.TeamName);
+                foreach (var TeamUser in Team.TeamUsers)
+                {
+                    if (TeamUser.UserId.Equals(userId))
+                    {
+                        return RedirectToAction("Index", "Competitions", new { check = true });
+                    }
+                }
+            }
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+            if (check == null)
+            {
+                ViewData["Show"] = false;
+            }
+            else
+            {
+                ViewData["Show"] = true;
+            }
+            return View();
+            //return View();
+        }
+
+        //Just add user to UserTeam will do
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Join([Bind("TeamID, Password, CompetitionID")]Team team)
+        {
+            var localvarTeam = await _context.Teams
+                .Include(t => t.TeamUsers)
+                .FirstOrDefaultAsync(m => m.CompetitionID == team.CompetitionID);
+
+            if (localvarTeam.Password.Equals(team.Password))
+            {
+                //if (ModelState.IsValid)
+                //{
+                //get userId
+                //var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                //Migrate to get user object
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                TeamUser teamUser = new TeamUser();
+                teamUser.UserId = user.Id;
+                teamUser.UserName = user.UserName;
+
+                teamUser.TeamId = team.TeamID;
+                _context.Add(teamUser);
+                await _context.SaveChangesAsync();
+                //}
+                return RedirectToAction("Index", "Competitions");
+            }
+            else
+            {
+                @ViewData["Show"] = true;
+                return RedirectToAction("Join", "Competitions", new { id = team.CompetitionID, check=true });
+            }
         }
 
         private bool CompetitionExists(int id)

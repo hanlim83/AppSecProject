@@ -64,7 +64,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     await scopedUpdatingService.DoWorkAsync();
                 }catch (Exception)
                 {
-
+                
                 }
             }
         }

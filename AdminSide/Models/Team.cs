@@ -12,8 +12,7 @@ namespace AdminSide.Models
     {
         [Key]
         public int TeamID { get; set; }
-
-        [Required]
+        
         [DisplayName("Team Name")]
         public string TeamName { get; set; }
         [Required]

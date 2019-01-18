@@ -50,6 +50,7 @@ namespace AdminSide.Controllers
             }
 
             var team = await _context.Teams
+                .Include(t => t.TeamUsers)
                 .FirstOrDefaultAsync(m => m.TeamID == id);
             if (team == null)
             {

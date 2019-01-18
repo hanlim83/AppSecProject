@@ -164,7 +164,7 @@ namespace AdminSide.Data
             }
         }
 
-        public static void InitializeCompetitions (CompetitionContext context)
+        public static void InitializeCompetitions(CompetitionContext context)
         {
             context.Database.EnsureCreated();
 
@@ -214,10 +214,10 @@ namespace AdminSide.Data
 
             var challenges = new Challenge[]
             {
-            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", FileName="TestingOnly", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", CompetitionID=1, CompetitionCategoryID=1 },
+            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", CompetitionID=1, CompetitionCategoryID=1 },
             };
 
             foreach (Challenge ch in challenges)
@@ -228,10 +228,7 @@ namespace AdminSide.Data
 
             var teams = new Team[]
             {
-            new Team{ TeamName="T0X1C V4P04", Password="Pass123!", Score=100, CompetitionID=1},
-            new Team{ TeamName="Team 1", Password="Pass123!", Score=80, CompetitionID=1},
-            new Team{ TeamName="Team 2", Password="Pass123!", Score=50, CompetitionID=1},
-            new Team{ TeamName="Team 3", Password="Pass123!", Score=20, CompetitionID=1},
+            new Team{ TeamName="T0X1C V4P0R", Password="", Salt="", Score=100, CompetitionID=1},
             };
 
             foreach (Team t in teams)
@@ -242,12 +239,23 @@ namespace AdminSide.Data
 
             var teamUsers = new TeamUser[]
             {
-            new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f"}
+            new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f", UserName = "hugoxyz"}
             };
 
             foreach (TeamUser tu in teamUsers)
             {
                 context.TeamUsers.Add(tu);
+            }
+            context.SaveChanges();
+
+            var teamChallenges = new TeamChallenge[]
+            {
+            new TeamChallenge{ TeamId=1, ChallengeId=1 }
+            };
+
+            foreach (TeamChallenge tc in teamChallenges)
+            {
+                context.TeamChallenges.Add(tc);
             }
             context.SaveChanges();
         }
@@ -287,6 +295,10 @@ namespace AdminSide.Data
             }
             context.SaveChanges();
 
+        }
+        public static void InitializeNewsFeed(NewsFeedContext context)
+        {
+            context.Database.EnsureCreated();
         }
     }
 }

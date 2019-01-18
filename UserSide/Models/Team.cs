@@ -25,6 +25,6 @@ namespace UserSide.Models
         public int CompetitionID { get; set; }
 
         public ICollection<TeamUser> TeamUsers { get; set; }
-
+        public ICollection<TeamChallenge> TeamChallenges { get; set; }
     }
 }
