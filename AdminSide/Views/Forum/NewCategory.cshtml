@@ -1,0 +1,26 @@
+﻿@model AdminSide.Models.ForumCategory
+
+@{
+    ViewData["Title"] = "New Category";
+}
+<br />
+<div class="container">
+
+    <h2> Create New Category </h2>
+
+    <form asp-action="NewCategory">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <br />
+        <div class="form-group">
+            <label asp-for="CategoryName" class="control-label">Category Name</label>
+            <input asp-for="CategoryName" class="form-control" id="CatgoryName" />
+            <span asp-validation-for="CategoryName" class="text-danger"></span>
+        </div>
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </form>
+</div>
+<br />
+
+<div class="container">
+    <a asp-action="Index">Back to Forum Page</a>
+</div>
