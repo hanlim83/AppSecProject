@@ -1,38 +1,38 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using AdminSide.Areas.PlatformManagement.Data;
+using AdminSide.Areas.PlatformManagement.Services;
 using AdminSide.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Amazon.CloudWatch;
+using Amazon.CloudWatchEvents;
+using Amazon.CloudWatchLogs;
+using Amazon.EC2;
+using Amazon.ElasticBeanstalk;
+using Amazon.ElasticLoadBalancingV2;
+using Amazon.RDS;
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.EC2;
-using Amazon.CloudWatch;
 using Amazon.SimpleNotificationService;
-using Amazon.CloudWatchLogs;
-using Amazon.CloudWatchEvents;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Amazon.RDS;
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticBeanstalk;
-using AdminSide.Areas.PlatformManagement.Data;
 using Amazon.SimpleSystemsManagement;
-using AdminSide.Areas.PlatformManagement.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AdminSide
 {
     public class Startup
     {
-       public Startup(IConfiguration configuration)
-       {
-           Configuration = configuration;
-       }
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
 
         private static void SetEbConfig()
         {
@@ -136,8 +136,16 @@ namespace AdminSide
 
             //Platform Resources Db Context
             services.AddDbContext<PlatformResourcesContext>(options =>
-            options.UseLazyLoadingProxies().UseSqlServer(
-            GetRdsConnectionStringPlatformResources()));
+            {
+                options.UseLazyLoadingProxies().UseSqlServer(GetRdsConnectionStringPlatformResources(),
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 10,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                    });
+            });
 
             //Forum Db Context
             services.AddDbContext<ForumContext>(options =>

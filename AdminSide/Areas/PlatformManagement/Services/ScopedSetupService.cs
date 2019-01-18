@@ -615,7 +615,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
             catch (Exception e)
             {
                 _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message);
-            }
+            } 
         }
     }
 }
