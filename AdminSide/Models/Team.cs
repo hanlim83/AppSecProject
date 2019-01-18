@@ -18,6 +18,7 @@ namespace AdminSide.Models
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+        public string Salt { get; set; }
         public int Score { get; set; }
 
         [ForeignKey("CompetitionID")]
