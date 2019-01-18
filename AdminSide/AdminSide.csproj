@@ -6,6 +6,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Views\Forum\Index.cshtml~RF2af88750.TMP" />
+  </ItemGroup>
+
+  <ItemGroup>
 
     <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.10.11" />
     <PackageReference Include="AWSSDK.CloudWatchEvents" Version="3.3.8.11" />
@@ -111,6 +115,9 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Forum\Edit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Forum\NewCategory.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Home\About.cshtml">
