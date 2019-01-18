@@ -4,27 +4,54 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
+<br>
+<div class="container">
+    <h2>Details</h2>
+    <div>
+        <h4>Team</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.TeamName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.TeamName)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Password)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Password)
+            </dd>
+        </dl>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    Username
+                </th>
+                @*<th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th></th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.TeamUsers)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.UserName)
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div>
+        <a asp-action="Edit" asp-route-id="@Model.TeamID">Edit</a> |
+        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back to List" class="btn btn btn-default"></a>
 
-<div>
-    <h4>Team</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TeamName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TeamName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Password)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Password)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model.TeamID">Edit</a> |
-    <a asp-action="Index" asp-route-id="@Model.CompetitionID">Back to List</a>
+        @*<a asp-action="Index" asp-route-id="@Model.CompetitionID">Back to List</a>*@
+    </div>
 </div>
