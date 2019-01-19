@@ -82,7 +82,7 @@ namespace UserSide.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                if (!ReCaptchaPassed(
+                if (ReCaptchaPassed(
                     Request.Form["g-recaptcha-response"], // that's how you get it from the Request object
                     _configuration.GetSection("GoogleReCaptcha:secret").Value,
                     _logger))
