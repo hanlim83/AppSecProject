@@ -270,8 +270,15 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     TerminateInstancesResponse response = await EC2Client.TerminateInstancesAsync(request);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
+                        if (!deleted.LinkedSubnet.LinkedVPC.AWSVPCDefaultSecurityGroup.Equals(deleted.AWSSecurityGroupReference))
+                        {
+                            await EC2Client.DeleteSecurityGroupAsync(new DeleteSecurityGroupRequest
+                            {
+                                GroupId = deleted.AWSSecurityGroupReference
+                            });
+                        }
                         _context.Servers.Remove(deleted);
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
                         ViewData["Result"] = "Successfully Deleted!";
                         return RedirectToAction("");
                     }
@@ -518,7 +525,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 });
                 if (response.HttpStatusCode == HttpStatusCode.OK)
                 {
-                    retrieved.State = State.Starting;
+                    retrieved.State = State.Stopping;
                     _context.Servers.Update(retrieved);
                     await _context.SaveChangesAsync();
                     return RedirectToAction("");
