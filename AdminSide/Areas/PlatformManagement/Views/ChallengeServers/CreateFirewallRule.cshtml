@@ -4,9 +4,9 @@
     ViewData["Title"] = "CreateFirewallRule";
 }
 
-<h2>CreateFirewallRule</h2>
+<h2>Create</h2>
 
-<h4>FirewallRule</h4>
+<h4>Firewall Rule</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -27,6 +27,8 @@
                     <option value="HTTPS">HTTPS</option>
                     <option value="SSH">SSH</option>
                     <option value="FTP">FTP</option>
+                    <option value="ICMP">ICMP</option>
+                    <option value="ICMPv6">ICMPv6</option>
                     <option value="ALL">ALL</option>
                     <option value="CUSTOM">CUSTOM</option>
 
@@ -35,10 +37,11 @@
             </div>
             <div class="form-group">
                 <label asp-for="Protocol" class="control-label"></label>
-                <select asp-for="Protocol" class="form-control">
+                <select id="protoType" asp-for="Protocol" class="form-control" onchange="protoFill()">
                     <option value="TCP">TCP</option>
                     <option value="UDP">UDP</option>
                     <option value="ICMP">ICMP</option>
+                    <option value="ICMPv6">ICMPv6</option>
                     <option value="ALL">ALL</option>
                 </select>
                 <span asp-validation-for="Protocol" class="text-danger"></span>
@@ -50,7 +53,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="Direction" class="control-label"></label>
-                <select asp-for="Direction" class="form-control">
+                <select id="direction" asp-for="Direction" class="form-control">
                     <option value="Incoming">Incoming</option>
                     <option value="Outgoing">Outgoing</option>
                     <option value="Both">Both</option>
@@ -73,35 +76,78 @@
     <a asp-action="ModifyServer" asp-route-ServerID="@ViewData["ServerID"]">Back to List</a>
 </div>
 <script>
+    function protoFill() {
+        var selected = $("#portType").val();
+        switch (selected) {
+            case "ICMP":
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+            case "ICMPv6":
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+            case "ALL":
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+                break;
+            default:
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', false);
+        }
+    }
     function portFill() {
-        var selected = document.getElementById("portType").value;
+        var selected = $("#portType").val();
         switch (selected) {
             case "HTTP":
-                document.getElementById("portInput").value = 80;
-                document.getElementById("portInput").readonly = true;
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(80);
+                $('#portInput').prop('readonly', true);
                 break;
             case "HTTPS":
-                document.getElementById("portInput").value = 443;
-                document.getElementById("portInput").readonly = true;
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(443);
+                $('#portInput').prop('readonly', true);
                 break;
             case "SSH":
-                document.getElementById("portInput").value = 22;
-                document.getElementById("portInput").readonly = true;
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(22);
+                $('#portInput').prop('readonly', true);
                 break;
             case "FTP":
-                document.getElementById("portInput").value = 21;
-                document.getElementById("portInput").readonly = true;
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(21);
+                $('#portInput').prop('readonly', true);
                 break;
+            case "ICMP":
+                $("#protoType").val('ICMP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+            case "ICMPv6":
+                $("#protoType").val('ICMPv6');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
             case "ALL":
-                document.getElementById("portInput").readonly = true;
+                $("#protoType").val('ALL');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
                 break;
-            default: 
-                document.getElementById("portInput").value = null;
-                document.getElementById("portInput").readonly = false;
+            default:
+                document.getElementById("protoType").selectedIndex = -1;
+                $('#protoType option:not(:selected)').prop('disabled', false);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', false);
 
         }
     }
     document.getElementById("portType").selectedIndex = -1;
+    document.getElementById("protoType").selectedIndex = -1;
+    document.getElementById("direction").selectedIndex = -1;
 </script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
