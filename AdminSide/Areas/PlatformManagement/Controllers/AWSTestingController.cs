@@ -27,10 +27,12 @@ using Amazon.SimpleSystemsManagement.Model;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using ASPJ_MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
+    [Authorize]
     public class AWSTestingController : Controller
     {
         IAmazonS3 S3Client { get; set; }

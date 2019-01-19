@@ -7,12 +7,14 @@ using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
 using ASPJ_MVC.Models;
 using CodeHollow.FeedReader;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
+    [Authorize]
     public class HomeController : Controller
     {
 

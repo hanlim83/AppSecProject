@@ -4,6 +4,7 @@ using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using ASPJ_MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Diagnostics;
@@ -12,6 +13,7 @@ using System.Threading.Tasks;
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
+    [Authorize]
     public class PlatformLogsController : Controller
     {
         private readonly PlatformResourcesContext _context;

@@ -3,6 +3,7 @@ using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,6 +19,7 @@ using Tenancy = AdminSide.Areas.PlatformManagement.Models.Tenancy;
 namespace AdminSide.Areas.PlatformManagement.Controllers
 {
     [Area("PlatformManagement")]
+    [Authorize]
     public class ChallengeServersController : Controller
     {
         private readonly PlatformResourcesContext _context;
