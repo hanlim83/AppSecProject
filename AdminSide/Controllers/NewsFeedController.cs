@@ -72,6 +72,14 @@ namespace AdminSide.Controllers
             List<RSSFeed> searchFeeds = new List<RSSFeed>();
             foreach(RSSFeed feed in AllFeeds)
             {
+                if (Filter == "All")
+                {
+                    if (feed.Title.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                    if (feed.sourceCat.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
+
                 if (Filter == "Title")
                 {
                     if (feed.Title.Contains(SearchQuery))
@@ -84,11 +92,7 @@ namespace AdminSide.Controllers
                         searchFeeds.Add(feed);
                 }
             }
-            if (searchFeeds.Count == 0)
-            {
-                Console.WriteLine("Search Result failed.");
-            }
-            else
+     
             return View(searchFeeds);
         }
 
@@ -175,7 +179,7 @@ namespace AdminSide.Controllers
             {
                 _context.Add(feedSource);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListSource));
             }
             return View(feedSource);
         }
@@ -214,6 +218,7 @@ namespace AdminSide.Controllers
                 {
                     _context.Update(feedSource);
                     await _context.SaveChangesAsync();
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -226,7 +231,7 @@ namespace AdminSide.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListSource));
             }
             return View(feedSource);
         }
@@ -257,7 +262,7 @@ namespace AdminSide.Controllers
             var feedSource = await _context.FeedSources.FindAsync(id);
             _context.FeedSources.Remove(feedSource);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(ListSource));
         }
 
         private bool FeedSourceExists(int id)
