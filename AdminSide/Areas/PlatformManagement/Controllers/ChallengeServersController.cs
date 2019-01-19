@@ -201,8 +201,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         AWSEC2Reference = response.Reservation.Instances[0].InstanceId,
                         AWSSecurityGroupReference = response.Reservation.Instances[0].SecurityGroups[0].GroupId,
                         LinkedSubnet = selectedS,
-                        SubnetID = selectedS.ID
-                    };
+                        SubnetID = selectedS.ID,
+                        IPAddress = response.Reservation.Instances[0].PrivateIpAddress,
+                        DNSHostname = response.Reservation.Instances[0].PrivateDnsName
+                };
                     if (Model2.ServerWorkload.Equals("Low"))
                         newlyCreated.Workload = Workload.Low;
                     else if (Model2.ServerWorkload.Equals("Medium"))
@@ -210,15 +212,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     else if (Model2.ServerWorkload.Equals("Large"))
                         newlyCreated.Workload = Workload.Large;
                     if (selectedS.Type == SubnetType.Internet)
-                    {
-                        newlyCreated.IPAddress = response.Reservation.Instances[0].PublicIpAddress;
-                        newlyCreated.DNSHostname = response.Reservation.Instances[0].PublicDnsName;
                         newlyCreated.Visibility = Visibility.Internet;
-                    }
                     else
                     {
-                        newlyCreated.IPAddress = response.Reservation.Instances[0].PrivateIpAddress;
-                        newlyCreated.DNSHostname = response.Reservation.Instances[0].PrivateDnsName;
                         if (selectedS.Type == SubnetType.Extranet)
                             newlyCreated.Visibility = Visibility.Extranet;
                         else
