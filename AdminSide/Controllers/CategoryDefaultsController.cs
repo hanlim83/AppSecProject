@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using AdminSide.Data;
 using AdminSide.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Controllers
 {
+    [Authorize]
+    //the line above makes a page protected and will redirect user back to login
     public class CategoryDefaultsController : Controller
     {
         private readonly CompetitionContext _context;

@@ -12,9 +12,12 @@ using System.IO;
 using Amazon.S3.Transfer;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Controllers
 {
+    [Authorize]
+    //the line above makes a page protected and will redirect user back to login
     public class ChallengesController : Controller
     {
         IAmazonS3 S3Client { get; set; }
@@ -112,7 +115,7 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            var vm = new ChallengesViewModelIEnumerable();
+            //var vm = new ChallengesViewModelIEnumerable();
 
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
@@ -123,20 +126,19 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
-
-            vm.Competition = competition;
+            
+            ViewData["CompetitionID"]=competition.ID;
             var dictionary = new Dictionary<int, string>
             {
 
             };
             foreach (var category in competition.CompetitionCategories)
             {
-                //vm.CategoriesList.Add(new SelectListItem { Value = categoryDefault.CategoryName, Text = categoryDefault.CategoryName });
                 dictionary.Add(category.ID, category.CategoryName);
             }
             ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
 
-            return View(vm);
+            return View();
             //return View();
         }
 
@@ -164,19 +166,31 @@ namespace AdminSide.Controllers
                     }
                 }
             }
-            //Testing codes
             
-            //Testing codes
-
             if (ModelState.IsValid)
             {
-                //call method to add file
-                _context.Add(challenge);
+                competition.Challenges.Add(challenge);
+
+                _context.Update(competition);
                 await _context.SaveChangesAsync();
+                //_context.Add(challenge);
+                //await _context.SaveChangesAsync();
                 //return RedirectToAction(nameof(Index));
                 return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
             }
-            return View(challenge);
+
+            ViewData["CompetitionID"] = competition.ID;
+            var dictionary = new Dictionary<int, string>
+            {
+
+            };
+            foreach (var category in competition.CompetitionCategories)
+            {
+                dictionary.Add(category.ID, category.CategoryName);
+            }
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+
+            return View();
         }
 
         //Upload file to S3
