@@ -31,6 +31,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
         private readonly IAmazonRDS rdsClient;
         private const string IPv4CIDR = "172.30.0.0/16";
         private static string IPv6CIDR;
+        private static string primaryVPCID;
         private static Boolean Flag;
 
         public ScopedSetupService(ILogger<ScopedSetupService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient, IAmazonRDS relationaldatabaseserviceClient)
@@ -151,7 +152,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 foreach (var VPC in responseDescribeVPC.Vpcs)
                 {
                     if (VPC.CidrBlock.Contains(IPv4CIDR))
+                    {
+                        primaryVPCID = VPC.VpcId;
                         Flag = true;
+                    }
                     if (Flag == true)
                         break;
                 }
@@ -208,7 +212,49 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     _logger.LogInformation("VPC created!");
                 }
                 else
-                    _logger.LogInformation("VPC already created!");
+                {
+                    VPC Rvpc = await context.VPCs.FindAsync(1);
+                    if (Rvpc == null)
+                    {
+                        _logger.LogInformation("VPC already created but not inside SQL Database!");
+                        responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                        {
+                            Filters = new List<Filter>
+                            {
+                                new Filter
+                                {
+                                    Name = "vpc-id",
+                                    Values = new List<string>
+                                    {
+                                        primaryVPCID
+                                    }
+                                }
+                            }
+                        });
+                        DescribeSecurityGroupsResponse responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
+                        {
+                            Filters = new List<Filter>
+                        {
+                            new Filter
+                            {
+                                Name ="vpc-id",
+                                Values = new List<string>
+                                {
+                                    primaryVPCID
+                                }
+                            }
+                        }
+                        });
+                        VPC newlyCreatedVPC = new VPC
+                        {
+                            AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
+                            AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId
+                        };
+                        context.VPCs.Add(newlyCreatedVPC);
+                        await context.SaveChangesAsync();
+                    } else
+                        _logger.LogInformation("VPC already created!");
+                }
                 VPC vpc = await context.VPCs.FindAsync(1);
                 responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                 {
@@ -324,8 +370,14 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     await context.SaveChangesAsync();
                     _logger.LogInformation("Subnets created!");
                 }
-                else
-                    _logger.LogInformation("Subnets already created!");
+                else if (responseDescribeSubnets.Subnets.Count >= 3)
+                {
+                    if (await context.Subnets.FindAsync(0) == null && await context.Subnets.FindAsync(1) == null && await context.Subnets.FindAsync(2) == null)
+                    {
+                        _logger.LogInformation("Subnets already created! but not inside SQL Database!");
+                    } else
+                        _logger.LogInformation("Subnets already created!");
+                }
                 DescribeRouteTablesResponse responseDescribeRouteTable = await ec2Client.DescribeRouteTablesAsync(new DescribeRouteTablesRequest
                 {
                     Filters = new List<Filter>
