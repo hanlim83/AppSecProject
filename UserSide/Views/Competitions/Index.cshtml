@@ -51,6 +51,7 @@
                         counter2++;
                     }
                 }
+                counter2 -= 1;
                 <tr>
                     <td>
                         @Html.DisplayFor(modelItem => competition.CompetitionName)
@@ -61,7 +62,7 @@
                     <td>
                         @if (competition.Teams.Count == 0)
                         {
-                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join1" class="btn btn btn-default"></a>
+                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                             //break;
                         }
                         else
@@ -72,7 +73,7 @@
                                 {
                                     @if (team.TeamUsers.Count == 0)
                                     {
-                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join2" class="btn btn btn-default"></a>
+                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                                         counter = 1;
                                         //break;
                                     }

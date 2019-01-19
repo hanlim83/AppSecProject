@@ -45,6 +45,8 @@ namespace UserSide.Controllers
                 .Include(c1 => c1.Challenges)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamChallenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
@@ -54,6 +56,25 @@ namespace UserSide.Controllers
             
             if (ValidateUserJoined(id).Result == true)
             {
+                //Optimize this next time
+                var competition2 = await _context.Competitions
+                .Include(c => c.Teams)
+                .ThenInclude(t => t.TeamUsers)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+
+                foreach (var Team in competition2.Teams)
+                {
+                    foreach (var TeamUser in Team.TeamUsers)
+                    {
+                        if (TeamUser.UserId.Equals(user.Id))
+                        {
+                            ViewData["TeamID"] = Team.TeamID;
+                        }
+                    }
+                }
                 return View(competition);
             }
             else
