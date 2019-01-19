@@ -16,17 +16,18 @@
                 @ViewData["Exception"]
             </div>
         }
-        <form asp-action="SubmitFirewallRule">
+        <form asp-action="CreateFirewallRule">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID" />
             <input type="hidden" asp-for="ServerID" value="@ViewData["ServerID"]" />
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
-                <select asp-for="Type" class="form-control">
+                <select id="portType" asp-for="Type" class="form-control" onchange="portFill()">
                     <option value="HTTP">HTTP</option>
                     <option value="HTTPS">HTTPS</option>
                     <option value="SSH">SSH</option>
                     <option value="FTP">FTP</option>
+                    <option value="ALL">ALL</option>
                     <option value="CUSTOM">CUSTOM</option>
 
                 </select>
@@ -38,12 +39,13 @@
                     <option value="TCP">TCP</option>
                     <option value="UDP">UDP</option>
                     <option value="ICMP">ICMP</option>
+                    <option value="ALL">ALL</option>
                 </select>
                 <span asp-validation-for="Protocol" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Port" class="control-label"></label>
-                <input asp-for="Port" class="form-control" />
+                <input id="portInput" asp-for="Port" class="form-control" />
                 <span asp-validation-for="Port" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -68,9 +70,39 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="ModifyServer" asp-route-ServerID="@ViewData["ServerID"]">Back to List</a>
 </div>
+<script>
+    function portFill() {
+        var selected = document.getElementById("portType").value;
+        switch (selected) {
+            case "HTTP":
+                document.getElementById("portInput").value = 80;
+                document.getElementById("portInput").readonly = true;
+                break;
+            case "HTTPS":
+                document.getElementById("portInput").value = 443;
+                document.getElementById("portInput").readonly = true;
+                break;
+            case "SSH":
+                document.getElementById("portInput").value = 22;
+                document.getElementById("portInput").readonly = true;
+                break;
+            case "FTP":
+                document.getElementById("portInput").value = 21;
+                document.getElementById("portInput").readonly = true;
+                break;
+            case "ALL":
+                document.getElementById("portInput").readonly = true;
+                break;
+            default: 
+                document.getElementById("portInput").value = null;
+                document.getElementById("portInput").readonly = false;
 
+        }
+    }
+    document.getElementById("portType").selectedIndex = -1;
+</script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
