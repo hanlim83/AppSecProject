@@ -33,45 +33,6 @@
   </ItemGroup>
 
  <ItemGroup>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\CloudwatchView.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\EC2Create.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\EC2List.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\Index.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\S3Create.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\S3List.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SNSSend.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SubnetCreate.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SubnetList.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\VPCList.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkRoutes\Index.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Create.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Edit.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
     <Content Update="Areas\PlatformManagement\Views\ChallengeNetwork\Create.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
