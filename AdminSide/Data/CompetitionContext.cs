@@ -20,21 +20,17 @@ namespace AdminSide.Data
         public DbSet<Challenge> Challenges { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamUser> TeamUsers { get; set; }
-
-
+        public DbSet<TeamChallenge> TeamChallenges { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Competition>().ToTable("Competition");
-            //modelBuilder.Entity<Competition>()
-            //    .HasOne<CompetitionCategory>(c => c.ID)
-            //    .WithMany(g => g.CompetitionID);
             modelBuilder.Entity<CompetitionCategory>().ToTable("CompetitionCategory");
             modelBuilder.Entity<CategoryDefault>().ToTable("CategoryDefault");
             modelBuilder.Entity<Challenge>().ToTable("Challenges");
             modelBuilder.Entity<Team>().ToTable("Teams");
-                //.HasMany<TeamUser>(t => t.);
             modelBuilder.Entity<TeamUser>().ToTable("TeamUsers");
-
+            modelBuilder.Entity<TeamChallenge>().ToTable("TeamChallenges");
         }
     }
 }

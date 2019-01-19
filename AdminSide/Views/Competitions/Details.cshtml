@@ -5,57 +5,54 @@
 }
 
 <br>
-<div class="col-md-8 offset-2">
-    <div>
-        <h4>Competition</h4>
-        <hr>
-        <dl class="dl-horizontal">
-            <dt>
-                @Html.DisplayNameFor(model => model.CompetitionName)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.CompetitionName)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Status)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Status)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.BucketName)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.BucketName)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.CompetitionCategories)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.CompetitionCategories)
-            </dd>
-            <dd>
-                <table class="table">
+<div class="container">
+    <div class="btn-group d-flex" role="group">
+        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Challenges" class="btn btn btn-outline-info w-100"></a>
+        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Teams" class="btn btn btn-outline-info w-100"></a>
+    </div>
+    <br>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.CompetitionName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompetitionName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BucketName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.BucketName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.CompetitionCategories)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.CompetitionCategories)
+        </dd>
+        <dd>
+            <table class="table">
+                <tr>
+                    <th>Testing</th>
+                </tr>
+                @foreach (var item in Model.CompetitionCategories)
+                {
                     <tr>
-                        <th>Testing</th>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CategoryName)
+                        </td>
                     </tr>
-                    @foreach (var item in Model.CompetitionCategories)
-                    {
-                        <tr>
-                            <td>
-                                @Html.DisplayFor(modelItem => item.CategoryName)
-                            </td>
-                        </tr>
-                    }
-                </table>
-            </dd>
-        </dl>
-        <h1>ADMIN DASHBOARD</h1>
-    </div>
-    <div>
-        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">View Challenges</button></a>
-        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">View Teams</button></a>
-    </div>
+                }
+            </table>
+        </dd>
+    </dl>
+    <h1>ADMIN DASHBOARD</h1>
 </div>
 
 <!--<div>

@@ -5,17 +5,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace AdminSide.Models
+namespace UserSide.Models
 {
-    public class TeamUser
+    public class TeamChallenge
     {
         [Key]
-        public int TeamUserID { get; set; }
-
-        public string UserName { get; set; }
+        public int TeamChallengeID { get; set; }
 
         [ForeignKey("TeamId")]
         public int TeamId { get; set; }
-        public string UserId { get; set; }
+        [ForeignKey("ChallengeId")]
+        public int ChallengeId { get; set; }
     }
 }

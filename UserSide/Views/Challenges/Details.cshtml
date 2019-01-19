@@ -46,6 +46,8 @@
                     @*<label asp-for="Flag" class="control-label"></label>*@
                     <input asp-for="Flag" class="form-control" placeholder="Flag" />
                     <span asp-validation-for="Flag" class="text-danger"></span>
+                    <input type="hidden" asp-for="CompetitionID" value="@ViewData["CompetitionID"]" />
+                    <input type="hidden" asp-for="ID" value="@ViewData["ChallengeID"]" />
                 </div>
                 <div class="form-group col-md-3">
                     <input type="submit" value="Submit" class="btn btn-default" asp-route-id="@Model.ID" />
@@ -54,6 +56,7 @@
         </form>
     </div>
     <div>
-        <a asp-action="Index" asp-route-id="@Model.CompetitionID">Back to List</a>
+        @*<a asp-action="Index" asp-route-id="@Model.CompetitionID">Back to List</a>*@
+        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back" class="btn btn btn-default"></a>
     </div>
 </div>

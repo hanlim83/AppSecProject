@@ -42,8 +42,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 var ScopedSetupService =
                     scope.ServiceProvider
                         .GetRequiredService<IScopedSetupService>();
+                try
+                {
+                    await ScopedSetupService.DoWorkAsync();
+                } catch (Exception)
+                {
 
-                await ScopedSetupService.DoWorkAsync();
+                }
             }
         }
 
@@ -54,8 +59,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 var scopedUpdatingService =
                     scope.ServiceProvider
                         .GetRequiredService<IScopedUpdatingService>();
-
-                //await scopedUpdatingService.DoWorkAsync();
+                try
+                {
+                    await scopedUpdatingService.DoWorkAsync();
+                }catch (Exception)
+                {
+                
+                }
             }
         }
         public Task StopAsync(CancellationToken cancellationToken)

@@ -4,26 +4,28 @@
     ViewData["Title"] = "Details";
 }
 
-<h2>Details</h2>
-
-<div>
-    <h4>Team</h4>
-    <hr />
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.TeamName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.TeamName)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Score)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Score)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Index">Back to List</a>
+<br>
+<div class="container">
+    <h2>Details</h2>
+    <div>
+        <h4>Team</h4>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.TeamName)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.TeamName)
+            </dd>
+            <dt>
+                @Html.DisplayNameFor(model => model.Score)
+            </dt>
+            <dd>
+                @Html.DisplayFor(model => model.Score)
+            </dd>
+        </dl>
+    </div>
+    <div>
+        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back to Teams" class="btn btn btn-default"></a>
+    </div>
 </div>
