@@ -174,6 +174,16 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             new Tag("Name","ASPJ VM VPC - Autocreated")
                         }
                     });
+                    await ec2Client.ModifyVpcAttributeAsync(new ModifyVpcAttributeRequest
+                    {
+                        EnableDnsSupport = true,
+                        VpcId = responseCreateVPC.Vpc.VpcId
+                    });
+                    await ec2Client.ModifyVpcAttributeAsync(new ModifyVpcAttributeRequest
+                    {
+                        EnableDnsHostnames = true,
+                        VpcId = responseCreateVPC.Vpc.VpcId
+                    });
                     DescribeSecurityGroupsResponse responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
                     {
                         Filters = new List<Filter>
