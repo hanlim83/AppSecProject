@@ -12,9 +12,12 @@ using System.IO;
 using Amazon.S3.Transfer;
 using Amazon.S3;
 using Amazon.S3.Model;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Controllers
 {
+    [Authorize]
+    //the line above makes a page protected and will redirect user back to login
     public class ChallengesController : Controller
     {
         IAmazonS3 S3Client { get; set; }
