@@ -72,6 +72,12 @@
     <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Edit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeNetwork\Create.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Areas\PlatformManagement\Views\ChallengeNetwork\Edit.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Areas\PlatformManagement\Views\ChallengeServers\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
