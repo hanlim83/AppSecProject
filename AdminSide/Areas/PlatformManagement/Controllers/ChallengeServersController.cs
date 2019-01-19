@@ -5,6 +5,9 @@ using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Abstractions;
+using Microsoft.AspNetCore.Mvc.ActionConstraints;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -288,23 +291,21 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
         }
 
-        [HttpPost]
-
         public async Task<IActionResult> ModifyServer(String serverID)
         {
             Server selected = await _context.Servers.FindAsync(Int32.Parse(serverID));
             if (selected != null)
             {
-                StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
-                {
-                    InstanceIds = new List<string> {
-                    selected.AWSEC2Reference
-            }
-                });
-                if (response.HttpStatusCode == HttpStatusCode.OK)
+            //    StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+            //    {
+            //        InstanceIds = new List<string> {
+            //        selected.AWSEC2Reference
+            //}
+            //    });
+            //    if (response.HttpStatusCode == HttpStatusCode.OK)
                     return View(selected);
-                else
-                    return StatusCode(500);
+                //else
+                //    return StatusCode(500);
             }
             else
                 return NotFound(); 
@@ -531,7 +532,6 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
         }
 
-        [HttpPost]
         public async Task<IActionResult> CreateFirewallRule(String ServerID)
         {
             Server modified = await _context.Servers.FindAsync(int.Parse(ServerID));
@@ -546,7 +546,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SubmitFirewallRule([Bind("ID", "Type", "Protocol", "Port", "Direction", "ServerID")]FirewallRule Rule)
+        public async Task<IActionResult> CreateFirewallRule([Bind("ID", "Type", "Protocol", "Port", "Direction", "ServerID", "IPCIDR")]FirewallRule Rule)
         {
             Server modified = await _context.Servers.FindAsync(Rule.ServerID);
             if (modified != null)
@@ -563,6 +563,31 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 GroupName = "Security Group for " + modified.Name,
                                 Description = "Created via Platform"
                             });
+                            await EC2Client.CreateTagsAsync(new CreateTagsRequest
+                            {
+                                Resources = new List<string>
+                                {
+                                    responseCreateSecurityGroup.GroupId
+                                },
+                                Tags = new List<Tag>
+                                {
+                                    new Tag("Name","Security Group for " + modified.Name)
+                                }
+                            });
+                            ModifyInstanceAttributeResponse responseModifyInstanceAttribute = await EC2Client.ModifyInstanceAttributeAsync(new ModifyInstanceAttributeRequest
+                            {
+                                InstanceId = modified.AWSEC2Reference,
+                                Groups = new List<string>
+                                {
+                                    responseCreateSecurityGroup.GroupId
+                                }
+                            });
+                            if (responseModifyInstanceAttribute.HttpStatusCode == HttpStatusCode.OK)
+                            {
+                                modified.AWSSecurityGroupReference = responseCreateSecurityGroup.GroupId;
+                                _context.Servers.Update(modified);
+                                await _context.SaveChangesAsync();
+                            }
                             if (Rule.Direction == Direction.Incoming)
                             {
                                 AuthorizeSecurityGroupIngressRequest AuthorizeSecurityGroupRuleDescriptionsIngressRequest = new AuthorizeSecurityGroupIngressRequest
@@ -598,6 +623,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                         }
                                     };
                                 }
+                                else
+                                {
+                                    ViewData["Exception"] = "You have entered an invaild IP CIDR";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
+                                }
                                 AuthorizeSecurityGroupIngressResponse responseUpdateSecurityGroupIngress = await EC2Client.AuthorizeSecurityGroupIngressAsync(AuthorizeSecurityGroupRuleDescriptionsIngressRequest);
                                 if (responseUpdateSecurityGroupIngress.HttpStatusCode == HttpStatusCode.OK)
                                 {
@@ -605,11 +636,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    TempData["Exception"] = "Creation Failed!";
-                                    if (Rule.ID == 0)
-                                        return RedirectToAction("CreateFirewallRule", new { ServerID = modified.ID });
-                                    else
-                                        return RedirectToAction("ModifyFirewallRule", new { Rule.ID });
+                                    ViewData["Exception"] = "Creation Failed!";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                             }
                             else if (Rule.Direction == Direction.Outgoing)
@@ -647,6 +676,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                         }
                                     };
                                 }
+                                else
+                                {
+                                    ViewData["Exception"] = "You have entered an invaild IP CIDR";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
+                                }
                                 AuthorizeSecurityGroupEgressResponse responseUpdateSecurityGroupEgress = await EC2Client.AuthorizeSecurityGroupEgressAsync(AuthorizeSecurityGroupEgressRequest);
                                 if (responseUpdateSecurityGroupEgress.HttpStatusCode == HttpStatusCode.OK)
                                 {
@@ -654,11 +689,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    TempData["Exception"] = "Creation Failed!";
-                                    if (Rule.ID == 0)
-                                        return RedirectToAction("CreateFirewallRule", new { ServerID = modified.ID });
-                                    else
-                                        return RedirectToAction("ModifyFirewallRule", new { Rule.ID });
+                                    ViewData["Exception"] = "Creation Failed!";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                             }
                             else if (Rule.Direction == Direction.Both)
@@ -695,6 +728,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
+                                } else
+                                {
+                                    ViewData["Exception"] = "You have entered an invaild IP CIDR";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                                 AuthorizeSecurityGroupEgressRequest AuthorizeSecurityGroupEgressRequest = new AuthorizeSecurityGroupEgressRequest
                                 {
@@ -737,26 +775,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    TempData["Exception"] = "Creation Failed! - M";
-                                    if (Rule.ID == 0)
-                                        return RedirectToAction("CreateFirewallRule", new { ServerID = modified.ID });
-                                    else
-                                        return RedirectToAction("ModifyFirewallRule", new { Rule.ID });
+                                    ViewData["Exception"] = "Creation Failed! - M";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
-                            }
-                            ModifyInstanceAttributeResponse responseModifyInstanceAttribute = await EC2Client.ModifyInstanceAttributeAsync(new ModifyInstanceAttributeRequest
-                            {
-                                InstanceId = modified.AWSEC2Reference,
-                                Groups = new List<string>
-                                {
-                                    responseCreateSecurityGroup.GroupId
-                                }
-                            });
-                            if (responseModifyInstanceAttribute.HttpStatusCode == HttpStatusCode.OK)
-                            {
-                                modified.AWSSecurityGroupReference = responseCreateSecurityGroup.GroupId;
-                                _context.Servers.Update(modified);
-                                await _context.SaveChangesAsync();
                             }
                         }
                         else
@@ -796,6 +818,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                         }
                                     };
                                 }
+                                else
+                                {
+                                    ViewData["Exception"] = "You have entered an invaild IP CIDR";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
+                                }
                                 AuthorizeSecurityGroupIngressResponse responseUpdateSecurityGroupIngress = await EC2Client.AuthorizeSecurityGroupIngressAsync(AuthorizeSecurityGroupRuleDescriptionsIngressRequest);
                                 if (responseUpdateSecurityGroupIngress.HttpStatusCode == HttpStatusCode.OK)
                                 {
@@ -803,11 +831,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    TempData["Exception"] = "Creation Failed!";
-                                    if (Rule.ID == 0)
-                                        return RedirectToAction("CreateFirewallRule", new { ServerID = modified.ID });
-                                    else
-                                        return RedirectToAction("ModifyFirewallRule", new { Rule.ID });
+                                    ViewData["Exception"] = "Creation Failed!";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                             }
                             else if (Rule.Direction == Direction.Outgoing)
@@ -844,6 +870,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
+                                } else
+                                {
+                                    ViewData["Exception"] = "You have entered an invaild IP CIDR";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                                 AuthorizeSecurityGroupEgressResponse responseUpdateSecurityGroupEgress = await EC2Client.AuthorizeSecurityGroupEgressAsync(AuthorizeSecurityGroupEgressRequest);
                                 if (responseUpdateSecurityGroupEgress.HttpStatusCode == HttpStatusCode.OK)
@@ -852,11 +883,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    TempData["Exception"] = "Creation Failed!";
-                                    if (Rule.ID == 0)
-                                        return RedirectToAction("CreateFirewallRule", new { ServerID = modified.ID });
-                                    else
-                                        return RedirectToAction("ModifyFirewallRule", new { Rule.ID });
+                                    ViewData["Exception"] = "Creation Failed!";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                             }
                             else if (Rule.Direction == Direction.Both)
@@ -893,6 +922,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
+                                } else
+                                {
+                                    ViewData["Exception"] = "You have entered an invaild IP CIDR";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                                 AuthorizeSecurityGroupEgressRequest AuthorizeSecurityGroupEgressRequest = new AuthorizeSecurityGroupEgressRequest
                                 {
@@ -926,6 +960,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
+                                } else
+                                {
+                                    ViewData["Exception"] = "You have entered an invaild IP CIDR";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                                 AuthorizeSecurityGroupEgressResponse responseAuthorizeSecurityGroupEgress = await EC2Client.AuthorizeSecurityGroupEgressAsync(AuthorizeSecurityGroupEgressRequest);
                                 AuthorizeSecurityGroupIngressResponse responseAuthorizeSecurityGroupIngress = await EC2Client.AuthorizeSecurityGroupIngressAsync(AuthorizeSecurityGroupIngressRequest);
@@ -935,46 +974,344 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    TempData["Exception"] = "Creation Failed! - M";
-                                    if (Rule.ID == 0)
-                                        return RedirectToAction("CreateFirewallRule", new { ServerID = modified.ID });
-                                    else
-                                        return RedirectToAction("ModifyFirewallRule", new { Rule.ID });
+                                    ViewData["Exception"] = "Creation Failed! - M";
+                                    ViewData["ServerID"] = modified.ID;
+                                    return View();
                                 }
                             }
-                            await _context.SaveChangesAsync();
                         }
-                        return await ModifyServer(Convert.ToString(modified.ID));
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction("ModifyServer", new { serverID = modified.ID});
                     }
                     else
                     {
                         return StatusCode(500);
-                        ICollection<FirewallRule> exisitingFRs = modified.FirewallRules;
-                        List<FirewallRule> EgressFRs = new List<FirewallRule>();
-                        List<FirewallRule> IgressFRs = new List<FirewallRule>();
-                        List<FirewallRule> BothFRs = new List<FirewallRule>();
-                        foreach (FirewallRule r in exisitingFRs)
-                        {
-                            if (r.Direction == Direction.Incoming)
-                                IgressFRs.Add(r);
-                            else if (r.Direction == Direction.Outgoing)
-                                EgressFRs.Add(r);
-                            else if (r.Direction == Direction.Both)
-                                BothFRs.Add(r);
-                        }
-                        UpdateSecurityGroupRuleDescriptionsEgressRequest requestUpdateSecurityGroupEgress = new UpdateSecurityGroupRuleDescriptionsEgressRequest
-                        {
-                            GroupId = modified.AWSSecurityGroupReference
-                        };
                     }
                 }
                 catch (AmazonEC2Exception e)
                 {
                     TempData["Exception"] = e.Message;
-                    if (Rule.ID == 0)
-                        return RedirectToAction("CreateFirewallRule", new { ServerID = modified.ID });
-                    else
-                        return RedirectToAction("ModifyFirewallRule", new { ID = Rule.ID });
+                    return RedirectToAction("ModifyServer", new { serverID = modified.ID });
+                }
+            }
+            else
+                return NotFound();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteFirewallRule(string ID)
+        {
+            FirewallRule deleted = await _context.FirewallRules.FindAsync(int.Parse(ID));
+            if (deleted != null)
+            {
+                try
+                {
+                    if (deleted.Direction == Direction.Incoming)
+                    {
+                        RevokeSecurityGroupIngressRequest requestRevokeSecurityGroupIngress = new RevokeSecurityGroupIngressRequest
+                        {
+                            GroupId = deleted.LinkedServer.AWSSecurityGroupReference,
+                            IpPermissions = new List<IpPermission>
+                            {
+                                new IpPermission()
+                            }
+                        };
+                        if (Regex.IsMatch(deleted.IPCIDR, "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"))
+                        {
+                            requestRevokeSecurityGroupIngress.IpPermissions[0].Ipv4Ranges = new List<IpRange>
+                            {
+                                new IpRange
+                                {
+                                    CidrIp = deleted.IPCIDR
+                                }
+                            };
+                            if (deleted.Protocol == Protocol.UDP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                            else if (deleted.Protocol == Protocol.TCP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+
+                            }
+                            else if (deleted.Protocol == Protocol.ICMP)
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "ICMP";
+                            else if (deleted.Protocol == Protocol.ALL)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+
+                        }
+                        else if (Regex.IsMatch(deleted.IPCIDR, "^s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:)))(%.+)?s*(\\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8]))$"))
+                        {
+                            requestRevokeSecurityGroupIngress.IpPermissions[0].Ipv6Ranges = new List<Ipv6Range>
+                            {
+                                new Ipv6Range
+                                {
+                                    CidrIpv6 = deleted.IPCIDR
+                                }
+                            };
+                            if (deleted.Protocol == Protocol.UDP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                            else if (deleted.Protocol == Protocol.TCP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+
+                            }
+                            else if (deleted.Protocol == Protocol.ICMP)
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "ICMP";
+                            else if (deleted.Protocol == Protocol.ALL)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                        }
+                        RevokeSecurityGroupIngressResponse responseRevokeSecurityGroupIngress = await EC2Client.RevokeSecurityGroupIngressAsync(requestRevokeSecurityGroupIngress);
+                        if (responseRevokeSecurityGroupIngress.HttpStatusCode == HttpStatusCode.OK)
+                        {
+                            _context.FirewallRules.Remove(deleted);
+                        }
+                        else
+                        {
+                            TempData["Exception"] = "Delete Firewall Rule Failed!";
+                            return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
+                        }
+                    }
+                    else if (deleted.Direction == Direction.Outgoing)
+                    {
+                        RevokeSecurityGroupEgressRequest requestRevokeSecurityGroupEgress = new RevokeSecurityGroupEgressRequest
+                        {
+                            GroupId = deleted.LinkedServer.AWSSecurityGroupReference,
+                            IpPermissions = new List<IpPermission>
+                            {
+                                new IpPermission()
+                            }
+                        };
+                        if (Regex.IsMatch(deleted.IPCIDR, "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"))
+                        {
+                            requestRevokeSecurityGroupEgress.IpPermissions[0].Ipv4Ranges = new List<IpRange>
+                            {
+                                new IpRange
+                                {
+                                    CidrIp = deleted.IPCIDR
+                                }
+                            };
+                            if (deleted.Protocol == Protocol.UDP)
+                            {
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                            else if (deleted.Protocol == Protocol.TCP)
+                            {
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+
+                            }
+                            else if (deleted.Protocol == Protocol.ICMP)
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "ICMP";
+                            else if (deleted.Protocol == Protocol.ALL)
+                            {
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+
+                        }
+                        else if (Regex.IsMatch(deleted.IPCIDR, "^s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:)))(%.+)?s*(\\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8]))$"))
+                        {
+                            requestRevokeSecurityGroupEgress.IpPermissions[0].Ipv6Ranges = new List<Ipv6Range>
+                            {
+                                new Ipv6Range
+                                {
+                                    CidrIpv6 = deleted.IPCIDR
+                                }
+                            };
+                            if (deleted.Protocol == Protocol.UDP)
+                            {
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                            else if (deleted.Protocol == Protocol.TCP)
+                            {
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+
+                            }
+                            else if (deleted.Protocol == Protocol.ICMP)
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "ICMP";
+                            else if (deleted.Protocol == Protocol.ALL)
+                            {
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                        }
+                        RevokeSecurityGroupEgressResponse responseRevokeSecurityGroupEgress = await EC2Client.RevokeSecurityGroupEgressAsync(requestRevokeSecurityGroupEgress);
+                        if (responseRevokeSecurityGroupEgress.HttpStatusCode == HttpStatusCode.OK)
+                        {
+                            _context.FirewallRules.Remove(deleted);
+                        }
+                        else
+                        {
+                            TempData["Exception"] = "Delete Firewall Rule Failed!";
+                            return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
+                        }
+                    }
+                    else if (deleted.Direction == Direction.Both)
+                    {
+                        RevokeSecurityGroupIngressRequest requestRevokeSecurityGroupIngress = new RevokeSecurityGroupIngressRequest
+                        {
+                            GroupId = deleted.LinkedServer.AWSSecurityGroupReference,
+                            IpPermissions = new List<IpPermission>
+                            {
+                                new IpPermission()
+                            }
+                        };
+                        RevokeSecurityGroupEgressRequest requestRevokeSecurityGroupEgress = new RevokeSecurityGroupEgressRequest
+                        {
+                            GroupId = deleted.LinkedServer.AWSSecurityGroupReference,
+                            IpPermissions = new List<IpPermission>
+                            {
+                                new IpPermission()
+                            }
+                        };
+                        if (Regex.IsMatch(deleted.IPCIDR, "^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\/([0-9]|[1-2][0-9]|3[0-2]))$"))
+                        {
+                            requestRevokeSecurityGroupIngress.IpPermissions[0].Ipv4Ranges = new List<IpRange>
+                            {
+                                new IpRange
+                                {
+                                    CidrIp = deleted.IPCIDR
+                                }
+                            };
+                            requestRevokeSecurityGroupEgress.IpPermissions[0].Ipv4Ranges = new List<IpRange>
+                            {
+                                new IpRange
+                                {
+                                    CidrIp = deleted.IPCIDR
+                                }
+                            };
+                            if (deleted.Protocol == Protocol.UDP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                            else if (deleted.Protocol == Protocol.TCP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+
+                            }
+                            else if (deleted.Protocol == Protocol.ICMP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "ICMP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "ICMP";
+                            }
+                            else if (deleted.Protocol == Protocol.ALL)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+
+                        }
+                        else if (Regex.IsMatch(deleted.IPCIDR, "^s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]d|1dd|[1-9]?d)(.(25[0-5]|2[0-4]d|1dd|[1-9]?d)){3}))|:)))(%.+)?s*(\\/([0-9]|[1-9][0-9]|1[0-1][0-9]|12[0-8]))$"))
+                        {
+                            requestRevokeSecurityGroupIngress.IpPermissions[0].Ipv6Ranges = new List<Ipv6Range>
+                            {
+                                new Ipv6Range
+                                {
+                                    CidrIpv6 = deleted.IPCIDR
+                                }
+                            };
+                            requestRevokeSecurityGroupEgress.IpPermissions[0].Ipv6Ranges = new List<Ipv6Range>
+                            {
+                                new Ipv6Range
+                                {
+                                    CidrIpv6 = deleted.IPCIDR
+                                }
+                            };
+                            if (deleted.Protocol == Protocol.UDP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "UDP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                            else if (deleted.Protocol == Protocol.TCP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "TCP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+
+                            }
+                            else if (deleted.Protocol == Protocol.ICMP)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "ICMP";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "ICMP";
+                            }
+                            else if (deleted.Protocol == Protocol.ALL)
+                            {
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].IpProtocol = "-1";
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].FromPort = deleted.Port;
+                                requestRevokeSecurityGroupEgress.IpPermissions[0].ToPort = deleted.Port;
+                            }
+                        }
+                        RevokeSecurityGroupIngressResponse responseRevokeSecurityGroupIngress = await EC2Client.RevokeSecurityGroupIngressAsync(requestRevokeSecurityGroupIngress);
+                        RevokeSecurityGroupEgressResponse responseRevokeSecurityGroupEgress = await EC2Client.RevokeSecurityGroupEgressAsync(requestRevokeSecurityGroupEgress);
+                        if (responseRevokeSecurityGroupIngress.HttpStatusCode == HttpStatusCode.OK && responseRevokeSecurityGroupEgress.HttpStatusCode == HttpStatusCode.OK)
+                        {
+                            _context.FirewallRules.Remove(deleted);
+                        }
+                        else
+                        {
+                            TempData["Exception"] = "Delete Firewall Rule Failed!";
+                            return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
+                        }
+                    }
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
+                }
+                catch (AmazonEC2Exception)
+                {
+                    TempData["Exception"] = "Delete Firewall Rule Failed! - E";
+                    return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
                 }
             }
             else
