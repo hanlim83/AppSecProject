@@ -14,7 +14,8 @@ namespace AdminSide.Models
         public String Description { get; set; }
         public string PubDate { get; set; }
 
-        public Boolean main { get; set; }
+        public string sourceCat { get; set; }
+
   
     }
 }

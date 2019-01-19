@@ -23,6 +23,7 @@ namespace AdminSide.Controllers
             this._context = context;
         }
 
+        //For the feed when it just loaded
         public async Task <IActionResult> Index()
         {
             List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
@@ -37,7 +38,7 @@ namespace AdminSide.Controllers
                         Title = item.Title,
                         Link = item.Link,
                         Description = item.Description,
-                        main = false
+                        sourceCat = var.sourceName
                     };
                     AllFeeds.Add(Feed2);
                 }
@@ -45,9 +46,9 @@ namespace AdminSide.Controllers
             }
             return View(AllFeeds);
         }
-
+        // for feed when searched
         [HttpPost]
-        public async Task<IActionResult> Index(string SearchQuery)
+        public async Task<IActionResult> Index(string SearchQuery, string Filter)
         {
             List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
             List<RSSFeed> AllFeeds = new List<RSSFeed>();
@@ -61,24 +62,34 @@ namespace AdminSide.Controllers
                         Title = item.Title,
                         Link = item.Link,
                         Description = item.Description,
-                        main = false
+                        sourceCat = var.sourceName
                     };
                     AllFeeds.Add(Feed2);
                 }
 
             }
+        
             List<RSSFeed> searchFeeds = new List<RSSFeed>();
             foreach(RSSFeed feed in AllFeeds)
             {
-                if (feed.Title.Contains(SearchQuery))
-                    searchFeeds.Add(feed);
-            }
-            return View(searchFeeds);
-        }
+                if (Filter == "Title")
+                {
+                    if (feed.Title.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
 
-        public IActionResult SearchPage()
-        {
-            return View();
+                if (Filter =="Category")
+                {
+                    if (feed.sourceCat.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
+            }
+            if (searchFeeds.Count == 0)
+            {
+                Console.WriteLine("Search Result failed.");
+            }
+            else
+            return View(searchFeeds);
         }
 
         // RSS FEED Codes
