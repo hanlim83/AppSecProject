@@ -1,4 +1,4 @@
-﻿@model AdminSide.Models.ChallengesViewModelIEnumerable
+﻿@model AdminSide.Models.Challenge
 
 @{
     ViewData["Title"] = "Create";
@@ -11,24 +11,24 @@
     <form method="post" enctype="multipart/form-data" asp-action="Create">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
-            <label asp-for="Challenge.Name" class="control-label"></label>
-            <input asp-for="Challenge.Name" class="form-control" />
-            <span asp-validation-for="Challenge.Name" class="text-danger"></span>
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Challenge.Description" class="control-label"></label>
-            <input asp-for="Challenge.Description" class="form-control" />
-            <span asp-validation-for="Challenge.Description" class="text-danger"></span>
+            <label asp-for="Description" class="control-label"></label>
+            <input asp-for="Description" class="form-control" />
+            <span asp-validation-for="Description" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Challenge.Value" class="control-label"></label>
-            <input asp-for="Challenge.Value" class="form-control" />
-            <span asp-validation-for="Challenge.Value" class="text-danger"></span>
+            <label asp-for="Value" class="control-label"></label>
+            <input asp-for="Value" class="form-control" />
+            <span asp-validation-for="Value" class="text-danger"></span>
         </div>
         <div class="form-group">
-            <label asp-for="Challenge.Flag" class="control-label"></label>
-            <input asp-for="Challenge.Flag" class="form-control" />
-            <span asp-validation-for="Challenge.Flag" class="text-danger"></span>
+            <label asp-for="Flag" class="control-label"></label>
+            <input asp-for="Flag" class="form-control" />
+            <span asp-validation-for="Flag" class="text-danger"></span>
         </div>
         <!--
         <div class="form-group">
@@ -41,13 +41,13 @@
         </div>
         -->
         <div class="form-group">
-            <label asp-for="Challenge.CompetitionCategoryID" class="control-label"></label>
-            <select asp-for="Challenge.CompetitionCategoryID" class="form-control" asp-items="ViewBag.SelectList"></select>
-            <span asp-validation-for="Challenge.CompetitionCategoryID" class="text-danger"></span>
+            <label asp-for="CompetitionCategoryID" class="control-label"></label>
+            <select asp-for="CompetitionCategoryID" class="form-control" asp-items="@ViewBag.SelectList"></select>
+            <span asp-validation-for="CompetitionCategoryID" class="text-danger"></span>
         </div>
         <div>
-            <input type="hidden" asp-for="Challenge.CompetitionID" value="@Model.Competition.ID">
-            <span asp-validation-for="Challenge.CompetitionID" class="text-danger"></span>
+            <input type="hidden" asp-for="CompetitionID" value="@ViewData["CompetitionID"]">
+            <span asp-validation-for="CompetitionID" class="text-danger"></span>
         </div>
         @*@foreach (var item in Model.Competition.CompetitionCategories)
             {
@@ -60,7 +60,6 @@
                 <label class="custom-file-label" for="customFile">Choose file</label>
             </div>*@
         <!--Testing nice UI-->
-
         <div class="form-group">
             <p>Upload one or more files using this form:</p>
             <div class="custom-file">

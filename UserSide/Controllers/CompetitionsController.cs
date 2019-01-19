@@ -79,7 +79,7 @@ namespace UserSide.Controllers
 
             return View(competition);
         }
-        
+
         public async Task<IActionResult> SignUp(int? id)
         {
             if (id == null)
@@ -129,12 +129,17 @@ namespace UserSide.Controllers
         {
             if (ModelState.IsValid)
             {
+                //BCryptPasswordHash bCryptPasswordHash = new BCryptPasswordHash();
+                var salt = BCryptPasswordHash.GetRandomSalt();
+                var hashPassword = BCryptPasswordHash.HashPassword(team.Password, salt);
+                team.Password = hashPassword;
+                team.Salt = salt;
                 _context.Add(team);
                 //get userId
                 //var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
                 //Migrating to new way to get user object
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                
+
                 TeamUser teamUser = new TeamUser();
                 teamUser.UserId = user.Id;
                 teamUser.UserName = user.UserName;
@@ -178,7 +183,7 @@ namespace UserSide.Controllers
             {
 
             };
-            
+
             foreach (var Team in competition.Teams)
             {
                 dictionary.Add(Team.TeamID, Team.TeamName);
@@ -210,9 +215,12 @@ namespace UserSide.Controllers
         {
             var localvarTeam = await _context.Teams
                 .Include(t => t.TeamUsers)
-                .FirstOrDefaultAsync(m => m.CompetitionID == team.CompetitionID);
+                .FirstOrDefaultAsync(m => m.TeamID == team.TeamID);
 
-            if (localvarTeam.Password.Equals(team.Password))
+            var ProvidedPasswordhash = BCryptPasswordHash.HashPassword(team.Password, localvarTeam.Salt);
+
+            if (localvarTeam.Password.Equals(ProvidedPasswordhash))
+            //if (BCryptPasswordHash.ValidatePassword(ProvidedPasswordhash, (localvarTeam.Password)))
             {
                 //if (ModelState.IsValid)
                 //{
@@ -234,7 +242,7 @@ namespace UserSide.Controllers
             else
             {
                 @ViewData["Show"] = true;
-                return RedirectToAction("Join", "Competitions", new { id = team.CompetitionID, check=true });
+                return RedirectToAction("Join", "Competitions", new { id = team.CompetitionID, check = true });
             }
         }
 
