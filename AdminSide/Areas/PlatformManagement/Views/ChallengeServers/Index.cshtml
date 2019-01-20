@@ -79,6 +79,10 @@
                                                         <span class="sr-only">Toggle Dropdown</span>
                                                     </button>
                                                     <div class="dropdown-menu">
+                                                        <form asp-action="Credentials" method="post">
+                                                            <input type="hidden" name="serverID" value="@server.ID" />
+                                                            <button class="dropdown-item" type="submit">Get Credentials</button>
+                                                        </form>
                                                         <form asp-action="ModifyServer" asp-route-ServerID="@server.ID">
                                                             <button class="dropdown-item" type="submit">Modify Server Settings</button>
                                                         </form>

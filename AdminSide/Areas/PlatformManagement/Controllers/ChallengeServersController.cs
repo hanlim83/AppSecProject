@@ -2,6 +2,9 @@
 using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.EC2;
 using Amazon.EC2.Model;
+using Amazon.S3;
+using Amazon.S3.Model;
+using Amazon.S3.Transfer;
 using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +15,14 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Protocol = AdminSide.Areas.PlatformManagement.Models.Protocol;
 using State = AdminSide.Areas.PlatformManagement.Models.State;
 using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
+using Tag = Amazon.EC2.Model.Tag;
 using Tenancy = AdminSide.Areas.PlatformManagement.Models.Tenancy;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
@@ -29,12 +35,15 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         private IAmazonEC2 EC2Client { get; set; }
 
+        private IAmazonS3 S3Client { get; set; }
+
         private ChallengeServersCreationFormModel creationReference;
 
-        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
+        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client, IAmazonS3 s3Client)
         {
             this._context = context;
             this.EC2Client = ec2Client;
+            this.S3Client = s3Client;
         }
 
         public async Task<IActionResult> Index()
@@ -75,6 +84,61 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> Credentials(string serverID)
+        {
+            Server selected = await _context.Servers.FindAsync(int.Parse(serverID));
+            if (selected != null)
+            {
+                ChallengeServersCredentialsPageModel model = new ChallengeServersCredentialsPageModel();
+                model.serverName = selected.Name;
+                model.serverIP = selected.IPAddress;
+                model.serverDNS = selected.DNSHostname;
+                String keyPairString = null;
+                TransferUtility fileTransferUtility = new TransferUtility(S3Client);
+                fileTransferUtility.Download(@"C:\Tempt\"+selected.KeyPairName + ".pem", "ectf-keypair", selected.KeyPairName+".pem");
+                using (FileStream fileDownloaded = new FileStream(@"C:\Tempt\" + selected.KeyPairName + ".pem", FileMode.Open, FileAccess.Read))
+                {
+                    using (StreamReader reader = new StreamReader(fileDownloaded))
+                    {
+                        keyPairString = reader.ReadToEnd();
+                    }
+                }
+                System.IO.File.Delete(@"C:\Tempt\" + selected.KeyPairName + ".pem");
+                if (selected.OperatingSystem.Contains("Windows"))
+                {
+                    model.Windows = true;
+                    GetPasswordDataResponse response = await EC2Client.GetPasswordDataAsync(new GetPasswordDataRequest
+                    {
+                        InstanceId = selected.AWSEC2Reference
+                    });
+                    if (String.IsNullOrEmpty(response.PasswordData))
+                        model.Available = false;
+                    else
+                    {
+                        model.retrievedPassword = response.GetDecryptedPassword(keyPairString);
+                        model.Available = true;
+                    }
+                } else
+                {
+                    model.keyPairDownloadURL = S3Client.GetPreSignedURL(new GetPreSignedUrlRequest
+                    {
+                        BucketName = "ectf-keypair",
+                        Key = selected.KeyPairName + ".pem",
+                        Expires = DateTime.Now.AddMinutes(5),
+                        Protocol = Amazon.S3.Protocol.HTTPS,
+                        ResponseHeaderOverrides = new ResponseHeaderOverrides
+                        {
+                            ContentDisposition = "attachement"
+                        }
+                    });
+                }
+                return View(model);
+            }
+            else
+                return NotFound();
+        }
+
+        [HttpPost]
 
         public async Task<IActionResult> SpecifySettings(String selectedTemplate)
         {
@@ -111,6 +175,33 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         {
             Template selectedT = await _context.Templates.FindAsync(Int32.Parse(Model2.TemplateID));
             Subnet selectedS = await _context.Subnets.FindAsync(Int32.Parse(Model2.SubnetID));
+            Guid g = Guid.NewGuid();
+            string randomKeypairString = Convert.ToBase64String(g.ToByteArray());
+            randomKeypairString = randomKeypairString.Replace("=", "");
+            randomKeypairString = randomKeypairString.Replace("+", "");
+            randomKeypairString = randomKeypairString.Replace("\\", "");
+            randomKeypairString = randomKeypairString.Replace("/", "");
+            CreateKeyPairResponse responseCreateKeyPair = await EC2Client.CreateKeyPairAsync(new CreateKeyPairRequest
+            {
+                KeyName = randomKeypairString
+            });
+            if (responseCreateKeyPair.HttpStatusCode == HttpStatusCode.OK)
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(@"C:\Tempt\" + responseCreateKeyPair.KeyPair.KeyName + ".pem"));
+                using (FileStream s = new FileStream(@"C:\Tempt\" + responseCreateKeyPair.KeyPair.KeyName + ".pem", FileMode.Create))
+                using (StreamWriter writer = new StreamWriter(s))
+                {
+                    writer.WriteLine(responseCreateKeyPair.KeyPair.KeyMaterial);
+                }
+                PutObjectResponse responsePutObject = await S3Client.PutObjectAsync(new PutObjectRequest
+                {
+                    BucketName = "ectf-keypair",
+                    Key = responseCreateKeyPair.KeyPair.KeyName + ".pem",
+                    FilePath = @"C:\Tempt\" + responseCreateKeyPair.KeyPair.KeyName + ".pem"
+                });
+                if (responsePutObject.HttpStatusCode == HttpStatusCode.OK)
+                    System.IO.File.Delete(@"C:\Tempt\" + responseCreateKeyPair.KeyPair.KeyName + ".pem");
+            }
             RunInstancesRequest request = new RunInstancesRequest
             {
                 BlockDeviceMappings = new List<BlockDeviceMapping> {
@@ -120,7 +211,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         }
                     },
                 ImageId = selectedT.AWSAMIReference,
-                KeyName = "ASPJ Instances Master Key Pair",
+                KeyName = responseCreateKeyPair.KeyPair.KeyName,
                 MaxCount = 1,
                 MinCount = 1,
                 SubnetId = selectedS.AWSVPCSubnetReference
@@ -206,8 +297,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         LinkedSubnet = selectedS,
                         SubnetID = selectedS.ID,
                         IPAddress = response.Reservation.Instances[0].PrivateIpAddress,
-                        DNSHostname = response.Reservation.Instances[0].PrivateDnsName
-                };
+                        DNSHostname = response.Reservation.Instances[0].PrivateDnsName,
+                        KeyPairName = responseCreateKeyPair.KeyPair.KeyName
+                    };
                     if (Model2.ServerWorkload.Equals("Low"))
                         newlyCreated.Workload = Workload.Low;
                     else if (Model2.ServerWorkload.Equals("Medium"))
@@ -270,6 +362,15 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     TerminateInstancesResponse response = await EC2Client.TerminateInstancesAsync(request);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
+                        await EC2Client.DeleteKeyPairAsync(new DeleteKeyPairRequest
+                        {
+                            KeyName = deleted.KeyPairName
+                        });
+                        await S3Client.DeleteObjectAsync(new DeleteObjectRequest
+                        {
+                            BucketName = "ectf-keypair",
+                            Key = deleted.KeyPairName+".pem"
+                        });
                         if (!deleted.LinkedSubnet.LinkedVPC.AWSVPCDefaultSecurityGroup.Equals(deleted.AWSSecurityGroupReference))
                         {
                             await EC2Client.DeleteSecurityGroupAsync(new DeleteSecurityGroupRequest
@@ -315,7 +416,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     return StatusCode(500);
             }
             else
-                return NotFound(); 
+                return NotFound();
         }
 
         [HttpPost]
@@ -512,9 +613,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     _context.Servers.Update(retrieved);
                     await _context.SaveChangesAsync();
                     return RedirectToAction("");
-                }else
+                }
+                else
                     return StatusCode(500);
-            } else if (retrieved != null && action.Equals("Stop"))
+            }
+            else if (retrieved != null && action.Equals("Stop"))
             {
                 StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
                 {
@@ -610,7 +713,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].IpProtocol = "-1";
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].FromPort = -1;
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].ToPort = -1;
-                                } else if (Rule.Protocol == Protocol.ICMP)
+                                }
+                                else if (Rule.Protocol == Protocol.ICMP)
                                 {
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].IpProtocol = "icmp";
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].FromPort = -1;
@@ -621,7 +725,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].IpProtocol = "58";
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].FromPort = -1;
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].ToPort = -1;
-                                } else if (Rule.Protocol == Protocol.TCP || Rule.Protocol == Protocol.UDP)
+                                }
+                                else if (Rule.Protocol == Protocol.TCP || Rule.Protocol == Protocol.UDP)
                                 {
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].FromPort = Rule.Port;
                                     AuthorizeSecurityGroupIngressRequest.IpPermissions[0].ToPort = Rule.Port;
@@ -792,7 +897,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
-                                } else
+                                }
+                                else
                                 {
                                     ViewData["Exception"] = "You have entered an invaild IP CIDR";
                                     ViewData["ServerID"] = modified.ID;
@@ -993,7 +1099,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
-                                } else
+                                }
+                                else
                                 {
                                     ViewData["Exception"] = "You have entered an invaild IP CIDR";
                                     ViewData["ServerID"] = modified.ID;
@@ -1065,7 +1172,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
-                                } else
+                                }
+                                else
                                 {
                                     ViewData["Exception"] = "You have entered an invaild IP CIDR";
                                     ViewData["ServerID"] = modified.ID;
@@ -1127,7 +1235,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                             CidrIpv6 = Rule.IPCIDR
                                         }
                                     };
-                                } else
+                                }
+                                else
                                 {
                                     ViewData["Exception"] = "You have entered an invaild IP CIDR";
                                     ViewData["ServerID"] = modified.ID;
@@ -1148,7 +1257,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                             }
                         }
-                        return RedirectToAction("ModifyServer", new { serverID = modified.ID});
+                        return RedirectToAction("ModifyServer", new { serverID = modified.ID });
                     }
                     else
                     {
@@ -1217,8 +1326,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = -1;
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = -1;
                             }
-                            else if (deleted.Protocol == Protocol.ALL) { 
-}
+                            else if (deleted.Protocol == Protocol.ALL)
+                            {
+                            }
                             {
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "-1";
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = -1;
