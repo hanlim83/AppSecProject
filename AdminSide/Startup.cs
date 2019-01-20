@@ -34,30 +34,6 @@ namespace AdminSide
             Configuration = configuration;
         }
 
-        private static void SetEbConfig()
-        {
-            var tempConfigBuilder = new ConfigurationBuilder();
-
-            tempConfigBuilder.AddJsonFile(
-                @"C:\Program Files\Amazon\ElasticBeanstalk\config\containerconfiguration",
-                optional: true,
-                reloadOnChange: true
-            );
-
-            var configuration = tempConfigBuilder.Build();
-
-            var ebEnv =
-                configuration.GetSection("iis:env")
-                    .GetChildren()
-                    .Select(pair => pair.Value.Split(new[] { '=' }, 2))
-                    .ToDictionary(keypair => keypair[0], keypair => keypair[1]);
-
-            foreach (var keyVal in ebEnv)
-            {
-                Environment.SetEnvironmentVariable(keyVal.Key, keyVal.Value);
-            }
-        }
-
         //For ASP.NET Identity Only | You can reuse this but replace dbname with your own database name and change method name
         private string GetRdsConnectionStringIdentity()
         {
@@ -129,8 +105,6 @@ namespace AdminSide
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            SetEbConfig();
 
             //Identity Db Context
             services.AddDbContext<ApplicationDbContext>(options =>

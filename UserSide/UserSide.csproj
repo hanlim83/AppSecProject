@@ -16,6 +16,7 @@
     <PackageReference Include="AWSSDK.ElasticLoadBalancingV2" Version="3.3.12.11" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.6" />
     <PackageReference Include="AWSSDK.RDS" Version="3.3.37.13" />
+    <PackageReference Include="AWSSDK.Route53Domains" Version="3.3.3.33" />
     <PackageReference Include="AWSSDK.S3" Version="3.3.31.11" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.3.14" />
     <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.3.37.12" />
