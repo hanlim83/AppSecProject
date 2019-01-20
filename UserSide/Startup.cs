@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserSide.Data;
@@ -21,12 +16,9 @@ using Amazon.CloudWatchLogs;
 using Amazon.SimpleNotificationService;
 using Amazon.CloudWatchEvents;
 using Amazon.RDS;
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticBeanstalk;
 using UserSide.Areas.Identity.Services;
-using Amazon.SimpleSystemsManagement;
 using UserSide.Hubs;
-using Microsoft.AspNetCore.SignalR;
+using Amazon.Route53Domains;
 
 namespace UserSide
 {
@@ -157,12 +149,8 @@ namespace UserSide
             services.AddAWSService<IAmazonSimpleNotificationService>();
             //RDS Initialization
             services.AddAWSService<IAmazonRDS>();
-            //ELB Initialization
-            services.AddAWSService<IAmazonElasticLoadBalancingV2>();
-            //EBS Initialization
-            services.AddAWSService<IAmazonElasticBeanstalk>();
-            //SSM Initialization
-            services.AddAWSService<IAmazonSimpleSystemsManagement>();
+            //Route53 Initialization
+            services.AddAWSService<IAmazonRoute53Domains>();
 
             //Chat Signalr
             services.AddSignalR();

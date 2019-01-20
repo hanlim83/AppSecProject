@@ -5,13 +5,11 @@ using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
 using Amazon.EC2;
-using Amazon.ElasticBeanstalk;
-using Amazon.ElasticLoadBalancingV2;
 using Amazon.RDS;
+using Amazon.Route53Domains;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.SimpleNotificationService;
-using Amazon.SimpleSystemsManagement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdminSide
@@ -181,12 +178,8 @@ namespace AdminSide
             services.AddAWSService<IAmazonSimpleNotificationService>();
             //RDS Initialization
             services.AddAWSService<IAmazonRDS>();
-            //ELB Initialization
-            services.AddAWSService<IAmazonElasticLoadBalancingV2>();
-            //EBS Initialization
-            services.AddAWSService<IAmazonElasticBeanstalk>();
-            //SSM Initialization
-            services.AddAWSService<IAmazonSimpleSystemsManagement>();
+            //Route53 Initialization
+            services.AddAWSService<IAmazonRoute53Domains>();
 
             //Background Processing
             services.AddHostedService<ConsumeScopedServicesHostedService>();
