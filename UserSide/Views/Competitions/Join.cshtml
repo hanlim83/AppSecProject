@@ -11,11 +11,22 @@
         <a asp-controller="Competitions" asp-action="Join" asp-route-id="@ViewData["CompetitionID"]" class="w-100"><input type="button" value="Join Group" class="btn btn btn-outline-primary w-100 active"></a>
         <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@ViewData["CompetitionID"]" class="w-100"><input type="button" value="Create Group" class="btn btn btn-outline-primary w-100"></a>
     </div>
+    <h2></h2>
+    @if ((bool)ViewData["Show"] == true)
+    {
+        <br>
+        <div class="alert alert-danger" role="alert">
+            @*<h4 class="alert-heading">Invalid password</h4>
+                <hr>*@
+            <p style="margin-bottom: 0;">Invalid Password. Please try again.</p>
+        </div>
+    }
     <div>
+        <br>
         <section>
-            <br>
             <form method="post">
                 <h2>Change form data</h2>
+                <h3>Warning! Once you join a team you cannot change your team</h3>
                 <div class="form-group">
                     <label asp-for="TeamName" class="control-label"></label>
                     <select asp-for="TeamID" class="form-control" asp-items="ViewBag.SelectList"></select>

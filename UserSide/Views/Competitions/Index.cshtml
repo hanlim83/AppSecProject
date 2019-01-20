@@ -15,6 +15,15 @@
 
 <br>
 <div class="container">
+    @if ((bool)ViewData["ShowWrongDirectory"] == true)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Invalid Directory!</h4>
+            <p>Ignore if this was accidental</p>
+            <hr>
+            <p>Warning your actions have been logged and you will face the full force of the law if there are attempts to hack. If repeated attempts are detected, action will be taken against hackers!</p>
+        </div>
+    }
     <h2>Ongoing CTF</h2>
     <table class="table">
         <thead>
@@ -32,7 +41,17 @@
             @foreach (var competition in Model)
             {
                 counter = 0;
-                counter2 = competition.Teams.Count() - 1;
+                //counter2 = competition.Teams.Count() - 1;
+                //Counter 2 handles number of users. Only when it reaches the last user and unable to find a match then it will place the button
+                counter2 = 0;
+                @foreach(var Team in competition.Teams)
+                {
+                    @foreach(var teamUsers in Team.TeamUsers)
+                    {
+                        counter2++;
+                    }
+                }
+                counter2 -= 1;
                 <tr>
                     <td>
                         @Html.DisplayFor(modelItem => competition.CompetitionName)
@@ -43,7 +62,7 @@
                     <td>
                         @if (competition.Teams.Count == 0)
                         {
-                            <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                             //break;
                         }
                         else
@@ -54,7 +73,7 @@
                                 {
                                     @if (team.TeamUsers.Count == 0)
                                     {
-                                        <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                                         counter = 1;
                                         //break;
                                     }
@@ -64,7 +83,7 @@
                                         {
                                             if (teamUsers.UserId.Equals(user.Id))
                                             {
-                                                <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">View</button></a>
+                                                <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><input type="button" value="View" class="btn btn btn-default"></a>
                                                 counter = 1;
                                                 break;
                                             }
@@ -72,7 +91,7 @@
                                             {
                                                 if (counter2 == 0)
                                                 {
-                                                    <a asp-controller="Competitions" asp-action="SignUp" asp-route-id="@competition.ID"><button type="button" class="btn btn-default">Join</button></a>
+                                                    <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
                                                 }
                                                 counter2--;
                                             }

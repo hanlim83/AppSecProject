@@ -12,13 +12,13 @@ namespace AdminSide.Models
     {
         [Key]
         public int TeamID { get; set; }
-
-        [Required]
+        
         [DisplayName("Team Name")]
         public string TeamName { get; set; }
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
+        public string Salt { get; set; }
         public int Score { get; set; }
 
         [ForeignKey("CompetitionID")]

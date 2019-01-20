@@ -14,6 +14,7 @@ using System.Data.SqlClient;
 using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
+using System.ComponentModel;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
@@ -26,10 +27,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
         private readonly IAmazonCloudWatchEvents cweClient;
         private readonly IAmazonCloudWatchLogs cwlClient;
 
-        public ScopedUpdatingService(ILogger<ScopedUpdatingService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient)
+        public ScopedUpdatingService(ILogger<ScopedUpdatingService> logger, PlatformResourcesContext context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient)
         {
             _logger = logger;
-            context = Context;
+            this.context = context;
             ec2Client = EC2Client;
             cwClient = cloudwatchClient;
             cweClient = cloudwatcheventsClient;
@@ -255,12 +256,31 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 }
                     });
                 }
+                //_logger.LogInformation("Update Background Service is getting RSS Feeds");
+                //var feed = await FeedReader.ReadAsync("https://hnrss.org/newcomments");
+                //foreach (FeedItem var in feed.Items)
+                //{
+                //    RSSFeed Feed = new RSSFeed
+                //    {
+                //        Title = var.Title,
+                //        Link = var.Link,
+                //        Description = var.Description,
+                //        PubDate = var.PublishingDateString,
+                //        main = false
+                //    };
+                //    NewsFeedcontext.Feeds.Add(Feed);
+                //}
+                //await NewsFeedcontext.SaveChangesAsync();
                 _logger.LogInformation("Update Background Service has completed!");
             } catch (SqlException e)
             {
-                _logger.LogInformation("Update Background Service faced an exception! "+e.Message+" | "+e.Source);
+                _logger.LogInformation("Update Background Service faced an SQL exception! "+e.Message+" | "+e.Source);
                 return;
-            }  
+            } catch (Exception e)
+            {
+                _logger.LogInformation("Update Background Service faced an exception! " + e.Message + " | " + e.Source);
+                return;
+            } 
         }
     }
 }

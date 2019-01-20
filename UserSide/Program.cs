@@ -28,6 +28,9 @@ namespace UserSide
                     var contextF = services.GetRequiredService<ForumContext>();
                     //DbInitializer.InitializeCompetitions(contextC);
                     DbInitializer.InitializeForum(contextF);
+
+                    var contextChat = services.GetRequiredService<ChatContext>();
+                    DbInitializer.InitializeChat(contextChat);
                 }
                 catch (Exception ex)
                 {

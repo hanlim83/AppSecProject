@@ -7,7 +7,7 @@
 <br>
 <div class="container">
     <div class="float-right">
-        <a asp-controller="Teams" asp-action="Create" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Create New</button></a>
+        <a asp-controller="Teams" asp-action="Create" asp-route-id="@Model.ID"><input type="button" value="Create New" class="btn btn btn-default"></a>
     </div>
     <br>
     <br>
@@ -21,6 +21,10 @@
                 <th>
                     @*@Html.DisplayNameFor(model => model.Password)*@
                     Password
+                </th>
+                <th>
+                    @*@Html.DisplayNameFor(model => model.Password)*@
+                    Score
                 </th>
                 <th></th>
             </tr>
@@ -36,6 +40,9 @@
                         @Html.DisplayFor(modelItem => item.Password)
                     </td>
                     <td>
+                        @Html.DisplayFor(modelItem => item.Score)
+                    </td>
+                    <td>
                         <a asp-action="Edit" asp-route-id="@item.TeamID">Edit</a> |
                         <a asp-action="Details" asp-route-id="@item.TeamID">Details</a> |
                         <a asp-action="Delete" asp-route-id="@item.TeamID">Delete</a>
@@ -44,4 +51,5 @@
             }
         </tbody>
     </table>
+    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><input type="button" value="Back to Competition Details" class="btn btn btn-default"></a>
 </div>

@@ -1,38 +1,38 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using AdminSide.Areas.PlatformManagement.Data;
+using AdminSide.Areas.PlatformManagement.Services;
 using AdminSide.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
+using Amazon.CloudWatch;
+using Amazon.CloudWatchEvents;
+using Amazon.CloudWatchLogs;
+using Amazon.EC2;
+using Amazon.ElasticBeanstalk;
+using Amazon.ElasticLoadBalancingV2;
+using Amazon.RDS;
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.EC2;
-using Amazon.CloudWatch;
 using Amazon.SimpleNotificationService;
-using Amazon.CloudWatchLogs;
-using Amazon.CloudWatchEvents;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Amazon.RDS;
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticBeanstalk;
-using AdminSide.Areas.PlatformManagement.Data;
 using Amazon.SimpleSystemsManagement;
-using AdminSide.Areas.PlatformManagement.Services;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AdminSide
 {
     public class Startup
     {
-       public Startup(IConfiguration configuration)
-       {
-           Configuration = configuration;
-       }
+        public Startup(IConfiguration configuration)
+        {
+            Configuration = configuration;
+        }
 
         private static void SetEbConfig()
         {
@@ -106,6 +106,18 @@ namespace AdminSide
             return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
         }
 
+        // For NewsFeed
+        private string GetRdsConnectionStringNewsFeed()
+        {
+            string hostname = Configuration.GetValue<string>("RDS_HOSTNAME");
+            string port = Configuration.GetValue<string>("RDS_PORT");
+            string dbname = "RSSFeedDb";
+            string username = Configuration.GetValue<string>("RDS_USERNAME");
+            string password = Configuration.GetValue<string>("RDS_PASSWORD");
+
+            return $"Data Source={hostname},{port};Initial Catalog={dbname};User ID={username};Password={password};";
+        }
+
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -136,13 +148,26 @@ namespace AdminSide
 
             //Platform Resources Db Context
             services.AddDbContext<PlatformResourcesContext>(options =>
-            options.UseLazyLoadingProxies().UseSqlServer(
-            GetRdsConnectionStringPlatformResources()));
+            {
+                options.UseLazyLoadingProxies().UseSqlServer(GetRdsConnectionStringPlatformResources(),
+                    sqlServerOptionsAction: sqlOptions =>
+                    {
+                        sqlOptions.EnableRetryOnFailure(
+                            maxRetryCount: 10,
+                            maxRetryDelay: TimeSpan.FromSeconds(30),
+                            errorNumbersToAdd: null);
+                    });
+            });
 
             //Forum Db Context
             services.AddDbContext<ForumContext>(options =>
             options.UseSqlServer(
             GetRdsConnectionStringForum()));
+
+            //NewsFeed Db Context
+            services.AddDbContext<NewsFeedContext>(options =>
+            options.UseSqlServer(
+            GetRdsConnectionStringNewsFeed()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
         .AddRazorPagesOptions(options =>
