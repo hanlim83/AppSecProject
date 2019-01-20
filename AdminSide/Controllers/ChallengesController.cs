@@ -147,7 +147,7 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ID,Name,Description,Value,Flag,FileName,CompetitionID,CompetitionCategoryID")] Challenge challenge, List<IFormFile> files)
+        public async Task<IActionResult> Create([Bind("Name,Description,Value,Flag,FileName,CompetitionID,CompetitionCategoryID")] Challenge challenge, List<IFormFile> files)
         {
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
@@ -155,26 +155,22 @@ namespace AdminSide.Controllers
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
 
-            foreach (var category in competition.CompetitionCategories)
-            {
-                if (category.ID == challenge.CompetitionCategoryID)
-                {
-                    foreach (var file in files)
-                    {
-                        challenge.FileName = file.FileName;
-                        await UploadFileToS3(file, competition.BucketName, category.CategoryName);
-                    }
-                }
-            }
-            
             if (ModelState.IsValid)
             {
-                competition.Challenges.Add(challenge);
-
-                _context.Update(competition);
+                foreach (var category in competition.CompetitionCategories)
+                {
+                    if (category.ID == challenge.CompetitionCategoryID)
+                    {
+                        foreach (var file in files)
+                        {
+                            challenge.FileName = file.FileName;
+                            await UploadFileToS3(file, competition.BucketName, category.CategoryName);
+                        }
+                    }
+                }
+                
+                _context.Challenges.Add(challenge);
                 await _context.SaveChangesAsync();
-                //_context.Add(challenge);
-                //await _context.SaveChangesAsync();
                 //return RedirectToAction(nameof(Index));
                 return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
             }
