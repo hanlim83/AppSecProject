@@ -2,6 +2,7 @@
 using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.EC2;
 using Amazon.EC2.Model;
+using Amazon.Extensions.NETCore.Setup;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -39,11 +40,16 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         private ChallengeServersCreationFormModel creationReference;
 
-        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client, IAmazonS3 s3Client)
+        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
         {
             this._context = context;
             this.EC2Client = ec2Client;
-            this.S3Client = s3Client;
+            AmazonS3Config config = new AmazonS3Config
+            {
+                ForcePathStyle = true
+            };
+
+            this.S3Client = new AmazonS3Client(config);
         }
 
         public async Task<IActionResult> Index()
