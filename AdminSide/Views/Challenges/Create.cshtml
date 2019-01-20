@@ -5,7 +5,7 @@
 }
 
 <br>
-<div class="col-md-8 offset-2">
+<div class="container">
     <h2>Create Challenge</h2>
     <hr>
     <form method="post" enctype="multipart/form-data" asp-action="Create">
@@ -24,6 +24,7 @@
             <label asp-for="Value" class="control-label"></label>
             <input asp-for="Value" class="form-control" />
             <span asp-validation-for="Value" class="text-danger"></span>
+            <p>Input value between 1 and 9999. 0 is not allowed as it doesn't make sense for a challenge to have 0 points</p>
         </div>
         <div class="form-group">
             <label asp-for="Flag" class="control-label"></label>
