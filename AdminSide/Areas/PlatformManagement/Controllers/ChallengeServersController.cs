@@ -46,7 +46,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             this.EC2Client = ec2Client;
             AmazonS3Config config = new AmazonS3Config
             {
-                ForcePathStyle = true
+                ForcePathStyle = true,
+                UseAccelerateEndpoint = true
             };
 
             this.S3Client = new AmazonS3Client(config);
