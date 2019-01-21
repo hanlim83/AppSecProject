@@ -5,13 +5,11 @@ using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
 using Amazon.EC2;
-using Amazon.ElasticBeanstalk;
-using Amazon.ElasticLoadBalancingV2;
 using Amazon.RDS;
+using Amazon.Route53Domains;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.SimpleNotificationService;
-using Amazon.SimpleSystemsManagement;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -22,7 +20,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdminSide
@@ -32,30 +29,6 @@ namespace AdminSide
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }
-
-        private static void SetEbConfig()
-        {
-            var tempConfigBuilder = new ConfigurationBuilder();
-
-            tempConfigBuilder.AddJsonFile(
-                @"C:\Program Files\Amazon\ElasticBeanstalk\config\containerconfiguration",
-                optional: true,
-                reloadOnChange: true
-            );
-
-            var configuration = tempConfigBuilder.Build();
-
-            var ebEnv =
-                configuration.GetSection("iis:env")
-                    .GetChildren()
-                    .Select(pair => pair.Value.Split(new[] { '=' }, 2))
-                    .ToDictionary(keypair => keypair[0], keypair => keypair[1]);
-
-            foreach (var keyVal in ebEnv)
-            {
-                Environment.SetEnvironmentVariable(keyVal.Key, keyVal.Value);
-            }
         }
 
         //For ASP.NET Identity Only | You can reuse this but replace dbname with your own database name and change method name
@@ -129,8 +102,6 @@ namespace AdminSide
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
-
-            SetEbConfig();
 
             //Identity Db Context
             services.AddDbContext<ApplicationDbContext>(options =>
@@ -207,12 +178,8 @@ namespace AdminSide
             services.AddAWSService<IAmazonSimpleNotificationService>();
             //RDS Initialization
             services.AddAWSService<IAmazonRDS>();
-            //ELB Initialization
-            services.AddAWSService<IAmazonElasticLoadBalancingV2>();
-            //EBS Initialization
-            services.AddAWSService<IAmazonElasticBeanstalk>();
-            //SSM Initialization
-            services.AddAWSService<IAmazonSimpleSystemsManagement>();
+            //Route53 Initialization
+            services.AddAWSService<IAmazonRoute53Domains>();
 
             //Background Processing
             services.AddHostedService<ConsumeScopedServicesHostedService>();

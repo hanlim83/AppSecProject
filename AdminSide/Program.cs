@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Linq;
 using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -12,6 +14,7 @@ namespace AdminSide
     {
         public static void Main(string[] args)
         {
+            SetEbConfig();
             var host = CreateWebHostBuilder(args).Build();
 
             using (var scope = host.Services.CreateScope())
@@ -41,5 +44,29 @@ namespace AdminSide
             WebHost.CreateDefaultBuilder(args)
             .UseSetting(WebHostDefaults.DetailedErrorsKey, "true")
                 .UseStartup<Startup>();
+
+        private static void SetEbConfig()
+        {
+            var tempConfigBuilder = new ConfigurationBuilder();
+
+            tempConfigBuilder.AddJsonFile(
+                @"C:\Program Files\Amazon\ElasticBeanstalk\config\containerconfiguration",
+                optional: true,
+                reloadOnChange: true
+            );
+
+            var configuration = tempConfigBuilder.Build();
+
+            var ebEnv =
+                configuration.GetSection("iis:env")
+                    .GetChildren()
+                    .Select(pair => pair.Value.Split(new[] { '=' }, 2))
+                    .ToDictionary(keypair => keypair[0], keypair => keypair[1]);
+
+            foreach (var keyVal in ebEnv)
+            {
+                Environment.SetEnvironmentVariable(keyVal.Key, keyVal.Value);
+            }
+        }
     }
 }

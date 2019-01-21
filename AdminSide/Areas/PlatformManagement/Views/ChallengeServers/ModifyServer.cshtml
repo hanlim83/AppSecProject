@@ -9,7 +9,7 @@
 @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])))
 {
     <div class="alert alert-danger" role="alert">
-        @ViewData["Exception"]
+        @TempData["Exception"]
     </div>
 }
 <div class="row">
@@ -116,7 +116,7 @@
         </div>
         <div class="form-group">
             <p class="form-text">Server Firewall Rules</p>
-            <form asp-action="CreateFirewallRule" method="post">
+            <form asp-action="CreateFirewallRule" method="get">
                 <input type="hidden" id="ServerIDDest" name="ServerID" value="" />
                 <button type="submit" class="btn btn-secondary float-right">Add Rule</button>
             </form>

@@ -16,13 +16,11 @@
     <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.7.12" />
     <PackageReference Include="AWSSDK.Core" Version="3.3.31.3" />
     <PackageReference Include="AWSSDK.EC2" Version="3.3.80" />
-    <PackageReference Include="AWSSDK.ElasticBeanstalk" Version="3.3.12.8" />
-    <PackageReference Include="AWSSDK.ElasticLoadBalancingV2" Version="3.3.12.11" />
     <PackageReference Include="AWSSDK.Extensions.NETCore.Setup" Version="3.3.6" />
     <PackageReference Include="AWSSDK.RDS" Version="3.3.37.13" />
+    <PackageReference Include="AWSSDK.Route53Domains" Version="3.3.3.33" />
     <PackageReference Include="AWSSDK.S3" Version="3.3.31.11" />
     <PackageReference Include="AWSSDK.SimpleNotificationService" Version="3.3.3.14" />
-    <PackageReference Include="AWSSDK.SimpleSystemsManagement" Version="3.3.37.12" />
     <PackageReference Include="BCrypt.Net-Next" Version="3.1.2" />
     <PackageReference Include="CodeHollow.FeedReader" Version="1.1.6" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -33,43 +31,10 @@
   </ItemGroup>
 
  <ItemGroup>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\CloudwatchView.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\ChallengeNetwork\Create.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\EC2Create.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\EC2List.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\Index.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\S3Create.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\S3List.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SNSSend.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SubnetCreate.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\SubnetList.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\AWSTesting\VPCList.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkRoutes\Index.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Create.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\PlatformManagement\Views\ChallengeNetworkSubnets\Edit.cshtml">
+    <Content Update="Areas\PlatformManagement\Views\ChallengeNetwork\Edit.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Areas\PlatformManagement\Views\ChallengeServers\Index.cshtml">

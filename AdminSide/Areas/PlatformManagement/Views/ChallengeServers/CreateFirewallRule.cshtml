@@ -4,9 +4,9 @@
     ViewData["Title"] = "CreateFirewallRule";
 }
 
-<h2>CreateFirewallRule</h2>
+<h2>Create</h2>
 
-<h4>FirewallRule</h4>
+<h4>Firewall Rule</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -16,17 +16,20 @@
                 @ViewData["Exception"]
             </div>
         }
-        <form asp-action="SubmitFirewallRule">
+        <form asp-action="CreateFirewallRule">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="ID" />
             <input type="hidden" asp-for="ServerID" value="@ViewData["ServerID"]" />
             <div class="form-group">
                 <label asp-for="Type" class="control-label"></label>
-                <select asp-for="Type" class="form-control">
+                <select id="portType" asp-for="Type" class="form-control" onchange="portFill()">
                     <option value="HTTP">HTTP</option>
                     <option value="HTTPS">HTTPS</option>
                     <option value="SSH">SSH</option>
                     <option value="FTP">FTP</option>
+                    <option value="ICMP">ICMP</option>
+                    <option value="ICMPv6">ICMPv6</option>
+                    <option value="ALL">ALL</option>
                     <option value="CUSTOM">CUSTOM</option>
 
                 </select>
@@ -34,21 +37,23 @@
             </div>
             <div class="form-group">
                 <label asp-for="Protocol" class="control-label"></label>
-                <select asp-for="Protocol" class="form-control">
+                <select id="protoType" asp-for="Protocol" class="form-control" onchange="protoFill()">
                     <option value="TCP">TCP</option>
                     <option value="UDP">UDP</option>
                     <option value="ICMP">ICMP</option>
+                    <option value="ICMPv6">ICMPv6</option>
+                    <option value="ALL">ALL</option>
                 </select>
                 <span asp-validation-for="Protocol" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Port" class="control-label"></label>
-                <input asp-for="Port" class="form-control" />
+                <input id="portInput" asp-for="Port" class="form-control" />
                 <span asp-validation-for="Port" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Direction" class="control-label"></label>
-                <select asp-for="Direction" class="form-control">
+                <select id="direction" asp-for="Direction" class="form-control">
                     <option value="Incoming">Incoming</option>
                     <option value="Outgoing">Outgoing</option>
                     <option value="Both">Both</option>
@@ -68,9 +73,82 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="ModifyServer" asp-route-ServerID="@ViewData["ServerID"]">Back to List</a>
 </div>
+<script>
+    function protoFill() {
+        var selected = $("#portType").val();
+        switch (selected) {
+            case "ICMP":
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+            case "ICMPv6":
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+            case "ALL":
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+                break;
+            default:
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', false);
+        }
+    }
+    function portFill() {
+        var selected = $("#portType").val();
+        switch (selected) {
+            case "HTTP":
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(80);
+                $('#portInput').prop('readonly', true);
+                break;
+            case "HTTPS":
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(443);
+                $('#portInput').prop('readonly', true);
+                break;
+            case "SSH":
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(22);
+                $('#portInput').prop('readonly', true);
+                break;
+            case "FTP":
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(21);
+                $('#portInput').prop('readonly', true);
+                break;
+            case "ICMP":
+                $("#protoType").val('ICMP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+            case "ICMPv6":
+                $("#protoType").val('ICMPv6');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+            case "ALL":
+                $("#protoType").val('ALL');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', true);
+                break;
+            default:
+                document.getElementById("protoType").selectedIndex = -1;
+                $('#protoType option:not(:selected)').prop('disabled', false);
+                $("#portInput").val("");
+                $('#portInput').prop('readonly', false);
 
+        }
+    }
+    document.getElementById("portType").selectedIndex = -1;
+    document.getElementById("protoType").selectedIndex = -1;
+    document.getElementById("direction").selectedIndex = -1;
+</script>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }

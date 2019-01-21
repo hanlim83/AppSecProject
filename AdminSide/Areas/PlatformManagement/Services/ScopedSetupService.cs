@@ -6,10 +6,12 @@ using Amazon.CloudWatchLogs;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using Amazon.RDS;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -29,8 +31,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
         private readonly IAmazonCloudWatchEvents cweClient;
         private readonly IAmazonCloudWatchLogs cwlClient;
         private readonly IAmazonRDS rdsClient;
-        private const string IPv4CIDR = "172.30.0.0/16";
-        private static string IPv6CIDR;
+        private const string IPv4VMCIDR = "172.30.0.0/16";
+        private static string IPv6VMCIDR;
+        private static string primaryVPCID;
         private static Boolean Flag;
 
         public ScopedSetupService(ILogger<ScopedSetupService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient, IAmazonRDS relationaldatabaseserviceClient)
@@ -150,8 +153,11 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 Flag = false;
                 foreach (var VPC in responseDescribeVPC.Vpcs)
                 {
-                    if (VPC.CidrBlock.Contains(IPv4CIDR))
+                    if (VPC.CidrBlock.Contains(IPv4VMCIDR))
+                    {
+                        primaryVPCID = VPC.VpcId;
                         Flag = true;
+                    }
                     if (Flag == true)
                         break;
                 }
@@ -160,7 +166,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     _logger.LogInformation("VPC not found! Creating...");
                     CreateVpcResponse responseCreateVPC = await ec2Client.CreateVpcAsync(new CreateVpcRequest
                     {
-                        CidrBlock = IPv4CIDR,
+                        CidrBlock = IPv4VMCIDR,
                         AmazonProvidedIpv6CidrBlock = true
                     });
                     await ec2Client.CreateTagsAsync(new CreateTagsRequest
@@ -173,6 +179,16 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         {
                             new Tag("Name","ASPJ VM VPC - Autocreated")
                         }
+                    });
+                    await ec2Client.ModifyVpcAttributeAsync(new ModifyVpcAttributeRequest
+                    {
+                        EnableDnsSupport = true,
+                        VpcId = responseCreateVPC.Vpc.VpcId
+                    });
+                    await ec2Client.ModifyVpcAttributeAsync(new ModifyVpcAttributeRequest
+                    {
+                        EnableDnsHostnames = true,
+                        VpcId = responseCreateVPC.Vpc.VpcId
                     });
                     DescribeSecurityGroupsResponse responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
                     {
@@ -198,7 +214,49 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     _logger.LogInformation("VPC created!");
                 }
                 else
-                    _logger.LogInformation("VPC already created!");
+                {
+                    VPC Rvpc = await context.VPCs.FindAsync(1);
+                    if (Rvpc == null)
+                    {
+                        _logger.LogInformation("VPC already created but not inside SQL Database!");
+                        responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                        {
+                            Filters = new List<Filter>
+                            {
+                                new Filter
+                                {
+                                    Name = "vpc-id",
+                                    Values = new List<string>
+                                    {
+                                        primaryVPCID
+                                    }
+                                }
+                            }
+                        });
+                        DescribeSecurityGroupsResponse responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
+                        {
+                            Filters = new List<Filter>
+                        {
+                            new Filter
+                            {
+                                Name ="vpc-id",
+                                Values = new List<string>
+                                {
+                                    primaryVPCID
+                                }
+                            }
+                        }
+                        });
+                        VPC newlyCreatedVPC = new VPC
+                        {
+                            AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
+                            AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId
+                        };
+                        context.VPCs.Add(newlyCreatedVPC);
+                        await context.SaveChangesAsync();
+                    } else
+                        _logger.LogInformation("VPC already created!");
+                }
                 VPC vpc = await context.VPCs.FindAsync(1);
                 responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                 {
@@ -216,7 +274,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 });
                 Vpc AWSvpc = responseDescribeVPC.Vpcs[0];
                 VpcIpv6CidrBlockAssociation set = AWSvpc.Ipv6CidrBlockAssociationSet[0];
-                IPv6CIDR = set.Ipv6CidrBlock;
+                IPv6VMCIDR = set.Ipv6CidrBlock;
                 DescribeSubnetsResponse responseDescribeSubnets = await ec2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                 {
                     Filters = new List<Filter>
@@ -234,12 +292,12 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 if (responseDescribeSubnets.Subnets.Count == 0)
                 {
                     _logger.LogInformation("Default Subnets not found! Creating...");
-                    string[] ipv6CIDRStr = IPv6CIDR.Split(":");
+                    string[] ipv6CIDRStr = IPv6VMCIDR.Split(":");
                     for (int i = 0; i < 3; i++)
                     {
                         CreateSubnetResponse responseCreateSubnet = await ec2Client.CreateSubnetAsync(new CreateSubnetRequest
                         {
-                            CidrBlock = IPv4CIDR.Substring(0, 7) + i + ".0/24",
+                            CidrBlock = IPv4VMCIDR.Substring(0, 7) + i + ".0/24",
                             Ipv6CidrBlock = ipv6CIDRStr[0] + ":" + ipv6CIDRStr[1] + ":" + ipv6CIDRStr[2] + ":" + ipv6CIDRStr[3].Substring(0, 3) + i + "::/64",
                             VpcId = vpc.AWSVPCReference
                         });
@@ -314,8 +372,15 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     await context.SaveChangesAsync();
                     _logger.LogInformation("Subnets created!");
                 }
-                else
-                    _logger.LogInformation("Subnets already created!");
+                else if (responseDescribeSubnets.Subnets.Count >= 3)
+                {
+                    if (!context.Subnets.Any())
+                    {
+                        _logger.LogInformation("Subnets already created but not inside SQL Database!");
+                        Flag = true;
+                    } else
+                        _logger.LogInformation("Subnets already created!");
+                }
                 DescribeRouteTablesResponse responseDescribeRouteTable = await ec2Client.DescribeRouteTablesAsync(new DescribeRouteTablesRequest
                 {
                     Filters = new List<Filter>
@@ -484,6 +549,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     {
                         VpcId = vpc.AWSVPCReference
                     });
+
                     RouteTable RTExtranet = new RouteTable
                     {
                         AWSVPCRouteTableReference = responseCreateRouteTable.RouteTable.RouteTableId,
@@ -597,10 +663,433 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     context.Subnets.Update(subnet);
                     await context.SaveChangesAsync();
                     _logger.LogInformation("Linking Subnets to Route Tables (SQL) Completed!");
-                    _logger.LogInformation("Setup Background Service Completed!");
                 }
                 else
-                    _logger.LogInformation("Route Tables Found!");
+                {
+                    if (!context.RouteTables.Any() && Flag == true)
+                    {
+                        _logger.LogInformation("Route Tables already created but not inside SQL database!");
+                        Flag = false;
+                        foreach (Amazon.EC2.Model.RouteTable RT in responseDescribeRouteTable.RouteTables)
+                        {
+                            Boolean isInternet = false;
+                            Boolean isExtranet = false;
+                            Boolean isIntranet = false;
+                            int IntranetCounter = 0;
+                            RouteTable newRT = new RouteTable
+                            {
+                                VPCID = vpc.ID,
+                                AWSVPCRouteTableReference = RT.RouteTableId
+                            };
+                            context.RouteTables.Add(newRT);
+                            context.SaveChanges();
+                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTable WHERE AWSVPCRouteTableReference = '"+RT.RouteTableId+"'").ToList();
+                            if (queryResult.Count() == 1)
+                                newRT = queryResult[0];
+                            foreach (Amazon.EC2.Model.Route R in RT.Routes)
+                            {
+                                if (!String.IsNullOrEmpty(R.GatewayId) && R.GatewayId.Contains("igw"))
+                                {
+                                    isInternet = true;
+                                    break;
+                                } else if (String.IsNullOrEmpty(R.GatewayId) && (!String.IsNullOrEmpty(R.NatGatewayId) || !String.IsNullOrEmpty(R.EgressOnlyInternetGatewayId)))
+                                {
+                                    isExtranet = true;
+                                    break;
+                                } else if (!String.IsNullOrEmpty(R.GatewayId) && R.GatewayId.Contains("local"))
+                                {
+                                    ++IntranetCounter;
+                                }
+                            }
+                            if (IntranetCounter == 2 && (isInternet == false || isExtranet == false))
+                                isIntranet = true;
+                            if (isInternet == true)
+                            {
+                                foreach(Amazon.EC2.Model.Route r in RT.Routes)
+                                {
+                                    Route newRoute = new Route();
+                                    if (!string.IsNullOrEmpty(r.DestinationCidrBlock) && !string.IsNullOrEmpty(r.GatewayId))
+                                    {
+                                        if (r.GatewayId.Contains("igw"))
+                                        {
+                                            newRoute.Description = "Route To Internet (IPv4)";
+                                            newRoute.RouteType = RouteType.Mandatory;
+                                            newRoute.Destination = "Internet Gateway";
+                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                                newRoute.Status = Status.OK;
+                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                                newRoute.Status = Status.Blackhole;
+                                            newRoute.IPCIDR = r.DestinationCidrBlock;
+                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.RouteTableID = newRT.ID;
+                                        }
+                                    }
+                                    else if (!string.IsNullOrEmpty(r.DestinationIpv6CidrBlock) && !string.IsNullOrEmpty(r.GatewayId))
+                                    {
+                                        if (r.GatewayId.Contains("igw"))
+                                        {
+                                            newRoute.Description = "Route To Internet (IPv6)";
+                                            newRoute.RouteType = RouteType.Mandatory;
+                                            newRoute.Destination = "Internet Gateway";
+                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                                newRoute.Status = Status.OK;
+                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                                newRoute.Status = Status.Blackhole;
+                                            newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
+                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.RouteTableID = newRT.ID;
+                                        }                                      
+                                    }
+                                    if (newRoute.Description != null)
+                                        context.Routes.Add(newRoute);
+                                }
+                                foreach (RouteTableAssociation a in RT.Associations)
+                                {
+                                    if (!string.IsNullOrEmpty(a.SubnetId))
+                                    {
+                                        responseDescribeSubnets = await ec2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+                                        {
+                                            Filters = new List<Filter>
+                                            {
+                                                new Filter("subnet-id",new List<string>
+                                                {
+                                                    a.SubnetId
+                                                })
+                                            }
+                                        });
+                                        DescribeTagsResponse responseDescribeTag = await ec2Client.DescribeTagsAsync(new DescribeTagsRequest(new List<Filter>
+                                            {
+                                                new Filter("key",new List<string>{
+                                                    "Name"
+                                                }),
+                                                new Filter("resource-id",new List<string>{
+                                                    a.SubnetId
+                                                })
+                                            }));
+                                        if (responseDescribeSubnets.HttpStatusCode == HttpStatusCode.OK && responseDescribeTag.HttpStatusCode == HttpStatusCode.OK)
+                                        {                                         
+                                            Subnet newSubnet = new Subnet
+                                            {
+                                                Name = responseDescribeTag.Tags[0].Value,
+                                                Type = SubnetType.Internet,
+                                                IPv4CIDR = responseDescribeSubnets.Subnets[0].CidrBlock,
+                                                IPv6CIDR = responseDescribeSubnets.Subnets[0].Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock,
+                                                AWSVPCSubnetReference = responseDescribeSubnets.Subnets[0].SubnetId,
+                                                AWSVPCRouteTableAssoicationID = a.RouteTableAssociationId,
+                                                RouteTableID = newRT.ID,
+                                                VPCID = vpc.ID
+                                            };
+                                            switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3,3))
+                                            {
+                                                case "/17":
+                                                    newSubnet.SubnetSize = Convert.ToString(32766);
+                                                    break;
+                                                case "/18":
+                                                    newSubnet.SubnetSize = Convert.ToString(16382);
+                                                    break;
+                                                case "/19":
+                                                    newSubnet.SubnetSize = Convert.ToString(8190);
+                                                    break;
+                                                case "/20":
+                                                    newSubnet.SubnetSize = Convert.ToString(4094);
+                                                    break;
+                                                case "/21":
+                                                    newSubnet.SubnetSize = Convert.ToString(2046);
+                                                    break;
+                                                case "/22":
+                                                    newSubnet.SubnetSize = Convert.ToString(1022);
+                                                    break;
+                                                case "/23":
+                                                    newSubnet.SubnetSize = Convert.ToString(510);
+                                                    break;
+                                                case "/24":
+                                                    newSubnet.SubnetSize = Convert.ToString(254);
+                                                    break;
+                                                case "/25":
+                                                    newSubnet.SubnetSize = Convert.ToString(126);
+                                                    break;
+                                                case "/26":
+                                                    newSubnet.SubnetSize = Convert.ToString(62);
+                                                    break;
+                                                case "/27":
+                                                    newSubnet.SubnetSize = Convert.ToString(30);
+                                                    break;
+                                                case "/28":
+                                                    newSubnet.SubnetSize = Convert.ToString(14);
+                                                    break;
+                                                case "/29":
+                                                    newSubnet.SubnetSize = Convert.ToString(6);
+                                                    break;
+                                                case "/30":
+                                                    newSubnet.SubnetSize = Convert.ToString(2);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                            context.Subnets.Add(newSubnet);
+                                        }
+                                    }
+                                }
+                            } else if (isExtranet == true)
+                            {
+                                foreach (Amazon.EC2.Model.Route r in RT.Routes)
+                                {
+                                    Route newRoute = new Route();
+                                    if (!string.IsNullOrEmpty(r.DestinationCidrBlock) && !string.IsNullOrEmpty(r.NatGatewayId))
+                                    { if (r.NatGatewayId.Contains("nat"))
+                                        {
+                                            newRoute.Description = "Route To Internet (IPv4)";
+                                            newRoute.RouteType = RouteType.Mandatory;
+                                            newRoute.Destination = "NAT Gateway";
+                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                                newRoute.Status = Status.OK;
+                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                                newRoute.Status = Status.Blackhole;
+                                            newRoute.IPCIDR = r.DestinationCidrBlock;
+                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.RouteTableID = newRT.ID;
+                                        }
+                                    }
+                                    else if (!string.IsNullOrEmpty(r.DestinationIpv6CidrBlock) && !string.IsNullOrEmpty(r.EgressOnlyInternetGatewayId))
+                                    {
+                                        if (r.EgressOnlyInternetGatewayId.Contains("eigw"))
+                                        {
+                                            newRoute.Description = "Route To Internet (IPv6)";
+                                            newRoute.RouteType = RouteType.Mandatory;
+                                            newRoute.Destination = "Internet-Only Gateway";
+                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                                newRoute.Status = Status.OK;
+                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                                newRoute.Status = Status.Blackhole;
+                                            newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
+                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.RouteTableID = newRT.ID;
+                                        }                                        
+                                    }
+                                    if (newRoute.Description != null)
+                                        context.Routes.Add(newRoute);
+                                }
+                                foreach (RouteTableAssociation a in RT.Associations)
+                                {
+                                    if (!string.IsNullOrEmpty(a.SubnetId))
+                                    {
+                                        responseDescribeSubnets = await ec2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+                                        {
+                                            Filters = new List<Filter>
+                                            {
+                                                new Filter("subnet-id",new List<string>
+                                                {
+                                                    a.SubnetId
+                                                })
+                                            }
+                                        });
+                                        DescribeTagsResponse responseDescribeTag = await ec2Client.DescribeTagsAsync(new DescribeTagsRequest(new List<Filter>
+                                            {
+                                                new Filter("key",new List<string>{
+                                                    "Name"
+                                                }),
+                                                new Filter("resource-id",new List<string>{
+                                                    a.SubnetId
+                                                })
+                                            }));
+                                        if (responseDescribeSubnets.HttpStatusCode == HttpStatusCode.OK && responseDescribeTag.HttpStatusCode == HttpStatusCode.OK)
+                                        {
+                                            Subnet newSubnet = new Subnet
+                                            {
+                                                Name = responseDescribeTag.Tags[0].Value,
+                                                Type = SubnetType.Extranet,
+                                                IPv4CIDR = responseDescribeSubnets.Subnets[0].CidrBlock,
+                                                IPv6CIDR = responseDescribeSubnets.Subnets[0].Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock,
+                                                AWSVPCSubnetReference = responseDescribeSubnets.Subnets[0].SubnetId,
+                                                AWSVPCRouteTableAssoicationID = a.RouteTableAssociationId,
+                                                RouteTableID = newRT.ID,
+                                                VPCID = vpc.ID
+                                            };
+                                            switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3, 3))
+                                            {
+                                                case "/17":
+                                                    newSubnet.SubnetSize = Convert.ToString(32766);
+                                                    break;
+                                                case "/18":
+                                                    newSubnet.SubnetSize = Convert.ToString(16382);
+                                                    break;
+                                                case "/19":
+                                                    newSubnet.SubnetSize = Convert.ToString(8190);
+                                                    break;
+                                                case "/20":
+                                                    newSubnet.SubnetSize = Convert.ToString(4094);
+                                                    break;
+                                                case "/21":
+                                                    newSubnet.SubnetSize = Convert.ToString(2046);
+                                                    break;
+                                                case "/22":
+                                                    newSubnet.SubnetSize = Convert.ToString(1022);
+                                                    break;
+                                                case "/23":
+                                                    newSubnet.SubnetSize = Convert.ToString(510);
+                                                    break;
+                                                case "/24":
+                                                    newSubnet.SubnetSize = Convert.ToString(254);
+                                                    break;
+                                                case "/25":
+                                                    newSubnet.SubnetSize = Convert.ToString(126);
+                                                    break;
+                                                case "/26":
+                                                    newSubnet.SubnetSize = Convert.ToString(62);
+                                                    break;
+                                                case "/27":
+                                                    newSubnet.SubnetSize = Convert.ToString(30);
+                                                    break;
+                                                case "/28":
+                                                    newSubnet.SubnetSize = Convert.ToString(14);
+                                                    break;
+                                                case "/29":
+                                                    newSubnet.SubnetSize = Convert.ToString(6);
+                                                    break;
+                                                case "/30":
+                                                    newSubnet.SubnetSize = Convert.ToString(2);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                            context.Subnets.Add(newSubnet);
+                                        }
+                                    }
+                                }
+                            } else if (isIntranet == true)
+                            {
+                                foreach (Amazon.EC2.Model.Route r in RT.Routes)
+                                {
+                                    Route newRoute = new Route();
+                                    if (!string.IsNullOrEmpty(r.DestinationCidrBlock) && !string.IsNullOrEmpty(r.GatewayId))
+                                    {
+                                        if (r.GatewayId.Equals("local"))
+                                        {
+                                            newRoute.Description = "Route To Challenge Network (IPv4)";
+                                            newRoute.RouteType = RouteType.Mandatory;
+                                            newRoute.Destination = "Challenge Network";
+                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                                newRoute.Status = Status.OK;
+                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                                newRoute.Status = Status.Blackhole;
+                                            newRoute.IPCIDR = r.DestinationCidrBlock;
+                                            newRoute.applicability = Applicability.All;
+                                            newRoute.RouteTableID = newRT.ID;
+                                        }
+                                    }
+                                    else if (!string.IsNullOrEmpty(r.DestinationIpv6CidrBlock) && !string.IsNullOrEmpty(r.GatewayId))
+                                    {
+                                        if (r.GatewayId.Equals("local"))
+                                        {
+                                            newRoute.Description = "Route To Challenge Network (IPv6)";
+                                            newRoute.RouteType = RouteType.Mandatory;
+                                            newRoute.Destination = "Challenge Network";
+                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                                newRoute.Status = Status.OK;
+                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                                newRoute.Status = Status.Blackhole;
+                                            newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
+                                            newRoute.applicability = Applicability.All;
+                                            newRoute.RouteTableID = newRT.ID;
+                                        }
+                                    }
+                                    if (newRoute.Description != null)
+                                        context.Routes.Add(newRoute);
+                                }
+                                foreach (RouteTableAssociation a in RT.Associations)
+                                {
+                                    if (!string.IsNullOrEmpty(a.SubnetId))
+                                    {
+                                        responseDescribeSubnets = await ec2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
+                                        {
+                                            Filters = new List<Filter>
+                                            {
+                                                new Filter("subnet-id",new List<string>
+                                                {
+                                                    a.SubnetId
+                                                })
+                                            }
+                                        });
+                                        DescribeTagsResponse responseDescribeTag = await ec2Client.DescribeTagsAsync(new DescribeTagsRequest(new List<Filter>
+                                            {
+                                                new Filter("key",new List<string>{
+                                                    "Name"
+                                                }),
+                                                new Filter("resource-id",new List<string>{
+                                                    a.SubnetId
+                                                })
+                                            }));
+                                        if (responseDescribeSubnets.HttpStatusCode == HttpStatusCode.OK && responseDescribeTag.HttpStatusCode == HttpStatusCode.OK)
+                                        {
+                                            Subnet newSubnet = new Subnet
+                                            {
+                                                Name = responseDescribeTag.Tags[0].Value,
+                                                Type = SubnetType.Intranet,
+                                                IPv4CIDR = responseDescribeSubnets.Subnets[0].CidrBlock,
+                                                IPv6CIDR = responseDescribeSubnets.Subnets[0].Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock,
+                                                AWSVPCSubnetReference = responseDescribeSubnets.Subnets[0].SubnetId,
+                                                AWSVPCRouteTableAssoicationID = a.RouteTableAssociationId,
+                                                RouteTableID = newRT.ID,
+                                                VPCID = vpc.ID
+                                            };
+                                            switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3, 3))
+                                            {
+                                                case "/17":
+                                                    newSubnet.SubnetSize = Convert.ToString(32766);
+                                                    break;
+                                                case "/18":
+                                                    newSubnet.SubnetSize = Convert.ToString(16382);
+                                                    break;
+                                                case "/19":
+                                                    newSubnet.SubnetSize = Convert.ToString(8190);
+                                                    break;
+                                                case "/20":
+                                                    newSubnet.SubnetSize = Convert.ToString(4094);
+                                                    break;
+                                                case "/21":
+                                                    newSubnet.SubnetSize = Convert.ToString(2046);
+                                                    break;
+                                                case "/22":
+                                                    newSubnet.SubnetSize = Convert.ToString(1022);
+                                                    break;
+                                                case "/23":
+                                                    newSubnet.SubnetSize = Convert.ToString(510);
+                                                    break;
+                                                case "/24":
+                                                    newSubnet.SubnetSize = Convert.ToString(254);
+                                                    break;
+                                                case "/25":
+                                                    newSubnet.SubnetSize = Convert.ToString(126);
+                                                    break;
+                                                case "/26":
+                                                    newSubnet.SubnetSize = Convert.ToString(62);
+                                                    break;
+                                                case "/27":
+                                                    newSubnet.SubnetSize = Convert.ToString(30);
+                                                    break;
+                                                case "/28":
+                                                    newSubnet.SubnetSize = Convert.ToString(14);
+                                                    break;
+                                                case "/29":
+                                                    newSubnet.SubnetSize = Convert.ToString(6);
+                                                    break;
+                                                case "/30":
+                                                    newSubnet.SubnetSize = Convert.ToString(2);
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                            context.Subnets.Add(newSubnet);
+                                        }
+                                    }
+                                }
+                            }
+                            context.SaveChanges();
+                        }
+                    } else
+                        _logger.LogInformation("Route Tables already created!");
+                }
+                _logger.LogInformation("Setup Background Service Completed!");
             }
             catch (SqlException)
             {
