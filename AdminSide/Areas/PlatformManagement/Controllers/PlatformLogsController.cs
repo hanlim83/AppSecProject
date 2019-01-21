@@ -57,6 +57,23 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         e.Message = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(e.Message),Formatting.Indented);
                     }
                     return View(response);
+                } else if (Component.Equals("PlatformVPCELBA"))
+                {
+                    GetLogEventsResponse response = await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest
+                    {
+                        LogGroupName = "PlatformVPCLogs",
+                        LogStreamName = "eni-06a6a263548d0f56f-all"
+                    });
+                    return View(response);
+                }
+                else if (Component.Equals("PlatformVPCELBB"))
+                {
+                    GetLogEventsResponse response = await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest
+                    {
+                        LogGroupName = "PlatformVPCLogs",
+                        LogStreamName = "eni-06f01cd8e3ac74e45-all"
+                    });
+                    return View(response);
                 }
                 else
                     return View();
