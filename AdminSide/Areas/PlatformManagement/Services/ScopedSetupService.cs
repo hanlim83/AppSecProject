@@ -51,7 +51,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
         {
             _logger.LogInformation("Setup Background Service is running.");
             _logger.LogInformation("Setup Background Service is getting IP Address for RDS.");
-            string externalip = new WebClient().DownloadString("https://checkip.amazonaws.com");
+            string tempt = new WebClient().DownloadString("https://checkip.amazonaws.com");
+            string externalip = tempt.Substring(0, tempt.Length - 2);
             try
             {
                 DescribeSecurityGroupsResponse responseDescribeSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
@@ -189,6 +190,19 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     {
                         EnableDnsHostnames = true,
                         VpcId = responseCreateVPC.Vpc.VpcId
+                    });
+                    await ec2Client.CreateFlowLogsAsync(new CreateFlowLogsRequest
+                    {
+                        DeliverLogsPermissionArn = "arn:aws:iam::188363912800:role/VPC-Flow-Logs",
+                        LogDestination = "arn:aws:logs:ap-southeast-1:188363912800:log-group:VMVPCLogs:*",
+                        LogDestinationType = "cloud-watch-logs",
+                        LogGroupName = "VMVPCLogs",
+                        ResourceIds = new List<string>
+                        {
+                            responseCreateVPC.Vpc.VpcId
+                        },
+                        ResourceType = FlowLogsResourceType.VPC,
+                        TrafficType = TrafficType.ALL
                     });
                     DescribeSecurityGroupsResponse responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
                     {
