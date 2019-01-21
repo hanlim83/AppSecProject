@@ -92,8 +92,8 @@ namespace UserSide.Data
 
             var Chat = new UserChat[]
             {
-                new UserChat{UserID="100",UserName="yolo",},
-                new UserChat{UserID="101",UserName="Tamny"}
+                new UserChat{UserId=1,UserName="Stephen Curry",},
+                new UserChat{UserId=2,UserName="Lebron James"}
             };
 
             foreach (UserChat c in Chat)
@@ -104,8 +104,8 @@ namespace UserSide.Data
 
             var Group = new GroupChat[]
             {
-                new GroupChat{GroupID=888,GroupName="PowerMan"},
-                new GroupChat{GroupID=999,GroupName="good try"}
+                new GroupChat{GroupId=1,GroupName="Golden State Warriors"},
+                new GroupChat{GroupId=2,GroupName="Los Angeles Laker"}
             };
 
             foreach (GroupChat c in Group)
@@ -114,6 +114,11 @@ namespace UserSide.Data
             }
             context.SaveChanges();
 
+            var Talk = new Chat[]
+            {
+                new Chat{ChatID=1,SendRec="Stephen_James",Messsage="Hello Man you are not going NBA Finals this times",Count=1 },
+                new Chat{ChatID=2,SendRec="James_Stephen",Messsage="I AM THE GOAT",Count=2}
+            };
         }
     }
 }

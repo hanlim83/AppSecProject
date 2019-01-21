@@ -6,14 +6,15 @@ using System.Threading.Tasks;
 
 namespace UserSide.Models
 {
-    public class Chats
+    public class Chat
     {
         [Key]
-        public string ChatID { get; set; }
+        public int ChatID { get; set; }
 
-        public string UserID { get; set; }
-        public int SenderID { get; set; }
-        public int ReceiverID { get; set; }
+        public string SendRec { get; set; }
+       
         public string Messsage { get; set; }
+
+        public int Count { get; set; }
     }
 }

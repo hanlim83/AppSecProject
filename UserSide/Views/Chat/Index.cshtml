@@ -1,5 +1,4 @@
-﻿@model IEnumerable<UserSide.Models.GroupChat>
-
+﻿
 @{
     ViewData["Title"] = "LIVE CHAT";
 }
@@ -28,10 +27,10 @@
             <thead>
                 <tr>
                     <th>
-                        @Html.DisplayNameFor(model => model.GroupName)
+                       
                     </th>
                     <th>
-                        @Html.DisplayNameFor(model => model.GroupID)
+
                     </th>
                     <th>
 
@@ -43,10 +42,10 @@
                 {
                     <tr>
                         <td>
-                            @Html.DisplayFor(modelItem => item.GroupID)
+                         
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.GroupName)
+                         
                         </td>
                         <td>
                             <a asp-action="Edit" asp-route-id="@item.UserID">Edit</a> |
@@ -119,7 +118,7 @@
                     </div>
                     <div class="col-auto">
                         <button type="submit" class="btn btn-dark"><i class="material-icons">search</i></button>
-                        <button type="submit" class="btn btn-dark" asp-action="Create"><i class="material-icons">group_add</i></button>
+                        <button type="submit" class="btn btn-dark" asp-action="CreateGroup"><i class="material-icons">group_add</i></button>
                         <button type="submit" class="btn btn-dark"><i class="material-icons">chat</i></button>
                     </div>
                 </div>
