@@ -107,14 +107,14 @@ namespace AdminSide.Areas.Identity.Pages.Account
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                        return RedirectToAction("Login", "Identity/Account");
+                        return RedirectToAction("Login", "Account");
                     }
                 }
             }
 
             // If we got this far, something failed, redisplay form
             //return Page();
-            return RedirectToAction("Login", "Identity/Account");
+            return RedirectToAction("Login", "Account");
         }
 
         public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret, ILogger logger)

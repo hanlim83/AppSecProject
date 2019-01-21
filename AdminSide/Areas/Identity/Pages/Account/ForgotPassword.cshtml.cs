@@ -77,10 +77,10 @@ namespace AdminSide.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    return RedirectToAction("ForgotPassword", "Identity/Account");
+                    return RedirectToAction("ForgotPassword", "Account");
                 }
             }
-            return RedirectToAction("ForgotPassword", "Identity/Account");
+            return RedirectToAction("ForgotPassword", "Account");
         }
 
         public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret)
