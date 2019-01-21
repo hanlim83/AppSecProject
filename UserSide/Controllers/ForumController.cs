@@ -94,7 +94,7 @@ namespace UserSide.Controllers
             return View(category);
             //return View(await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
         }
-        //[Authorize]
+        [Authorize]
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
         {
@@ -118,12 +118,78 @@ namespace UserSide.Controllers
             return View(post);
         }
 
+        [Authorize]
         // GET: Topic/Create
         public IActionResult NewTopicF()
         {
             PopulateCategoryDropDownList();
             return View();
         }
+
+        [Authorize]
+        // GET: Forum/Edit
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var post = await context1.Posts
+                //.Include(p => p.UserName)
+                //    .ThenInclude(e => e.Course)
+                //.AsNoTracking()
+                .SingleOrDefaultAsync(m => m.PostID == id);
+
+            if (post == null)
+            {
+                return NotFound();
+            }
+
+            // OWASP:Authorize
+            //Take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            ////For username (can use it inside method also)
+            var username = user;
+
+            if (!user.UserName.Equals(post.UserName))
+            {
+                return RedirectToAction("Index");
+            }
+
+            PopulateCategoryDropDownList();
+            return View(post);
+        }
+
+        //// GET: Forum/Delete
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var post = await context1.Posts
+        //        .AsNoTracking()
+        //        .SingleOrDefaultAsync(m => m.PostID == id);
+        //    if (post == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return View(post);
+        //}
+
+        //// POST: Forum/Delete
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var post = await context1.Posts.FindAsync(id);
+        //    context1.Posts.Remove(post);
+        //    await context1.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         // POST: Topic/Create
         [HttpPost]
@@ -147,40 +213,6 @@ namespace UserSide.Controllers
                 await context1.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            return View(post);
-        }
-
-        [Authorize]
-        // GET: Forum/Edit
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-            
-            var post = await context1.Posts
-                //.Include(p => p.UserName)
-                //    .ThenInclude(e => e.Course)
-                //.AsNoTracking()
-                .SingleOrDefaultAsync(m => m.PostID == id);
-
-            if (post == null)
-            {
-                return NotFound();
-            }
-            // OWASP:Authorize
-            //Take in user object
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            ////For username (can use it inside method also)
-            var username = user;
-
-            if (!user.UserName.Equals(post.UserName))
-            {
-                return RedirectToAction("Index");
-            }
-
-            PopulateCategoryDropDownList();
             return View(post);
         }
 
@@ -219,35 +251,7 @@ namespace UserSide.Controllers
             return View(post);
         }
 
-        //// GET: Forum/Delete
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var post = await context1.Posts
-        //        .AsNoTracking()
-        //        .SingleOrDefaultAsync(m => m.PostID == id);
-        //    if (post == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(post);
-        //}
-
-        //// POST: Forum/Delete
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var post = await context1.Posts.FindAsync(id);
-        //    context1.Posts.Remove(post);
-        //    await context1.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
+        
 
         private bool PostExists(int id)
         {
