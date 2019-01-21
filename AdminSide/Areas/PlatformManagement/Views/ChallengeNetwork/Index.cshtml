@@ -40,7 +40,11 @@
                     </div>
                 }
                 @await Html.PartialAsync("SubnetList", Model.retrievedSubnets)
-                <hr>
+                @if (Model.retrievedSubnets.Count() != 0)
+                {
+                    <br />
+                    <hr>
+                }
                 @await Html.PartialAsync("RouteList", Model.retrievedRoutes)
             </div>
         </div>
