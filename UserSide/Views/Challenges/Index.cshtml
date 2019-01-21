@@ -30,29 +30,64 @@
         <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Scoreboard" class="btn btn btn-outline-info w-100"></a>
     </div>
 
-
     <hr>
+    @{ var SolveChallengeList = new List<int>(); }
+    @*check here to populate green or black(means haven't solve)
+        return team id from controller*@
+    @foreach (var team in Model.Teams)
+    {
+        if (team.TeamID == (int)ViewData["TeamID"])
+        {
+            foreach (var teamchallenge in team.TeamChallenges)
+            {
+                if (teamchallenge.TeamId == team.TeamID)
+                {
+                    SolveChallengeList.Add(teamchallenge.ChallengeId);
+                }
+            }
+        }
+    }
     @foreach (var item in Model.CompetitionCategories)
     {
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
         <hr>
-        <!--Loop through this part dynamically-->
         <div class="col-md-12">
             @{ counter = 0;}
             @foreach (var item1 in Model.Challenges)
             {
                 if (item1.CompetitionCategoryID == item.ID)
                 {
-                    <div class="col-md-3 d-inline-block">
-                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
-                            @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
-                            <button type="button" class="btn btn-light w-100" id="challengeButton" data="@item1">
-                                @Html.DisplayFor(modelItem => item1.Name)
-                                <br>
-                                @Html.DisplayFor(modelItem => item1.Value)
-                            </button>
-                        </a>
-                    </div>
+                    bool solved = false;
+                    @foreach (var challengeID in SolveChallengeList)
+                    {
+                        if (item1.ID == challengeID)
+                        {
+                            <div class="col-md-3 d-inline-block">
+                                <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
+                                    @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
+                                    <button type="button" class="btn btn-success w-100" id="challengeButton" data="@item1">
+                                        @Html.DisplayFor(modelItem => item1.Name)
+                                        <br>
+                                        @Html.DisplayFor(modelItem => item1.Value)
+                                    </button>
+                                </a>
+                            </div>
+                            solved = true;
+                        }
+                    }
+                    if (solved == false)
+                    {
+                        <div class="col-md-3 d-inline-block">
+                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
+                                @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
+                                <button type="button" class="btn btn-dark w-100" id="challengeButton" data="@item1">
+                                    @Html.DisplayFor(modelItem => item1.Name)
+                                    <br>
+                                    @Html.DisplayFor(modelItem => item1.Value)
+                                </button>
+                            </a>
+                        </div>
+                    }
                     counter++;
                 }
             }
