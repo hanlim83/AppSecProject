@@ -75,8 +75,12 @@ namespace AdminSide.Areas.Identity.Pages.Account
 
                     return RedirectToPage("./ForgotPasswordConfirmation");
                 }
+                else
+                {
+                    return RedirectToAction("ForgotPassword", "Identity/Account");
+                }
             }
-            return Page();
+            return RedirectToAction("ForgotPassword", "Identity/Account");
         }
 
         public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret)
