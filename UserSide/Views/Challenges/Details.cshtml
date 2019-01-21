@@ -8,7 +8,6 @@
 <div class="container">
     <div>
         <h4>Challenge</h4>
-        <!--Probably rename header to challenge name-->
         <hr />
         <dl class="dl-horizontal">
             <dt>
@@ -56,7 +55,6 @@
         </form>
     </div>
     <div>
-        @*<a asp-action="Index" asp-route-id="@Model.CompetitionID">Back to List</a>*@
         <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back" class="btn btn btn-default"></a>
     </div>
 </div>
