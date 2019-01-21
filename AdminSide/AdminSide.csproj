@@ -120,19 +120,7 @@
     <Content Update="Views\Forum\NewCategory.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
-    <Content Update="Views\Home\About.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Views\Home\Contact.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
     <Content Update="Views\Home\Index.cshtml">
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Views\Home\Privacy.cshtml">
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
