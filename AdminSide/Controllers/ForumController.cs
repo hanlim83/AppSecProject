@@ -10,6 +10,7 @@ using AdminSide.Data;
 using AdminSide.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Controllers
 {
@@ -25,6 +26,7 @@ namespace AdminSide.Controllers
             _userManager = userManager;
         }
 
+        [Authorize]
         // GET: Forum Post
         public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? page)
         {
@@ -95,7 +97,7 @@ namespace AdminSide.Controllers
             //return View(await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
         }
 
-
+        [Authorize]
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
         {
@@ -118,6 +120,7 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
+        [Authorize]
         // GET: Topic/Create
         public IActionResult NewTopicF()
         {
@@ -125,6 +128,7 @@ namespace AdminSide.Controllers
             return View();
         }
 
+        [Authorize]
         // GET: Forum/Edit
         public async Task<IActionResult> Edit(int? id)
         {
@@ -138,10 +142,23 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
+
+            // OWASP:Authorize
+            //Take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            ////For username (can use it inside method also)
+            var username = user;
+
+            if (!user.UserName.Equals(post.UserName))
+            {
+                return RedirectToAction("Index");
+            }
+
             PopulateCategoryDropDownList();
             return View(post);
         }
 
+        [Authorize]
         // GET: Forum/Delete
         public async Task<IActionResult> Delete(int? id)
         {
@@ -161,6 +178,7 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
+        [Authorize]
         // GET: Category/New
         public IActionResult NewCategory()
         {
