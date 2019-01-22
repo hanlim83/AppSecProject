@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Models
 {
-    public class ChallengeNetworkViewParentModel
+    public class ChallengeNetworkParentViewModel
     {
         public List<Subnet>RetrievedSubnets { get; set; }
         public List<Route>RetrievedRoutes { get; set; }

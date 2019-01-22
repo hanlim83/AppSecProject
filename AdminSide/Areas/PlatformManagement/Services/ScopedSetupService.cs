@@ -1124,7 +1124,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             CreationTime = lg.CreationTime
                         };
                         if (lg.LogGroupName.Contains("/"))
-                            newG.Name = lg.LogGroupName.Replace("/", "");
+                            newG.Name = lg.LogGroupName.Replace("/", "@");
                         else
                             newG.Name = lg.LogGroupName;
                         if (lg.RetentionInDays != null)
@@ -1158,10 +1158,18 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 if (newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
                                     newS.DisplayName = "SQL Database CPU Usage";
                             }
-                            else if (newG.Name.Equals("awselasticbeanstalkUser-SideIIS-Log"))
+                            else if (newG.Name.Equals("@aws@elasticbeanstalk@User-Side@IIS-Log"))
                                 newS.DisplayName = "IIS Logs for User Side Web Server";
-                            else if (newG.Name.Equals("awselasticbeanstalkAdmin-SideIIS-Log"))
+                            else if (newG.Name.Equals("@aws@elasticbeanstalk@Admin-Side@IIS-Log"))
                                 newS.DisplayName = "IIS Logs for Admin Side Web Server";
+                            else if (newG.Name.Equals("@aws@elasticbeanstalk@User-Side@EBDeploy-Log"))
+                                newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for User Side";
+                            else if (newG.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBDeploy-Log"))
+                                newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for Admin Side";
+                            else if (newG.Name.Equals("@aws@elasticbeanstalk@User-Side@EBHooks-Log"))
+                                newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for User Side";
+                            else if (newG.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBHooks-Log"))
+                                newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for Admin Side";
                             else
                                 newS.DisplayName = newS.Name;
                             if (!newS.Name.Equals("db-MRSZXHTQCY5QYXKQI3COPKQUUI"))

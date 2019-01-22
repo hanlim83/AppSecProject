@@ -1,4 +1,4 @@
-﻿@model Amazon.CloudWatchLogs.Model.GetLogEventsResponse
+﻿@model AdminSide.Areas.PlatformManagement.Models.PlatformLogsParentViewModel
 @{
     ViewData["Title"] = "Platform Logs";
 }
@@ -12,11 +12,11 @@
             <div class="col-lg-12">
                 <form asp-action="" method="post" class="form-inline">
                     <label class="my-1 mr-2" for="logGroup">Select which component of the platform to view logs for:</label>
-                    <select class="custom-select my-1 mr-sm-2" id="Component" name="component">
-                        <option value="RDS">SQL Database CPU Usage</option>
-                        <option value="PlatformVPCELBA">Platform Load Balancer A Network Flow Log</option>
-                        <option value="PlatformVPCELBB">Platform Load Balancer B Network Flow Log</option>
-                        <option value="VMVPC">Challenge Network Flow Log</option>
+                    <select id="selection" class="custom-select my-1 mr-sm-2" id="Component" name="StreamID" required>
+                        @foreach(var stream in Model.Streams)
+                        {
+                            <option value="@stream.ID">@stream.DisplayName</option>
+                        }
                     </select>
                     <button type="submit" class="btn btn-primary my-1">Retrieve Events</button>
                 </form>
@@ -26,7 +26,7 @@
         <br />
         <div class="row">
             <div class="col-lg-12">
-                @if (Model != null)
+                @if (Model.Response != null)
                 {
                     <table id="CWresults" class="table">
                         <thead>
@@ -40,7 +40,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var loggedEvent in Model.Events)
+                            @foreach (var loggedEvent in Model.Response.Events)
                             {
                                 <tr>
                                     <td>
@@ -61,3 +61,17 @@
         </div>
     </div>
 </div>
+<script>
+    var previous = @Model.SelectedValue;
+    if (previous == null || previous == 0)
+        document.getElementById("selection").selectedIndex = -1;
+    else {
+        for (i = 0; i < document.getElementById("selection").options.length; i++) {
+            var value = document.getElementById("selection").options[i].value
+            if (value == previous) {
+                document.getElementById("selection").selectedIndex = i;
+                break;
+            }
+        }
+    }
+</script>
