@@ -84,13 +84,6 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            //PostViewModel postViewModel = new PostViewModel();
-            //postViewModel.ForumCategory = category;
-
-            //foreach(var Category in category.Post)
-            //{
-
-            //}
             //int pageSize = 3;
 
             return View(category);
@@ -101,6 +94,7 @@ namespace AdminSide.Controllers
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
         {
+
             if (id == null)
             {
                 return NotFound();
@@ -111,13 +105,19 @@ namespace AdminSide.Controllers
                 //    .ThenInclude(e => e.Course)
                 //.AsNoTracking()
                 .SingleOrDefaultAsync(m => m.PostID == id);
+            List<Comment> comments = context1.Comments.FromSql("SELECT * FROM dbo.Comment WHERE PostID = " + post.PostID).ToList();
+            PostViewModel model = new PostViewModel
+            {
+                post = post,
+                Comments = comments
+            };
 
             if (post == null)
             {
                 return NotFound();
             }
 
-            return View(post);
+            return View(model);
         }
 
         [Authorize]
@@ -151,7 +151,13 @@ namespace AdminSide.Controllers
 
             if (!user.UserName.Equals(post.UserName))
             {
-                return RedirectToAction("Index");
+                ViewData["ShowWrongDirectory"] = "false";
+                return RedirectToAction("Index", "Forum", new { check = false });
+            }
+            else if (user.UserName.Equals(post.UserName))
+            {
+                ViewData["ShowWrongDirectory"] = "true";
+                return RedirectToAction("Edit", "Forum", new { check = true });
             }
 
             PopulateCategoryDropDownList();
@@ -241,6 +247,32 @@ namespace AdminSide.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(post);
+        }
+
+        // POST: Forum/PostReply
+        [HttpPost]
+        public async Task<IActionResult> PostReply(Comment comment, String PostID)
+        {
+            //Take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //For username (can use it inside method also)
+            var username = user;
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            Comment c = new Comment();
+            c.UserName = user.UserName;
+            c.Content = comment.Content;
+            c.DT = DateTime.Now;
+            c.CommentID = comment.CommentID;
+            c.PostID = int.Parse(PostID);
+
+            context1.Add(c);
+            await context1.SaveChangesAsync();
+            return RedirectToAction("Details", new { id = PostID });
         }
 
         // POST: Forum/Delete
