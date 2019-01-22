@@ -26,37 +26,38 @@ namespace AdminSide.Controllers
         //For the feed when it just loaded
         public async Task <IActionResult> Index(bool? check)
         {
-            List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
-            List<RSSFeed> AllFeeds = new List<RSSFeed>();
-            foreach (FeedSource var in AllSources)
+            if (check == null)
             {
-                var feed = await FeedReader.ReadAsync(var.sourceURL);
-                foreach (FeedItem item in feed.Items)
+                ViewData["ShowWrongDirectory"] = false;
+                List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
+                List<RSSFeed> AllFeeds = new List<RSSFeed>();
+                foreach (FeedSource var in AllSources)
                 {
-                    RSSFeed Feed2 = new RSSFeed
+                    var feed = await FeedReader.ReadAsync(var.sourceURL);
+                    foreach (FeedItem item in feed.Items)
                     {
-                        Title = item.Title,
-                        Link = item.Link,
-                        Description = item.Description,
-                        sourceCat = var.sourceName
-                    };
-                    AllFeeds.Add(Feed2);
-                }
+                        RSSFeed Feed2 = new RSSFeed
+                        {
+                            Title = item.Title,
+                            Link = item.Link,
+                            Description = item.Description,
+                            sourceCat = var.sourceName
+                        };
+                        AllFeeds.Add(Feed2);
+                    }
 
+                }
+                return View(AllFeeds);
             }
-            //    check = true;
-            //if (check == null)
-            //{
-            //    ViewData["ShowWrongDirectory"] = false;
-            //}
-            //else
-            //{
-            //    ViewData["ShowWrongDirectory"] = true;
-            //    //return RedirectToAction("Index", "NewsFeed", new { check = true });
-            //}
+            else
+            {
+                ViewData["ShowWrongDirectory"] = true;
+                //return RedirectToAction("Index", "NewsFeed", new { check = true });
+                return View();
+            }
 
             //return View();
-            return View(AllFeeds);
+            
             //return RedirectToAction("Index", "NewsFeed");
 
         }
@@ -115,10 +116,11 @@ namespace AdminSide.Controllers
                 }
             }
 
-            //if (searchFeeds.Count == 0)
-            //{
-            //    return RedirectToAction("Index", "NewsFeed", new { check = true });
-            //}
+            if (searchFeeds.Count == 0)
+            {
+                return RedirectToAction("Index", "NewsFeed", new { check = true });
+            }
+            ViewData["ShowWrongDirectory"] = false;
             return View(searchFeeds);
         }
 
