@@ -92,7 +92,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
             var R53Feed = await FeedReader.ReadAsync("https://status.aws.amazon.com/rss/route53.rss");
             var R53Feed1 = R53Feed.Items.ElementAt(0);
-            if (R53Feed1.Title.StartsWith("Service is operating normally"))
+            if (R53Feed1.Title.StartsWith("Service is operating normally") || R53Feed1.Title.Contains("[RESOLVED]"))
                 ViewData["R53Status"] = "OK";
             else if (R53Feed1.Title.StartsWith("Informational message") || R53Feed1.Title.StartsWith("Performance issues"))
                 ViewData["R53Status"] = "WARNING";
