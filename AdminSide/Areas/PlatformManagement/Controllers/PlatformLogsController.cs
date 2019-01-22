@@ -69,6 +69,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         LogGroupName = selectedStream.LinkedGroup.Name.Replace("@", "/"),
                         LogStreamName = selectedStream.Name
                     });
+                    foreach(OutputLogEvent e in response.Events)
+                    {
+                        e.Timestamp = e.Timestamp.ToLocalTime();
+                    }
                     PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
                     {
                         Response = response,
