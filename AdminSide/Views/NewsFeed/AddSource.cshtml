@@ -8,6 +8,7 @@
 
 <h4>FeedSource</h4>
 <hr />
+<div class =" container">
 <div class="row">
     <div class="col-md-4">
         <form asp-action="AddSource">
@@ -30,9 +31,11 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="ListSource">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+
+</div>
