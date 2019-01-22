@@ -2,6 +2,7 @@
 using AdminSide.Areas.PlatformManagement.Models;
 using AdminSide.Data;
 using AdminSide.Models;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Linq;
 using System.Security.Cryptography;
@@ -321,9 +322,36 @@ namespace AdminSide.Data
             context.SaveChanges();
 
         }
+
         public static void InitializeNewsFeed(NewsFeedContext context)
         {
             context.Database.EnsureCreated();
+        }
+
+        public static void InitializeIdentity(ApplicationDbContext context)
+        {
+            context.Database.EnsureCreated();
+
+            if (context.AspNetUsers.Any())
+            {
+                return;   // DB has been seeded
+            }
+
+            var user = new IdentityUser
+            {
+                UserName = "hugochiaxyz@gmail.com",
+                Email = "hugochiaxyz@gmail.com",
+                NormalizedEmail = "hugochiaxyz@gmail.com".ToUpper(),
+                NormalizedUserName = "hugochiaxyz@gmail.com".ToUpper(),
+                SecurityStamp = "FTZ25GYXE5FFX6SEXY7CMFLZM2AMWAFE"
+            };
+
+            PasswordHasher<IdentityUser> ph = new PasswordHasher<IdentityUser>();
+            user.PasswordHash = ph.HashPassword(user, "Pass123!");
+
+            context.AspNetUsers.Add(user);
+
+            context.SaveChanges();
         }
     }
 }

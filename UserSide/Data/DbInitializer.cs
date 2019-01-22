@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UserSide.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace UserSide.Data
 {
@@ -114,6 +115,31 @@ namespace UserSide.Data
             }
             context.SaveChanges();
 
+        }
+
+        public static void InitializeIdentity(ApplicationDbContext context)
+        {
+            context.Database.EnsureCreated();
+
+            //if (context.AspNetUsers.Any())
+            //{
+            //    return;   // DB has been seeded
+            //}
+
+            //var user = new IdentityUser
+            //{
+            //    UserName = "hugochiaxyz@gmail.com",
+            //    Email = "hugochiaxyz@gmail.com",
+            //    NormalizedEmail = "hugochiaxyz@gmail.com".ToUpper(),
+            //    NormalizedUserName = "hugochiaxyz@gmail.com".ToUpper(),
+            //};
+
+            //PasswordHasher<IdentityUser> ph = new PasswordHasher<IdentityUser>();
+            //user.PasswordHash = ph.HashPassword(user, "Pass123!");
+
+            //context.AspNetUsers.Add(user);
+
+            //context.SaveChanges();
         }
     }
 }
