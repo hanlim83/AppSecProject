@@ -51,7 +51,7 @@ However, it is gaining more popularity in recent years, and we hope to make it e
 ## Tools Used
 - Visual Studio 2017
 - ASP.NET Core 2.1 Framework
-- ASP.NET Entity Core Framework
+- ASP.NET Entity Framework Core (EF Core)
 - Amazon Web Services (S3, RDS, EC2, EBS, VPC, SNS, ELB)
 - [FeedReader](https://github.com/codehollow/FeedReader)
 - [Json.NET](https://github.com/JamesNK/Newtonsoft.Json)

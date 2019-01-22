@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -45,9 +43,6 @@ namespace UserSide.Controllers
                 return NotFound();
             }
 
-            //CompetitionIndexViewModel vm = new CompetitionIndexViewModel();
-            //vm.Competition = competition;
-            //vm.TeamUsers = teamUsers;
             if (check == null)
             {
                 ViewData["ShowWrongDirectory"] = false;
@@ -100,16 +95,13 @@ namespace UserSide.Controllers
 
             TeamCreateViewModel teamCreateViewModel = new TeamCreateViewModel();
             teamCreateViewModel.Competition = competition;
-
-            //Need to get user.Id
-            var userId = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            //var user = await _userManager.GetUserAsync(HttpContext.User);
-            //var username = user.UserName;
+            
+            var user = await _userManager.GetUserAsync(HttpContext.User);
             foreach (var Team in competition.Teams)
             {
                 foreach (var TeamUser in Team.TeamUsers)
                 {
-                    if (TeamUser.UserId.Equals(userId))
+                    if (TeamUser.UserId.Equals(user.Id))
                     {
                         ViewData["ShowWrongDirectory"] = "true";
                         return RedirectToAction("Index", "Competitions", new { check = true });

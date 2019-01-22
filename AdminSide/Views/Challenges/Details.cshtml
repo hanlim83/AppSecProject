@@ -5,38 +5,11 @@
 }
 
 <br>
-@*<div class="col-md-8 offset-2">*@
 <div class="container">
     <div>
         <h4>Challenge</h4>
         <hr />
-        <!--May replace this to form to allow Editing and Viewing of Details on 1 page-->
-        @*<dl class="dl-horizontal">
-            <dt>
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Name)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Description)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Value)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Value)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Flag)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Flag)
-            </dd>
-        </dl>*@
+        @*May replace this to form to allow Editing and Viewing of Details on 1 page*@
         <form method="post" enctype="multipart/form-data" asp-action="Details">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
@@ -89,10 +62,8 @@
         </form>
     </div>
     <div>
-        <a asp-controller="Challenges" asp-action="Edit" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Edit</button></a>
-        <a asp-controller="Challenges" asp-action="Delete" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Delete</button></a>
-
-        <a asp-action="Edit" asp-route-id="@Model.ID">Edit</a> |
+        @*<a asp-controller="Challenges" asp-action="Edit" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Edit</button></a>*@
+        <a asp-controller="Challenges" asp-action="Delete" asp-route-id="@Model.ID"><input type="button" value="Delete" class="btn btn btn-default"></a>
         <a asp-action="Index">Back to List</a>
     </div>
 </div>

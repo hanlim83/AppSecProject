@@ -1,4 +1,4 @@
-﻿@model AdminSide.Models.Post
+﻿@model AdminSide.Models.PostViewModel
 @{
     ViewData["Title"] = "Details";
 }
@@ -11,30 +11,46 @@
     <table class="table">
         <thead>
             <tr>
-                <th> @Html.DisplayNameFor(model => model.Title) </th>
-                <th> @Html.DisplayNameFor(model => model.Content) </th>
-                <th> @Html.DisplayNameFor(model => model.UserName) </th>
-                <th> @Html.DisplayNameFor(model => model.DT) </th>
+                <th> @Html.DisplayNameFor(model => model.post.Title) </th>
+                <th> @Html.DisplayNameFor(model => model.post.Content) </th>
+                <th> @Html.DisplayNameFor(model => model.post.UserName) </th>
+                <th> @Html.DisplayNameFor(model => model.post.DT) </th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => modelItem.Title)
+                    @Html.DisplayFor(modelItem => Model.post.Title)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => modelItem.Content)
+                    @Html.DisplayFor(modelItem => Model.post.Content)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => modelItem.UserName)
+                    @Html.DisplayFor(modelItem => Model.post.UserName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => modelItem.DT)
+                    @Html.DisplayFor(modelItem => Model.post.DT)
                 </td>
             </tr>
         </tbody>
     </table>
 </div>
+<div class="container" @*style="padding-left:150px;*@">
+    @foreach (var comment in Model.Comments)
+    {
+        @await Html.PartialAsync("ShowComment", comment)
+    }
+
+    @using (Html.BeginForm("PostReply", "Forum", FormMethod.Post))
+    {
+        <input type="text" name="Content" style="width:1050px; height:50px; font-size: 20px" placeholder="Type New Comment..." />
+        <input id="hiddenIDInput" type="hidden" name="PostID" value="@Model.post.PostID" />
+        <br />
+        <br />
+        <input type="submit" value="Post Reply" class="btn btn-success" style="float:inherit" />
+    }
+</div>
 <div class="container">
+    <br />
     <a asp-action="Index">Back to Posts</a>
 </div>

@@ -201,6 +201,13 @@ namespace AdminSide
                 app.UseHsts();
             }
 
+            //Testing programtically migrating DB
+            //using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            //{
+            //    var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            //    context.Database.Migrate();
+            //}
+
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
@@ -218,6 +225,8 @@ namespace AdminSide
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            //IdentityDbInitializer.Initialize(context, userManager).Wait();
         }
     }
 
