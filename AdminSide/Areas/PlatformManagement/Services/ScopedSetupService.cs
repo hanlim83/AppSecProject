@@ -1155,7 +1155,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 newS.DisplayName = "Network Flow Log For Platform Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
                             else if (newG.Name.Equals("RDSOSMetrics"))
                             {
-                                if (newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
                                     newS.DisplayName = "SQL Database CPU Usage";
                             }
                             else if (newG.Name.Equals("@aws@elasticbeanstalk@User-Side@IIS-Log"))
@@ -1172,7 +1172,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for Admin Side";
                             else
                                 newS.DisplayName = newS.Name;
-                            if (!newS.Name.Equals("db-MRSZXHTQCY5QYXKQI3COPKQUUI"))
+                            if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
                                 context.CloudWatchLogStreams.Add(newS);
                         }
                         await context.SaveChangesAsync();
