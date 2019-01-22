@@ -19,6 +19,7 @@ using Amazon.RDS;
 using UserSide.Areas.Identity.Services;
 using UserSide.Hubs;
 using Amazon.Route53Domains;
+using Microsoft.AspNetCore.SignalR;
 
 namespace UserSide
 {
@@ -90,6 +91,8 @@ namespace UserSide
             services.Configure<PasswordHasherOptions>(
                  o => o.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3);
 
+
+
             //Using RDS
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
@@ -155,8 +158,9 @@ namespace UserSide
             //Chat Signalr
             services.AddSignalR();
 
+           
             //User 
-           // services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+            // services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -199,6 +203,14 @@ namespace UserSide
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+
+            app.Use(async (context, next) =>
+            {
+                var hubContext = context.RequestServices
+                                        .GetRequiredService<IHubContext<ChatHub>>();
+                //...
+            });
+
         }
     }
 }

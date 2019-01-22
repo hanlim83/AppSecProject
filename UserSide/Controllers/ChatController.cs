@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
 using UserSide.Data;
 using UserSide.Hubs;
-using UserSide.Models;
+
 
 namespace UserSide.Controllers
 {
@@ -16,11 +16,17 @@ namespace UserSide.Controllers
         //HUB
         private readonly ChatContext _context;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public ChatController(ChatContext context, UserManager<IdentityUser> userManager)
+       
+
+
+
+        public ChatController(ChatContext context, UserManager<IdentityUser> userManager, IHubContext<ChatHub> hubContext)
         {
             _context = context;
             _userManager = userManager;
+            _hubContext = hubContext;
         }
 
         //private readonly IHubContext<ChatHub> _hubContext;
@@ -42,42 +48,79 @@ namespace UserSide.Controllers
         //    await _strongChatHubContext.Clients.All.ReceiveMessage(message);
         //}
 
+        [Authorize]
         public async Task<IActionResult> Index()
         {
-           // await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
-            return View(await _context.GroupChats.ToListAsync());
+            // await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
 
-          
+            //take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //For username (can use it inside method also)
+            var username = user.UserName;
+
+            await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
+            return View();
+
+
         }
-        
 
+        [Authorize]
         public IActionResult TalkView()
         {
             return View();
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> CreateGroup()
         {
+            //take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //For username (can use it inside method also)
+            var username = user.UserName;
+
+
+            return View(username);
+        }
+
+        public IActionResult CreateChat()
+        {
+            //take in user object
+
+
+
+            //var user = 
+
+            //var contact = new UserChat<string>();
+
+            //foreach (var username in user)
+            //{
+            //    //for username (can use it inside method also)
+            //    //var username = user.username;
+            //    contact.add(username);
+            //}
+            var users = _userManager.Users.Select(u => u.UserName).ToList();
+            ViewBag.Users = users;
+
             return View();
         }
-
-
-        // POST: UserChats/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserID,UserName,GroupID")] GroupChat groupChat)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(groupChat);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(groupChat);
-        }
     }
+
+
+    //POST: UserChats/Create
+    //To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+    // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+    //[HttpPost]
+    //[ValidateAntiForgeryToken]
+    //public async Task <IActionResult> CreateChat([Bind("username")] Message message)
+    //{
+    //    if (ModelState.isVaild()
+    //    {
+    //        _context.add(chat);
+    //        await _context.savechangesasync();
+    //        return redirecttoaction(nameof(index));
+    //    }
+    //    return view(Chat);
+    //}
+
 
 
     //public class UserChatsController : Controller
@@ -219,5 +262,6 @@ namespace UserSide.Controllers
     //    {
     //        return _context.UserChats.Any(e => e.UserID == id);
     //    }
-    //}
+
+
 }
