@@ -194,7 +194,6 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     await ec2Client.CreateFlowLogsAsync(new CreateFlowLogsRequest
                     {
                         DeliverLogsPermissionArn = "arn:aws:iam::188363912800:role/VPC-Flow-Logs",
-                        LogDestination = "arn:aws:logs:ap-southeast-1:188363912800:log-group:VMVPCLogs:*",
                         LogDestinationType = "cloud-watch-logs",
                         LogGroupName = "VMVPCLogs",
                         ResourceIds = new List<string>
