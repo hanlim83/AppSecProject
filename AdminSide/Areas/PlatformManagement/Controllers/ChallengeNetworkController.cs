@@ -33,10 +33,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index()
         {
-            ChallengeNetworkParentModel model = new ChallengeNetworkParentModel
+            ChallengeNetworkViewParentModel model = new ChallengeNetworkViewParentModel
             {
-                retrievedSubnets = await _context.Subnets.ToListAsync(),
-                retrievedRoutes = await _context.Routes.ToListAsync()
+                RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                RetrievedRoutes = await _context.Routes.ToListAsync()
             };
             return View(model);
         }
@@ -84,10 +84,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     if (flag == false)
                     {
                         ViewData["Result"] = "Subnet not found! The subnet may have been modified by another user";
-                        ChallengeNetworkParentModel model = new ChallengeNetworkParentModel
+                        ChallengeNetworkViewParentModel model = new ChallengeNetworkViewParentModel
                         {
-                            retrievedSubnets = await _context.Subnets.ToListAsync(),
-                            retrievedRoutes = await _context.Routes.ToListAsync()
+                            RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                            RetrievedRoutes = await _context.Routes.ToListAsync()
                         };
                         return View(model);
                     }
@@ -103,20 +103,20 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 _context.Subnets.Remove(Deletesubnet);
                                 await _context.SaveChangesAsync();
                                 ViewData["Result"] = "Successfully Deleted!";
-                                ChallengeNetworkParentModel model = new ChallengeNetworkParentModel
+                                ChallengeNetworkViewParentModel model = new ChallengeNetworkViewParentModel
                                 {
-                                    retrievedSubnets = await _context.Subnets.ToListAsync(),
-                                    retrievedRoutes = await _context.Routes.ToListAsync()
+                                    RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                                    RetrievedRoutes = await _context.Routes.ToListAsync()
                                 };
                                 return View(model);
                             }
                             else
                             {
                                 ViewData["Result"] = "Failed!";
-                                ChallengeNetworkParentModel model = new ChallengeNetworkParentModel
+                                ChallengeNetworkViewParentModel model = new ChallengeNetworkViewParentModel
                                 {
-                                    retrievedSubnets = await _context.Subnets.ToListAsync(),
-                                    retrievedRoutes = await _context.Routes.ToListAsync()
+                                    RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                                    RetrievedRoutes = await _context.Routes.ToListAsync()
                                 };
                                 return View(model);
                             }
@@ -124,10 +124,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         catch (AmazonEC2Exception e)
                         {
                             ViewData["Result"] = e.Message;
-                            ChallengeNetworkParentModel model = new ChallengeNetworkParentModel
+                            ChallengeNetworkViewParentModel model = new ChallengeNetworkViewParentModel
                             {
-                                retrievedSubnets = await _context.Subnets.ToListAsync(),
-                                retrievedRoutes = await _context.Routes.ToListAsync()
+                                RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                                RetrievedRoutes = await _context.Routes.ToListAsync()
                             };
                             return View(model);
                         }
@@ -140,10 +140,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 if (Modifysubnet.editable == false)
                 {
                     ViewData["Result"] = "You cannot modify a default subnet!";
-                    ChallengeNetworkParentModel model = new ChallengeNetworkParentModel
+                    ChallengeNetworkViewParentModel model = new ChallengeNetworkViewParentModel
                     {
-                        retrievedSubnets = await _context.Subnets.ToListAsync(),
-                        retrievedRoutes = await _context.Routes.ToListAsync()
+                        RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                        RetrievedRoutes = await _context.Routes.ToListAsync()
                     };
                     return View(model);
                 }
@@ -151,10 +151,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else
             {
-                ChallengeNetworkParentModel model = new ChallengeNetworkParentModel
+                ChallengeNetworkViewParentModel model = new ChallengeNetworkViewParentModel
                 {
-                    retrievedSubnets = await _context.Subnets.ToListAsync(),
-                    retrievedRoutes = await _context.Routes.ToListAsync()
+                    RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                    RetrievedRoutes = await _context.Routes.ToListAsync()
                 };
                 return View(model);
             }
