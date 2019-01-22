@@ -78,6 +78,8 @@ namespace AdminSide.Controllers
                         searchFeeds.Add(feed);
                     if (feed.sourceCat.Contains(SearchQuery))
                         searchFeeds.Add(feed);
+                    if (feed.Description.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
                 }
 
                 if (Filter == "Title")
@@ -91,52 +93,24 @@ namespace AdminSide.Controllers
                     if (feed.sourceCat.Contains(SearchQuery))
                         searchFeeds.Add(feed);
                 }
+
+                if (Filter == "Description")
+                {
+                    if (feed.Description.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
             }
-     
+
+            if (searchFeeds.Count == 0)
+            {
+                Console.Write("No result!");
+                
+            }
+            
             return View(searchFeeds);
         }
 
-        // RSS FEED Codes
-        /*[HttpPost]
-        public ActionResult Index (string RSSURL)
-        {
-            WebClient wclient = new WebClient();
-            string RSSDate = wclient.DownloadString(RSSURL);
-
-            XDocument xml = XDocument.Parse(RSSDate);
-            var RSSFeedData = (from x in xml.Descendants("item") select new RSSFeed
-            {
-                Title = ((string)x.Element("title")),
-                Link = ((string)x.Element("link")),
-                Description = ((string)x.Element("description")),
-                PubDate = ((string)x.Element("pubDate"))
-            });
-            ViewBag.RSSFeed = RSSFeedData;
-            ViewBag.URL = RSSURL;
-            return View();
-        }*/
-        //[HttpPost]
-        //public async Task<IActionResult> Index(string RSSURL)
-        //{
-        //    var feed = await FeedReader.ReadAsync(RSSURL); //await will wait for the feed
-        //    RSSFeed rssfeed = new RSSFeed
-        //    {
-        //        Title = feed.Title,
-        //        Link = feed.Link,
-        //        Description = feed.Description,
-        //        PubDate = feed.LastUpdatedDateString
-        //    };
-
-        //    List<FeedItem> feedlist = new List<FeedItem>();
-        //    foreach (var item in feed.Items)
-        //    {
-        //        feedlist.Add(item);
-        //    }
-        //    ViewBag.RSSFeed = feedlist;
-
-        //    ViewBag.URL = RSSURL;
-        //    return View();
-        //}
+        
 
         // GET: ListSource
         public async Task<IActionResult> ListSource()
@@ -180,6 +154,7 @@ namespace AdminSide.Controllers
                 _context.Add(feedSource);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(ListSource));
+                
             }
             return View(feedSource);
         }
