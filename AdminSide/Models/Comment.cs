@@ -16,6 +16,8 @@ namespace AdminSide.Models
 
         public string Content { get; set; }
 
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy} | {0:hh:mm tt}", ApplyFormatInEditMode = true)]
         public DateTime DT { get; set; }
 
         [ForeignKey("PostID")]
