@@ -10,22 +10,23 @@ using UserSide.Models;
 
 namespace UserSide.Controllers
 {
-    public class ChatsController : Controller
+    public class ChattingController : Controller
     {
         private readonly ChatContext _context;
 
-        public ChatsController(ChatContext context)
+        public ChattingController(ChatContext context)
         {
             _context = context;
         }
 
-        // GET: Chats
+        // GET: Chatting
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Chats.ToListAsync());
+            var chatContext = _context.Chats.Include(c => c.UserChat);
+            return View(await chatContext.ToListAsync());
         }
 
-        // GET: Chats/Details/5
+        // GET: Chatting/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -34,6 +35,7 @@ namespace UserSide.Controllers
             }
 
             var chat = await _context.Chats
+                .Include(c => c.UserChat)
                 .FirstOrDefaultAsync(m => m.ChatID == id);
             if (chat == null)
             {
@@ -43,18 +45,19 @@ namespace UserSide.Controllers
             return View(chat);
         }
 
-        // GET: Chats/Create
+        // GET: Chatting/Create
         public IActionResult Create()
         {
+            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId");
             return View();
         }
 
-        // POST: Chats/Create
+        // POST: Chatting/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ChatID,SendRec,Messsage,Count")] Chat chat)
+        public async Task<IActionResult> Create([Bind("ChatID,MsgCount,UserId")] Chat chat)
         {
             if (ModelState.IsValid)
             {
@@ -62,10 +65,11 @@ namespace UserSide.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId", chat.UserId);
             return View(chat);
         }
 
-        // GET: Chats/Edit/5
+        // GET: Chatting/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -78,15 +82,16 @@ namespace UserSide.Controllers
             {
                 return NotFound();
             }
+            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId", chat.UserId);
             return View(chat);
         }
 
-        // POST: Chats/Edit/5
+        // POST: Chatting/Edit/5
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChatID,SendRec,Messsage,Count")] Chat chat)
+        public async Task<IActionResult> Edit(int id, [Bind("ChatID,MsgCount,UserId")] Chat chat)
         {
             if (id != chat.ChatID)
             {
@@ -113,10 +118,11 @@ namespace UserSide.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId", chat.UserId);
             return View(chat);
         }
 
-        // GET: Chats/Delete/5
+        // GET: Chatting/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -125,6 +131,7 @@ namespace UserSide.Controllers
             }
 
             var chat = await _context.Chats
+                .Include(c => c.UserChat)
                 .FirstOrDefaultAsync(m => m.ChatID == id);
             if (chat == null)
             {
@@ -134,7 +141,7 @@ namespace UserSide.Controllers
             return View(chat);
         }
 
-        // POST: Chats/Delete/5
+        // POST: Chatting/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

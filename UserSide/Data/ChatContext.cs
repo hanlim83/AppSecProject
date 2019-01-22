@@ -9,15 +9,17 @@ namespace UserSide.Data
         {
         }
 
-        public DbSet<Chat> Chats { get; set; }
+        public DbSet<Message> Messages { get; set; }
         public DbSet<UserChat> UserChats { get; set; }
-        public DbSet<GroupChat> GroupChats { get; set; }
+       // public DbSet<GroupChat> GroupChats { get; set; }
+        public DbSet<Chat> Chats { get; set; }
        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Chat>().ToTable("Chats");
-            modelBuilder.Entity<GroupChat>().ToTable("GroupChats");
+            modelBuilder.Entity<Message>().ToTable("Messages");
+           // modelBuilder.Entity<GroupChat>().ToTable("GroupChats");
             modelBuilder.Entity<UserChat>().ToTable("UserChats");
+            modelBuilder.Entity<Chat>().ToTable("Chats");
         }
     }
 }

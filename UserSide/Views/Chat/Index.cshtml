@@ -1,4 +1,7 @@
 ﻿
+@using Microsoft.AspNetCore.Identity
+@inject UserManager<IdentityUser> UserManager
+
 @{
     ViewData["Title"] = "LIVE CHAT";
 }
@@ -22,108 +25,79 @@
 
     <!--Individual-->
 
-    <div class="table-responsive table table-hover">
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>
-                       
-                    </th>
-                    <th>
+    @UserManager.GetUserId(User);
 
-                    </th>
-                    <th>
-
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var item in Model)
-                {
+    <div class="container">
+        <div class="table-responsive table table-hover">
+            <table class="table">
+                <tbody>
                     <tr>
+                        <th scope="row">Mark</th>
+                        <td>Online</td>
+                        <td>0</td>
                         <td>
-                         
-                        </td>
-                        <td>
-                         
-                        </td>
-                        <td>
-                            <a asp-action="Edit" asp-route-id="@item.UserID">Edit</a> |
-                            <a asp-action="Details" asp-route-id="@item.UserID">Details</a> |
-                            <a asp-action="Delete" asp-route-id="@item.UserID">Delete</a>
+                            <form>
+                                <button type="submit" class="btn btn-default" asp-action="TalkView">Chat</button>
+                            </form>
                         </td>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>
 
-        <div class="container">
-            <div class="table-responsive table table-hover">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th scope="row">Mark</th>
-                            <td>Online</td>
-                            <td>0</td>
-                            <td>
-                                <form>
-                                    <button type="submit" class="btn btn-default" asp-action="TalkView" >Chat</button>
-                                </form>
-                            </td>
-                        </tr>
+                    <tr>
+                        <th scope="row">Tom</th>
+                        <td>Offline</td>
+                        <td></td>
 
-                        <tr>
-                            <th scope="row">Tom</th>
-                            <td>Offline</td>
-                            <td></td>
-
-                        </tr>
-                        <tr>
-                            <th scope="row">GOD</th>
-                            <td colspan="2">Larry the Bird</td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <!--Team-->
-            <div class="table-responsive table table-hover">
-                <table class="table">
-                    <tbody>
-                        <tr>
-                            <th scope="row">BatPower</th>
-                            <td>0/5</td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <th scope="row">asdfghjkl</th>
-                            <td>0/4</td>
-                            <td></td>
-
-                        </tr>
-                        <tr>
-                            <th scope="row">3</th>
-                            <td colspan="2">Larry the Bird</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <form>
-                <div class="form-row">
-                    <div class="col-7">
-                        <input type="text" class="form-control" placeholder="Search">
-                    </div>
-                    <div class="col-auto">
-                        <button type="submit" class="btn btn-dark"><i class="material-icons">search</i></button>
-                        <button type="submit" class="btn btn-dark" asp-action="CreateGroup"><i class="material-icons">group_add</i></button>
-                        <button type="submit" class="btn btn-dark"><i class="material-icons">chat</i></button>
-                    </div>
-                </div>
-            </form>
-
+                    </tr>
+                    <tr>
+                        <th scope="row">GOD</th>
+                        <td colspan="2">Larry the Bird</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+
+        <!--Team-->
+        <div class="table-responsive table table-hover">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <th scope="row">BatPower</th>
+                        <td>0/5</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <th scope="row">asdfghjkl</th>
+                        <td>0/4</td>
+                        <td></td>
+
+                    </tr>
+                    <tr>
+                        <th scope="row">3</th>
+                        <td colspan="2">Larry the Bird</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form>
+            <div class="form-row">
+                <div class="col-7">
+                    <input type="text" class="form-control" placeholder="Search">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-dark"><i class="material-icons">search</i></button>
+                    <button type="submit" class="btn btn-dark" asp-action="CreateGroup"><i class="material-icons">group_add</i></button>
+                    <button type="submit" class="btn btn-dark" asp-action="CreateChat"><i class="material-icons">chat</i></button>
+                </div>
+            </div>
+        </form>
+
+
+        <script src="~/lib/signalr/dist/browser/signalr.js"></script>
+        <script src="~/js/chat.js"></script>
+
+
+    </div>
 </body>
 </html>

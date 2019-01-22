@@ -85,15 +85,15 @@ namespace UserSide.Data
         {
             context.Database.EnsureCreated();
 
-            if (context.UserChats.Any())
+            if (context.Chats.Any())
             {
                 return;   // DB has been seeded
             }
 
             var Chat = new UserChat[]
             {
-                new UserChat{UserId=1,UserName="Stephen Curry",},
-                new UserChat{UserId=2,UserName="Lebron James"}
+                new UserChat{UserId="1",UserName="Stephen Curry"},
+                new UserChat{UserId="2",UserName="Lebron James"}
             };
 
             foreach (UserChat c in Chat)
@@ -102,23 +102,41 @@ namespace UserSide.Data
             }
             context.SaveChanges();
 
-            var Group = new GroupChat[]
+            //var Group = new GroupChat[]
+            //{
+            //    new GroupChat{GroupId=1,GroupName="Golden State Warriors",GroupMember="Brother"},
+            //    new GroupChat{GroupId=2,GroupName="Los Angeles Laker",GroupMember="sister"}
+            //};
+
+            //foreach (GroupChat g in Group)
+            //{
+            //    context.GroupChats.Add(g);
+            //}
+            //context.SaveChanges();
+
+            var Talk = new Message[]
             {
-                new GroupChat{GroupId=1,GroupName="Golden State Warriors"},
-                new GroupChat{GroupId=2,GroupName="Los Angeles Laker"}
+                new Message{Sender="James",Receiver="Stephen",Messsage="Hello ",ChatId=1},
+                new Message{Sender="Stephen",Receiver="James",Messsage="I AM THE GOAT",ChatId=2}
             };
 
-            foreach (GroupChat c in Group)
+            foreach (Message m in Talk)
             {
-                context.GroupChats.Add(c);
+                context.Messages.Add(m);
             }
             context.SaveChanges();
 
-            var Talk = new Chat[]
+            var text = new Chat[]
             {
-                new Chat{ChatID=1,SendRec="Stephen_James",Messsage="Hello Man you are not going NBA Finals this times",Count=1 },
-                new Chat{ChatID=2,SendRec="James_Stephen",Messsage="I AM THE GOAT",Count=2}
+                new Chat{UserId="1"},
+                new Chat{UserId="2"}
             };
+
+            foreach (Chat t in text)
+            {
+                context.Chats.Add(t);
+            }
+            context.SaveChanges();
         }
     }
 }

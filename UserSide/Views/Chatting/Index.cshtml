@@ -13,13 +13,10 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.SendRec)
+                @Html.DisplayNameFor(model => model.MsgCount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Messsage)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Count)
+                @Html.DisplayNameFor(model => model.UserChat)
             </th>
             <th></th>
         </tr>
@@ -28,13 +25,10 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.SendRec)
+                @Html.DisplayFor(modelItem => item.MsgCount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Messsage)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Count)
+                @Html.DisplayFor(modelItem => item.UserChat.UserId)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ChatID">Edit</a> |
