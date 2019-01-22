@@ -82,7 +82,7 @@ namespace UserSide.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
-                if (!ReCaptchaPassed(
+                if (ReCaptchaPassed(
                     Request.Form["g-recaptcha-response"], // that's how you get it from the Request object
                     _configuration.GetSection("GoogleReCaptcha:secret").Value,
                     _logger))
@@ -114,12 +114,12 @@ namespace UserSide.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    return Page();
+                    return RedirectToAction("Login", "Identity/Account");
                 }
             }
-
             // If we got this far, something failed, redisplay form
-            return Page();
+            //return Page();
+            return RedirectToAction("Login", "Identity/Account");
         }
 
         public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret, ILogger logger)

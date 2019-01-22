@@ -1,0 +1,70 @@
+﻿@model AdminSide.Areas.PlatformManagement.Models.ChallengeNetworkParentModel
+@{
+    ViewData["Title"] = "Challenge Network";
+}
+<div class="row">
+    <div class="col-lg-3">
+        <partial name="../_MainNav.cshtml" />
+    </div>
+    <div class="col-lg-9">
+        <div class="row">
+            <div class="col-lg-12">
+                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger" role="alert">
+                                @ViewData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Convert.ToString(ViewData["Result"]) == "Successfully Deleted!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-success" role="alert">
+                                @ViewData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (Convert.ToString(TempData["Result"]) == "Successfully Created!" || Convert.ToString(TempData["Result"]) == "Successfully Modified!")
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-success" role="alert">
+                                @TempData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @await Html.PartialAsync("SubnetList", Model.retrievedSubnets)
+                <hr>
+                @await Html.PartialAsync("RouteList", Model.retrievedRoutes)
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteSubnet" tabindex="-1" role="dialog" aria-labelledby="DeleteSubnetConfirmation" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="DeleteSubnetConfirmation">Delete Subnet Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete the subnet?
+            </div>
+            <div class="modal-footer">
+                <form method="post">
+                    <input type="hidden" name="action" value="Delete" />
+                    <input type="hidden" id="subnetDeletionInput" name="subnetID" value="" />
+                    <button type="submit" class="btn btn-danger">Delete Subnet</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

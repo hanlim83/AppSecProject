@@ -2,13 +2,6 @@
     ViewData["Title"] = "Home Page";
 }
 
-@*<div class="" id="background">
-        <!-- particles.js container --> <div id="particles-js"></div>
-        <!-- stats - count particles -->
-        <div class="count-particles">
-        <canvas id="particles-js" class="particles-js-canvas-el" style="width: 100%; height: 100%;"></canvas>
-    </div>*@
-
 <style>
     #particles-js {
         position: fixed;
@@ -23,6 +16,7 @@
         background-position: 50% 50%;
         background-repeat: no-repeat;
     }
+
     #unselectable {
         user-select: none;
         -moz-user-select: none;
@@ -30,10 +24,22 @@
         -webkit-user-select: none;
         -o-user-select: none;
     }
+
     .layout {
-        padding-top: 20em;
-        padding-bottom: 20em;
+        padding-top: 15em;
         pointer-events: none;
+    }
+
+    .panel {
+        position: absolute;
+        z-index: 10;
+        width: 700px;
+        height: 220px;
+        background: #eee;
+        top: 50%;
+        left: 50%;
+        margin: -110px 0 0 -100px;
+        padding: 20px;
     }
 </style>
 
@@ -44,19 +50,21 @@
     <div class="container">
         <div class="row">
             <div class="col align-self-center">
-                @*<svg class="event-logo img-responsive" width="1700" height="256" viewBox="0 0 1450 256">
-                    <text id="Gryphon_" data-name="Gryphon|" class="g-cls-1" x="-6" y="191">Gryphon|</text>
-                    <text id="CTF" class="cls-2" x="940" y="191">CTF</text>
-                    <text id="year2018" class="cls-3" x="1273" y="191">2018</text>
-                </svg>
-                <p class="intro-text">
-                    8 October 2018 - 12 October 2018
-                </p>*@
-                <h1 style="font-size:80px; color:white; top:50%;">eCTF Platform</h1>
+                @*<h1 style="font-size:80px; color:white; top:50%;">eCTF Platform</h1>*@
+                <h1 style="font-size:80px; color:white; top:50%;">Placeholder</h1>
             </div>
         </div>
     </div>
 </header>
+@*<div class="panel" style="display: block;">
+        <div class="container">
+            <div class="row">
+                <div class="col align-self-center">
+                    @*<h1 style="font-size:80px; color:white; top:50%;">eCTF Platform</h1>
+    <h1 style="font-size:80px; color:white; top:50%;">Placeholder</h1>
+                </div>
+            </div>
+    </div>*@
 <script src="~/js/particles.js" data-turbolinks-track="reload" asp-append-version="true"></script>
 
 

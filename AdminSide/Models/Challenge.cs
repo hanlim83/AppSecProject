@@ -16,6 +16,8 @@ namespace AdminSide.Models
         [Required]
         public string Description { get; set; }
         [Required]
+        //[Range(0, int.MaxValue, ErrorMessage = "Please enter valid integer Number")]
+        [Range(1, 9999, ErrorMessage = "Please enter valid score between 1 - 9999")]
         public int Value { get; set; }
         [Required]
         public string Flag { get; set; }

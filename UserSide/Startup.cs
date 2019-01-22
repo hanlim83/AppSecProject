@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using UserSide.Data;
@@ -21,12 +16,9 @@ using Amazon.CloudWatchLogs;
 using Amazon.SimpleNotificationService;
 using Amazon.CloudWatchEvents;
 using Amazon.RDS;
-using Amazon.ElasticLoadBalancingV2;
-using Amazon.ElasticBeanstalk;
 using UserSide.Areas.Identity.Services;
-using Amazon.SimpleSystemsManagement;
 using UserSide.Hubs;
-using Microsoft.AspNetCore.SignalR;
+using Amazon.Route53Domains;
 
 namespace UserSide
 {
@@ -35,30 +27,6 @@ namespace UserSide
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-        }
-
-        private static void SetEbConfig()
-        {
-            var tempConfigBuilder = new ConfigurationBuilder();
-
-            tempConfigBuilder.AddJsonFile(
-                @"C:\Program Files\Amazon\ElasticBeanstalk\config\containerconfiguration",
-                optional: true,
-                reloadOnChange: true
-            );
-
-            var configuration = tempConfigBuilder.Build();
-
-            var ebEnv =
-                configuration.GetSection("iis:env")
-                    .GetChildren()
-                    .Select(pair => pair.Value.Split(new[] { '=' }, 2))
-                    .ToDictionary(keypair => keypair[0], keypair => keypair[1]);
-
-            foreach (var keyVal in ebEnv)
-            {
-                Environment.SetEnvironmentVariable(keyVal.Key, keyVal.Value);
-            }
         }
 
         //For ASP.NET Identity Only | You can reuse this but replace dbname with your own database name
@@ -122,8 +90,6 @@ namespace UserSide
             services.Configure<PasswordHasherOptions>(
                  o => o.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3);
 
-            SetEbConfig();
-
             //Using RDS
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
@@ -183,12 +149,8 @@ namespace UserSide
             services.AddAWSService<IAmazonSimpleNotificationService>();
             //RDS Initialization
             services.AddAWSService<IAmazonRDS>();
-            //ELB Initialization
-            services.AddAWSService<IAmazonElasticLoadBalancingV2>();
-            //EBS Initialization
-            services.AddAWSService<IAmazonElasticBeanstalk>();
-            //SSM Initialization
-            services.AddAWSService<IAmazonSimpleSystemsManagement>();
+            //Route53 Initialization
+            services.AddAWSService<IAmazonRoute53Domains>();
 
             //Chat Signalr
             services.AddSignalR();
@@ -210,6 +172,13 @@ namespace UserSide
             {
                 app.UseExceptionHandler("/Home/Error");
                 app.UseHsts();
+            }
+
+            //Testing programtically migrating DB
+            using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                context.Database.Migrate();
             }
 
             app.UseHttpsRedirection();
