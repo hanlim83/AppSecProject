@@ -1,0 +1,54 @@
+﻿@model IEnumerable<AdminSide.Areas.PlatformManagement.Models.Route>
+    <div class="row">
+        <div class=" col-lg-12">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>
+                            Route Description
+                        </th>
+                        <th>
+                            Route Type
+                        </th>
+                        <th>
+                            IP CIDR
+                        </th>
+                        <th>
+                            Subnet(s) Applicable
+                        </th>
+                        <th>
+                            Destination
+                        </th>
+                        <th>
+                            Status
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var route in Model)
+                    {
+                        <tr>
+                            <td>@Html.ValueForModel(route.Description)</td>
+                            <td>@Html.ValueForModel(route.RouteType.ToString())</td>
+                            <td>@Html.ValueForModel(route.IPCIDR)</td>
+                            @if (route.applicability != Applicability.Custom)
+                            {
+                                <td>@Html.ValueForModel(route.applicability.ToString())</td>
+                            }
+                            @if (route.applicability == Applicability.Custom)
+                            {
+                                <td>
+                                    @foreach (var subnet in route.LinkedRouteTable.LinkedSubnets)
+                                    {
+                                        @subnet.Name
+                                    }
+                                </td>
+                            }
+                            <td>@Html.ValueForModel(route.Destination)</td>
+                            <td>@Html.ValueForModel(route.Status.ToString())</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
