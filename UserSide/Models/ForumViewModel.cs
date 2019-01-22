@@ -5,9 +5,10 @@ using System.Threading.Tasks;
 
 namespace UserSide.Models
 {
-    public class PostViewModel
+    public class ForumViewModel
     {
-        public Post Post { get; set; }
-        public List<Comment> Comments { get; set; }
+        public List<ForumCategory> ForumCategory { get; set; }
+        public List<Post> Posts { get; set; }
+
     }
 }

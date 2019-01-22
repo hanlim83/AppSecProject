@@ -108,7 +108,7 @@ namespace UserSide.Controllers
             List<Comment> comments = context1.Comments.FromSql("SELECT * FROM dbo.Comment WHERE PostID = " + post.PostID).ToList();
             PostViewModel model = new PostViewModel
             {
-                post = post,
+                Post = post,
                 Comments = comments
             };
 
