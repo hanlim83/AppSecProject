@@ -28,7 +28,7 @@ namespace AdminSide.Controllers
         {
             if (check == null)
             {
-                ViewData["ShowWrongDirectory"] = false;
+                ViewData["ShowNoResult"] = false;
                 List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
                 List<RSSFeed> AllFeeds = new List<RSSFeed>();
                 foreach (FeedSource var in AllSources)
@@ -51,7 +51,7 @@ namespace AdminSide.Controllers
             }
             else
             {
-                ViewData["ShowWrongDirectory"] = true;
+                ViewData["ShowNoResult"] = true;
                 //return RedirectToAction("Index", "NewsFeed", new { check = true });
                 return View();
             }
@@ -120,7 +120,7 @@ namespace AdminSide.Controllers
             {
                 return RedirectToAction("Index", "NewsFeed", new { check = true });
             }
-            ViewData["ShowWrongDirectory"] = false;
+            ViewData["ShowNoResult"] = false;
             return View(searchFeeds);
         }
 

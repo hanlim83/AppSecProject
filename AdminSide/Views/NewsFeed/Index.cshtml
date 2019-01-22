@@ -62,13 +62,13 @@
 
 
     </form>
-    @if ((bool)ViewData["ShowWrongDirectory"] == true)
+    @if ((bool)ViewData["ShowNoResult"] == true)
     {
         <div class="alert alert-danger" role="alert">
-            <h4 class="alert-heading">Invalid Directory!</h4>
-            <p>Ignore if this was accidental</p>
+            <h4 class="alert-heading">No Search Result!</h4>
+            <p>Please search again with different phrasing. This might help to get your result.</p>
             <hr>
-            <p>Warning your actions have been logged and you will face the full force of the law if there are attempts to hack. If repeated attempts are detected, action will be taken against hackers!</p>
+           
         </div>
     }
     <table class="table table-hover">
