@@ -24,7 +24,7 @@ namespace AdminSide.Controllers
         }
 
         //For the feed when it just loaded
-        public async Task <IActionResult> Index()
+        public async Task <IActionResult> Index(bool? check)
         {
             List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
             List<RSSFeed> AllFeeds = new List<RSSFeed>();
@@ -44,11 +44,25 @@ namespace AdminSide.Controllers
                 }
 
             }
+            //    check = true;
+            //if (check == null)
+            //{
+            //    ViewData["ShowWrongDirectory"] = false;
+            //}
+            //else
+            //{
+            //    ViewData["ShowWrongDirectory"] = true;
+            //    //return RedirectToAction("Index", "NewsFeed", new { check = true });
+            //}
+
+            //return View();
             return View(AllFeeds);
+            //return RedirectToAction("Index", "NewsFeed");
+
         }
         // for feed when searched
         [HttpPost]
-        public async Task<IActionResult> Index(string SearchQuery, string Filter)
+        public async Task<IActionResult> Index(string SearchQuery, string Filter, bool? check)
         {
             List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
             List<RSSFeed> AllFeeds = new List<RSSFeed>();
@@ -101,12 +115,10 @@ namespace AdminSide.Controllers
                 }
             }
 
-            if (searchFeeds.Count == 0)
-            {
-                Console.Write("No result!");
-                
-            }
-            
+            //if (searchFeeds.Count == 0)
+            //{
+            //    return RedirectToAction("Index", "NewsFeed", new { check = true });
+            //}
             return View(searchFeeds);
         }
 

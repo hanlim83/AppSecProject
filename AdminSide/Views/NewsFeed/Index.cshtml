@@ -97,6 +97,15 @@
             }
         </tbody>
     </table>
+    @*@if ((bool)ViewData["ShowWrongDirectory"] == true)
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Invalid Directory!</h4>
+            <p>Ignore if this was accidental</p>
+            <hr>
+            <p>Warning your actions have been logged and you will face the full force of the law if there are attempts to hack. If repeated attempts are detected, action will be taken against hackers!</p>
+        </div>
+    }*@
 </div>
 <!-- Script for Back To Top Button -->
 <script>
