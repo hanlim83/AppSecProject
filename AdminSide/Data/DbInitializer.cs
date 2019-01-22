@@ -4,6 +4,8 @@ using AdminSide.Data;
 using AdminSide.Models;
 using System;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace AdminSide.Data
 {
@@ -173,30 +175,30 @@ namespace AdminSide.Data
                 return;   // DB has been seeded
             }
 
-            var competition = new Competition[]
-            {
-            new Competition{CompetitionName="NYP Global CTF", Status="Active", BucketName="NYP Global CTF"}
-            };
+            //var competition = new Competition[]
+            //{
+            //new Competition{CompetitionName="NYP Global CTF", Status="Active", BucketName="NYP Global CTF"}
+            //};
 
-            foreach (Competition c in competition)
-            {
-                context.Competitions.Add(c);
-            }
-            context.SaveChanges();
+            //foreach (Competition c in competition)
+            //{
+            //    context.Competitions.Add(c);
+            //}
+            //context.SaveChanges();
 
-            var competitionCategory = new CompetitionCategory[]
-            {
-            new CompetitionCategory{ CategoryName="Web", CompetitionID=1 },
-            new CompetitionCategory{ CategoryName="Crypto", CompetitionID=1 },
-            new CompetitionCategory{ CategoryName="Forensics", CompetitionID=1 },
-            new CompetitionCategory{ CategoryName="Misc", CompetitionID=1 }
-            };
+            //var competitionCategory = new CompetitionCategory[]
+            //{
+            //new CompetitionCategory{ CategoryName="Web", CompetitionID=1 },
+            //new CompetitionCategory{ CategoryName="Crypto", CompetitionID=1 },
+            //new CompetitionCategory{ CategoryName="Forensics", CompetitionID=1 },
+            //new CompetitionCategory{ CategoryName="Misc", CompetitionID=1 }
+            //};
 
-            foreach (CompetitionCategory cc in competitionCategory)
-            {
-                context.CompetitionCategories.Add(cc);
-            }
-            context.SaveChanges();
+            //foreach (CompetitionCategory cc in competitionCategory)
+            //{
+            //    context.CompetitionCategories.Add(cc);
+            //}
+            //context.SaveChanges();
 
             var categoryDefault = new CategoryDefault[]
             {
@@ -212,52 +214,75 @@ namespace AdminSide.Data
             }
             context.SaveChanges();
 
-            var challenges = new Challenge[]
+            //var challenges = new Challenge[]
+            //{
+            //new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", CompetitionID=1, CompetitionCategoryID=1 },
+            //new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", CompetitionID=1, CompetitionCategoryID=1 },
+            //new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", CompetitionID=1, CompetitionCategoryID=1 },
+            //new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", CompetitionID=1, CompetitionCategoryID=1 },
+            //};
+
+            //foreach (Challenge ch in challenges)
+            //{
+            //    context.Challenges.Add(ch);
+            //}
+            //context.SaveChanges();
+
+            //var teams = new Team[]
+            //{
+            //new Team{ TeamName="T0X1C V4P0R", Password="", Salt="", Score=100, CompetitionID=1},
+            //};
+
+            //foreach (Team t in teams)
+            //{
+            //    context.Teams.Add(t);
+            //}
+            //context.SaveChanges();
+
+            //var teamUsers = new TeamUser[]
+            //{
+            //new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f", UserName = "hugoxyz"}
+            //};
+
+            //foreach (TeamUser tu in teamUsers)
+            //{
+            //    context.TeamUsers.Add(tu);
+            //}
+            //context.SaveChanges();
+
+            //var teamChallenges = new TeamChallenge[]
+            //{
+            //new TeamChallenge{ TeamId=1, ChallengeId=1 }
+            //};
+
+            //foreach (TeamChallenge tc in teamChallenges)
+            //{
+            //    context.TeamChallenges.Add(tc);
+            //}
+            //context.SaveChanges();
+
+            //Create Genesis Block
+            var block = new Block[]
             {
-            new Challenge{ Name="Challenge 1", Description="Testing 1", Value=100, Flag="aaa", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 2", Description="Testing 2", Value=200, Flag="aab", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 3", Description="Testing 3", Value=300, Flag="aac", CompetitionID=1, CompetitionCategoryID=1 },
-            new Challenge{ Name="Challenge 4", Description="Testing 4", Value=400, Flag="aad", CompetitionID=1, CompetitionCategoryID=1 },
+            new Block{ TimeStamp=DateTime.Now }
             };
 
-            foreach (Challenge ch in challenges)
+            string data = block[0].TimeStamp + ";" + block[0].CompetitionID + ";" + block[0].TeamID + ";" + block[0].ChallengeID + ";" + block[0].TeamChallengeID + ";" + block[0].Score + ";" + block[0].PreviousHash;
+            block[0].Hash = GenerateSHA512String(data);
+
+            foreach (Block b in block)
             {
-                context.Challenges.Add(ch);
+                context.Blockchain.Add(b);
             }
             context.SaveChanges();
+        }
 
-            var teams = new Team[]
-            {
-            new Team{ TeamName="T0X1C V4P0R", Password="", Salt="", Score=100, CompetitionID=1},
-            };
-
-            foreach (Team t in teams)
-            {
-                context.Teams.Add(t);
-            }
-            context.SaveChanges();
-
-            var teamUsers = new TeamUser[]
-            {
-            new TeamUser{ TeamId=1, UserId="c1ca32d9-43c6-40d4-b9cc-bad849873b7f", UserName = "hugoxyz"}
-            };
-
-            foreach (TeamUser tu in teamUsers)
-            {
-                context.TeamUsers.Add(tu);
-            }
-            context.SaveChanges();
-
-            var teamChallenges = new TeamChallenge[]
-            {
-            new TeamChallenge{ TeamId=1, ChallengeId=1 }
-            };
-
-            foreach (TeamChallenge tc in teamChallenges)
-            {
-                context.TeamChallenges.Add(tc);
-            }
-            context.SaveChanges();
+        private static string GenerateSHA512String(string inputString)
+        {
+            SHA512 sha512 = SHA512.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(inputString);
+            byte[] hash = sha512.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
 
         public static void InitializeForum(ForumContext context)

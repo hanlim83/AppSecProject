@@ -21,6 +21,7 @@ namespace AdminSide.Data
         public DbSet<Team> Teams { get; set; }
         public DbSet<TeamUser> TeamUsers { get; set; }
         public DbSet<TeamChallenge> TeamChallenges { get; set; }
+        public DbSet<Block> Blockchain { get; set; }
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -31,6 +32,7 @@ namespace AdminSide.Data
             modelBuilder.Entity<Team>().ToTable("Teams");
             modelBuilder.Entity<TeamUser>().ToTable("TeamUsers");
             modelBuilder.Entity<TeamChallenge>().ToTable("TeamChallenges");
+            modelBuilder.Entity<Block>().ToTable("Blockchain");
         }
     }
 }
