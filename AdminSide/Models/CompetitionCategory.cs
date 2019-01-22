@@ -20,8 +20,9 @@ namespace AdminSide.Models
         public int CompetitionID { get; set; }
         //Competition competition { get; set; }
 
-        
+        //public ICollection<Challenge> Challenges { get; set; }
 
+        
         //From SO
         //public string[] selectedCategories { get; set; }
 

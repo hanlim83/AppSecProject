@@ -26,6 +26,8 @@ namespace AdminSide.Models
         [Display(Name = "Bucket Name")]
         public string BucketName { get; set; }
 
+        //Take in start time/end time, may deprecate status
+
         public ICollection<CompetitionCategory> CompetitionCategories { get; set; }
         public ICollection<Challenge> Challenges { get; set; }
         public ICollection<Team> Teams { get; set; }

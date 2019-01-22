@@ -6,4 +6,36 @@
 <div class="container">
     <h1>@ViewData["LastHash"]</h1>
     <h1>Chain Validity: @ViewData["ChainValid"]</h1>
+    <div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Team Name
+                    </th>
+                    <th>
+                        Blockchain Score
+                    </th>
+                    <th>
+                        Team Score
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                    @foreach (var result in ViewBag.data)
+                    {
+                    <tr>
+                        <td>
+                            result.TeamName;
+                        </td>
+                        <td>
+                            result.BlockchainScore;
+                        </td>
+                        <td>
+                            result.TeamScore;
+                        </td>
+                    </tr>
+                    }
+            </tbody>
+    </div>
 </div>

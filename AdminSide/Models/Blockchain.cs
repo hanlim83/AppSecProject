@@ -57,5 +57,10 @@ namespace AdminSide.Models
             byte[] hash = sha512.ComputeHash(bytes);
             return Convert.ToBase64String(hash);
         }
+
+        public async Task<IList<Block>> GetChain()
+        {
+            return await _context.Blockchain.ToListAsync();
+        }
     }
 }
