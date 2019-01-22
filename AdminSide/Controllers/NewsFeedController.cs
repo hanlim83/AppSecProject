@@ -23,31 +23,47 @@ namespace AdminSide.Controllers
             this._context = context;
         }
 
-        public async Task <IActionResult> Index()
+        //For the feed when it just loaded
+        public async Task <IActionResult> Index(bool? check)
         {
-            List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
-            List<RSSFeed> AllFeeds = new List<RSSFeed>();
-            foreach (FeedSource var in AllSources)
+            if (check == null)
             {
-                var feed = await FeedReader.ReadAsync(var.sourceURL);
-                foreach (FeedItem item in feed.Items)
+                ViewData["ShowNoResult"] = false;
+                List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
+                List<RSSFeed> AllFeeds = new List<RSSFeed>();
+                foreach (FeedSource var in AllSources)
                 {
-                    RSSFeed Feed2 = new RSSFeed
+                    var feed = await FeedReader.ReadAsync(var.sourceURL);
+                    foreach (FeedItem item in feed.Items)
                     {
-                        Title = item.Title,
-                        Link = item.Link,
-                        Description = item.Description,
-                        main = false
-                    };
-                    AllFeeds.Add(Feed2);
-                }
+                        RSSFeed Feed2 = new RSSFeed
+                        {
+                            Title = item.Title,
+                            Link = item.Link,
+                            Description = item.Description,
+                            sourceCat = var.sourceName
+                        };
+                        AllFeeds.Add(Feed2);
+                    }
 
+                }
+                return View(AllFeeds);
             }
-            return View(AllFeeds);
+            else
+            {
+                ViewData["ShowNoResult"] = true;
+                //return RedirectToAction("Index", "NewsFeed", new { check = true });
+                return View();
+            }
+
+            //return View();
+            
+            //return RedirectToAction("Index", "NewsFeed");
+
         }
-
+        // for feed when searched
         [HttpPost]
-        public async Task<IActionResult> Index(string SearchQuery)
+        public async Task<IActionResult> Index(string SearchQuery, string Filter, bool? check)
         {
             List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
             List<RSSFeed> AllFeeds = new List<RSSFeed>();
@@ -61,67 +77,54 @@ namespace AdminSide.Controllers
                         Title = item.Title,
                         Link = item.Link,
                         Description = item.Description,
-                        main = false
+                        sourceCat = var.sourceName
                     };
                     AllFeeds.Add(Feed2);
                 }
 
             }
+        
             List<RSSFeed> searchFeeds = new List<RSSFeed>();
             foreach(RSSFeed feed in AllFeeds)
             {
-                if (feed.Title.Contains(SearchQuery))
-                    searchFeeds.Add(feed);
+                if (Filter == "All")
+                {
+                    if (feed.Title.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                    if (feed.sourceCat.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                    if (feed.Description.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
+
+                if (Filter == "Title")
+                {
+                    if (feed.Title.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
+
+                if (Filter =="Category")
+                {
+                    if (feed.sourceCat.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
+
+                if (Filter == "Description")
+                {
+                    if (feed.Description.Contains(SearchQuery))
+                        searchFeeds.Add(feed);
+                }
             }
+
+            if (searchFeeds.Count == 0)
+            {
+                return RedirectToAction("Index", "NewsFeed", new { check = true });
+            }
+            ViewData["ShowNoResult"] = false;
             return View(searchFeeds);
         }
 
-        public IActionResult SearchPage()
-        {
-            return View();
-        }
-
-        // RSS FEED Codes
-        /*[HttpPost]
-        public ActionResult Index (string RSSURL)
-        {
-            WebClient wclient = new WebClient();
-            string RSSDate = wclient.DownloadString(RSSURL);
-
-            XDocument xml = XDocument.Parse(RSSDate);
-            var RSSFeedData = (from x in xml.Descendants("item") select new RSSFeed
-            {
-                Title = ((string)x.Element("title")),
-                Link = ((string)x.Element("link")),
-                Description = ((string)x.Element("description")),
-                PubDate = ((string)x.Element("pubDate"))
-            });
-            ViewBag.RSSFeed = RSSFeedData;
-            ViewBag.URL = RSSURL;
-            return View();
-        }*/
-        //[HttpPost]
-        //public async Task<IActionResult> Index(string RSSURL)
-        //{
-        //    var feed = await FeedReader.ReadAsync(RSSURL); //await will wait for the feed
-        //    RSSFeed rssfeed = new RSSFeed
-        //    {
-        //        Title = feed.Title,
-        //        Link = feed.Link,
-        //        Description = feed.Description,
-        //        PubDate = feed.LastUpdatedDateString
-        //    };
-
-        //    List<FeedItem> feedlist = new List<FeedItem>();
-        //    foreach (var item in feed.Items)
-        //    {
-        //        feedlist.Add(item);
-        //    }
-        //    ViewBag.RSSFeed = feedlist;
-
-        //    ViewBag.URL = RSSURL;
-        //    return View();
-        //}
+        
 
         // GET: ListSource
         public async Task<IActionResult> ListSource()
@@ -164,7 +167,8 @@ namespace AdminSide.Controllers
             {
                 _context.Add(feedSource);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListSource));
+                
             }
             return View(feedSource);
         }
@@ -203,6 +207,7 @@ namespace AdminSide.Controllers
                 {
                     _context.Update(feedSource);
                     await _context.SaveChangesAsync();
+                    
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -215,7 +220,7 @@ namespace AdminSide.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(ListSource));
             }
             return View(feedSource);
         }
@@ -246,7 +251,7 @@ namespace AdminSide.Controllers
             var feedSource = await _context.FeedSources.FindAsync(id);
             _context.FeedSources.Remove(feedSource);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(ListSource));
         }
 
         private bool FeedSourceExists(int id)

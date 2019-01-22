@@ -8,31 +8,39 @@
 
 <h4>FeedSource</h4>
 <hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="sourceName" class="control-label"></label>
-                <input asp-for="sourceName" class="form-control" />
-                <span asp-validation-for="sourceName" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="sourceURL" class="control-label"></label>
-                <input asp-for="sourceURL" class="form-control" />
-                <span asp-validation-for="sourceURL" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
+<div class=" container">
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="sourceName" class="control-label"></label>
+                    <input asp-for="sourceName" class="form-control" />
+                    <span asp-validation-for="sourceName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="sourceURL" class="control-label"></label>
+                    <input asp-for="sourceURL" class="form-control" />
+                    <span asp-validation-for="sourceURL" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" value="Create" class="btn btn-default" onclick="myFunction()" />
+                </div>
+            </form>
+        </div>
     </div>
+
+    <div>
+        <a asp-action="ListSource">Back to List</a>
+    </div>
+
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    }
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<script>
+function myFunction() {
+  alert("New Link Source has been added!");
 }
+</script>
