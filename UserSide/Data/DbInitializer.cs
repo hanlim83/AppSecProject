@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using UserSide.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace UserSide.Data
 {
@@ -55,8 +56,9 @@ namespace UserSide.Data
 
             var category = new ForumCategory[]
             {
-            new ForumCategory{CategoryName="General"},
-            new ForumCategory{CategoryName="Crypto"}
+            new ForumCategory { CategoryName="General" },
+            new ForumCategory { CategoryName="Crypto" },
+            new ForumCategory { CategoryName="Forensics" }
             };
 
             foreach (ForumCategory c in category)
@@ -65,19 +67,19 @@ namespace UserSide.Data
             }
             context.SaveChanges();
 
-            var post = new Post[]
-            {
-            new Post{ Title="Errors", Content="How To Fix", UserName="Elxxwy", CategoryID=1 },
-            new Post{ Title="General", Content="How To Do", UserName="Eevee", CategoryID=2 },
-            new Post{ Title="Errors", Content="How To UnFix", UserName="EVELYN", CategoryID=1 },
-            new Post{ Title="General", Content="How To Undo", UserName="Elxxwy", CategoryID=2 },
-            };
+            //var post = new Post[]
+            //{
+            //new Post{ Title="Errors", Content="How To Fix", UserName="Elxxwy", CategoryID=1 },
+            //new Post{ Title="General", Content="How To Do", UserName="Eevee", CategoryID=2 },
+            //new Post{ Title="Errors", Content="How To UnFix", UserName="EVELYN", CategoryID=1 },
+            //new Post{ Title="General", Content="How To Undo", UserName="Elxxwy", CategoryID=2 },
+            //};
 
-            foreach (Post p in post)
-            {
-                context.Posts.Add(p);
-            }
-            context.SaveChanges();
+            //foreach (Post p in post)
+            //{
+            //    context.Posts.Add(p);
+            //}
+            //context.SaveChanges();
 
         }
 
@@ -114,6 +116,31 @@ namespace UserSide.Data
             }
             context.SaveChanges();
 
+        }
+
+        public static void InitializeIdentity(ApplicationDbContext context)
+        {
+            context.Database.EnsureCreated();
+
+            //if (context.AspNetUsers.Any())
+            //{
+            //    return;   // DB has been seeded
+            //}
+
+            //var user = new IdentityUser
+            //{
+            //    UserName = "hugochiaxyz@gmail.com",
+            //    Email = "hugochiaxyz@gmail.com",
+            //    NormalizedEmail = "hugochiaxyz@gmail.com".ToUpper(),
+            //    NormalizedUserName = "hugochiaxyz@gmail.com".ToUpper(),
+            //};
+
+            //PasswordHasher<IdentityUser> ph = new PasswordHasher<IdentityUser>();
+            //user.PasswordHash = ph.HashPassword(user, "Pass123!");
+
+            //context.AspNetUsers.Add(user);
+
+            //context.SaveChanges();
         }
     }
 }

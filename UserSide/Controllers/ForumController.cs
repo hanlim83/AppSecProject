@@ -26,11 +26,6 @@ namespace UserSide.Controllers
             _userManager = userManager;
         }
 
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
-
         [Authorize]
         // GET: Forum Post
         public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? page)
@@ -94,6 +89,7 @@ namespace UserSide.Controllers
             return View(category);
             //return View(await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
         }
+
         [Authorize]
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
@@ -109,13 +105,19 @@ namespace UserSide.Controllers
                 //    .ThenInclude(e => e.Course)
                 //.AsNoTracking()
                 .SingleOrDefaultAsync(m => m.PostID == id);
+            List<Comment> comments = context1.Comments.FromSql("SELECT * FROM dbo.Comment WHERE PostID = " + post.PostID).ToList();
+            PostViewModel model = new PostViewModel
+            {
+                post = post,
+                Comments = comments
+            };
 
             if (post == null)
             {
                 return NotFound();
             }
 
-            return View(post);
+            return View(model);
         }
 
         [Authorize]
@@ -154,42 +156,38 @@ namespace UserSide.Controllers
 
             if (!user.UserName.Equals(post.UserName))
             {
-                return RedirectToAction("Index");
+                //return RedirectToAction("Index");
+                ViewData["ShowWrongDirectory"] = "false";
+                return RedirectToAction("Index", "Forum", new { check = false });
+            }
+            else if(user.UserName.Equals(post.UserName))
+            {
+                ViewData["ShowWrongDirectory"] = "true";
+                return RedirectToAction("Edit", "Forum", new { check = true });
             }
 
             PopulateCategoryDropDownList();
             return View(post);
         }
 
-        //// GET: Forum/Delete
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // GET: Forum/Delete
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var post = await context1.Posts
-        //        .AsNoTracking()
-        //        .SingleOrDefaultAsync(m => m.PostID == id);
-        //    if (post == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var post = await context1.Posts
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.PostID == id);
+            if (post == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(post);
-        //}
-
-        //// POST: Forum/Delete
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var post = await context1.Posts.FindAsync(id);
-        //    context1.Posts.Remove(post);
-        //    await context1.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
+            return View(post);
+        }
 
         // POST: Topic/Create
         [HttpPost]
@@ -204,11 +202,8 @@ namespace UserSide.Controllers
                 ////For username (can use it inside method also)
                 var username = user;
                 post.UserName = user.UserName;
-
                 post.DT = DateTime.Now;
-                //// GET THE ID
-                //var userName = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                //post.UserName = userName;
+
                 context1.Add(post);
                 await context1.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -251,24 +246,56 @@ namespace UserSide.Controllers
             return View(post);
         }
 
-        
+        // POST: Forum/PostReply
+        [HttpPost]
+        public async Task<IActionResult> PostReply(Comment comment, String PostID)
+        {
+            //Take in user object
+            var user = await _userManager.GetUserAsync(HttpContext.User);
+            //For username (can use it inside method also)
+            var username = user;
 
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            Comment c = new Comment();
+            c.UserName = user.UserName;
+            c.Content = comment.Content;
+            c.DT = DateTime.Now;
+            c.CommentID = comment.CommentID;
+            c.PostID = int.Parse(PostID);
+
+            context1.Add(c);
+            await context1.SaveChangesAsync();
+            return RedirectToAction("Details",new {id = PostID});
+        }
+
+        // POST: Forum/Delete
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var post = await context1.Posts.FindAsync(id);
+            context1.Posts.Remove(post);
+            await context1.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        // Checking if Post Exists
         private bool PostExists(int id)
         {
             return context1.Posts.Any(e => e.PostID == id);
         }
 
+        // Drop down List for Category
         private void PopulateCategoryDropDownList(object selectCategory = null)
         {
             var categoryQuery = from c in context1.ForumCategories
                                 orderby c.CategoryName
                                 select c;
             ViewBag.CategoryID = new SelectList(categoryQuery.AsNoTracking(), "CategoryID", "CategoryName", selectCategory);
-        }
-
-        public ActionResult DT(int year, int month, int day)
-        {
-            return Content(day + "-" + month + "-" + year);
         }
     }
 }

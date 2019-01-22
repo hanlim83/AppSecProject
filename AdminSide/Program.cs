@@ -4,6 +4,7 @@ using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,7 +17,7 @@ namespace AdminSide
         {
             SetEbConfig();
             var host = CreateWebHostBuilder(args).Build();
-
+            
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -26,10 +27,12 @@ namespace AdminSide
                     var contextC = services.GetRequiredService<CompetitionContext>();
                     var contextF = services.GetRequiredService<ForumContext>();
                     var contextNF = services.GetRequiredService<NewsFeedContext>();
+                    var contextIdentity = services.GetRequiredService<ApplicationDbContext>();
                     DbInitializer.InitializePlatformResources(contextPR);
                     DbInitializer.InitializeCompetitions(contextC);
                     DbInitializer.InitializeForum(contextF);
                     DbInitializer.InitializeNewsFeed(contextNF);
+                    DbInitializer.InitializeIdentity(contextIdentity);
                 }
                 catch (Exception ex)
                 {
