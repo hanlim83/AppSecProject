@@ -50,6 +50,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string AWSSecurityGroupReference { get; set; }
         public Workload Workload { get; set; }
         public Tenancy Tenancy { get; set; }
+        public string KeyPairName { get; set; }
 
         public int SubnetID { get; set; }
         public virtual Subnet LinkedSubnet { get; set; }

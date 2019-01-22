@@ -4,12 +4,12 @@ namespace AdminSide.Areas.PlatformManagement.Models
 {
     public enum Type
     {
-        IMPLICT_DENY,CUSTOM,HTTP,HTTPS,SSH,Telnet,FTP,ALL
+        IMPLICT_DENY,CUSTOM,HTTP,HTTPS,SSH,Telnet,FTP,ALL,ICMP,ICMPv6
     }
 
     public enum Protocol
     {
-        TCP,UDP,ICMP
+        TCP,UDP,ICMP,ALL,ICMPv6
     }
 
     public enum Direction
@@ -25,7 +25,6 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public Type Type { get; set; }
         [Required]
         public Protocol Protocol { get; set; }
-        [Required]
         public int Port { get; set; }
         [Required]
         public Direction Direction { get; set; }
