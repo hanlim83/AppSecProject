@@ -3,6 +3,7 @@ using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
+using Amazon.CloudWatchLogs.Model;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using Amazon.RDS;
@@ -89,7 +90,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         if (Flag == true)
                             break;
                     }
-                    if (Flag == true && legacy == false)
+                    if (Flag == false && legacy == false)
                     {
                         AuthorizeSecurityGroupIngressResponse responseAuthorizeSecurityGroupIngress = await ec2Client.AuthorizeSecurityGroupIngressAsync(new AuthorizeSecurityGroupIngressRequest
                         {
@@ -103,7 +104,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         {
                                             CidrIp = externalip + "/32"
                                         }
-                                    }
+                                    },
+                                    IpProtocol = "tcp",
+                                    FromPort = 1433,
+                                    ToPort = 1433
                                 }
                             },
                             GroupId = securityGroup.GroupId
@@ -122,7 +126,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                     IpRanges = new List<string>
                                     {
                                         externalip + "/32"
-                                    }
+                                    },
+                                    IpProtocol = "tcp",
+                                    FromPort = 1433,
+                                    ToPort = 1433
                                 }
                             },
                             GroupId = securityGroup.GroupId
@@ -139,7 +146,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         {
                                             CidrIp = externalip + "/32"
                                         }
-                                    }
+                                    },
+                                    IpProtocol = "tcp",
+                                    FromPort = 1433,
+                                    ToPort = 1433
                                 }
                             },
                             GroupId = securityGroup.GroupId
@@ -696,7 +706,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             };
                             context.RouteTables.Add(newRT);
                             context.SaveChanges();
-                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTable WHERE AWSVPCRouteTableReference = '"+RT.RouteTableId+"'").ToList();
+                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = '"+RT.RouteTableId+"'").ToList();
                             if (queryResult.Count() == 1)
                                 newRT = queryResult[0];
                             foreach (Amazon.EC2.Model.Route R in RT.Routes)
@@ -1101,6 +1111,64 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         }
                     } else
                         _logger.LogInformation("Route Tables already created!");
+                }
+                if(!context.CloudWatchLogGroups.Any() && !context.CloudWatchLogStreams.Any())
+                {
+                    _logger.LogInformation("Importing CloudWatch Data...");
+                    DescribeLogGroupsResponse responseDescribeLogGroups = await cwlClient.DescribeLogGroupsAsync(new DescribeLogGroupsRequest());
+                    foreach (LogGroup lg in responseDescribeLogGroups.LogGroups)
+                    {
+                        CloudWatchLogGroup newG = new CloudWatchLogGroup
+                        {
+                            ARN = lg.Arn,
+                            CreationTime = lg.CreationTime
+                        };
+                        if (lg.LogGroupName.Contains("/"))
+                            newG.Name = lg.LogGroupName.Replace("/", "");
+                        else
+                            newG.Name = lg.LogGroupName;
+                        if (lg.RetentionInDays != null)
+                            lg.RetentionInDays = (int)lg.RetentionInDays;
+                        context.CloudWatchLogGroups.Add(newG);
+                        context.SaveChanges();
+                        List<CloudWatchLogGroup> gQuery = context.CloudWatchLogGroups.FromSql("SELECT * FROM dbo.CloudWatchLogGroups WHERE ARN = '" + lg.Arn + "'").ToList();
+                        if (gQuery.Count() == 1)
+                            newG = gQuery[0];
+                        DescribeLogStreamsResponse responseDescribeLogStreams = await cwlClient.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                        {
+                            LogGroupName = lg.LogGroupName
+                        });
+                        foreach (LogStream ls in responseDescribeLogStreams.LogStreams)
+                        {
+                            CloudWatchLogStream newS = new CloudWatchLogStream
+                            {
+                                ARN = ls.Arn,
+                                CreationTime = ls.CreationTime,
+                                FirstEventTime = ls.FirstEventTimestamp,
+                                LastEventTime = ls.LastEventTimestamp,
+                                Name = ls.LogStreamName,
+                                LinkedGroupID = newG.ID
+                            };
+                            if (newG.Name.Equals("VMVPCLogs"))
+                                newS.DisplayName = "Network Flow Log For Challenge Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                            else if (newG.Name.Equals("PlatformVPCLogs"))
+                                newS.DisplayName = "Network Flow Log For Platform Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                            else if (newG.Name.Equals("RDSOSMetrics"))
+                            {
+                                if (newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                    newS.DisplayName = "SQL Database CPU Usage";
+                            }
+                            else if (newG.Name.Equals("awselasticbeanstalkUser-SideIIS-Log"))
+                                newS.DisplayName = "IIS Logs for User Side Web Server";
+                            else if (newG.Name.Equals("awselasticbeanstalkAdmin-SideIIS-Log"))
+                                newS.DisplayName = "IIS Logs for Admin Side Web Server";
+                            else
+                                newS.DisplayName = newS.Name;
+                            if (!newS.Name.Equals("db-MRSZXHTQCY5QYXKQI3COPKQUUI"))
+                                context.CloudWatchLogStreams.Add(newS);
+                        }
+                        await context.SaveChangesAsync();
+                    }
                 }
                 _logger.LogInformation("Setup Background Service Completed!");
             }
