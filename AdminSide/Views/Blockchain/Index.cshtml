@@ -22,20 +22,21 @@
                 </tr>
             </thead>
             <tbody>
-                    @foreach (var result in ViewBag.data)
-                    {
+                @foreach (var result in ViewBag.ResultList)
+                {
                     <tr>
                         <td>
-                            result.TeamName;
+                            @result.TeamName
                         </td>
                         <td>
-                            result.BlockchainScore;
+                            @result.BlockchainScore
                         </td>
                         <td>
-                            result.TeamScore;
+                            @result.TeamScore
                         </td>
                     </tr>
-                    }
+                }
             </tbody>
+        </table>
     </div>
 </div>

@@ -75,7 +75,7 @@ namespace AdminSide.Controllers
                     //true
                 }
             }
-            ViewBag.data = IncorrectTeams;
+            ViewBag.ResultList = IncorrectTeams;
             return View();
         }
     }
