@@ -15,9 +15,23 @@
     }
 
     #challengeButton {
-        margin: 10px;
+        margin: 10px 0px 10px 0px;
         /*height: 70px;
         width: 200px;*/
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    #bigdiv {
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    #inlineblock {
+        padding-left: 0px;
+        padding-right: 0px;
     }
 </style>
 
@@ -50,7 +64,7 @@
     {
         <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
         <hr>
-        <div class="col-md-12">
+        <div class="col-md-12" id="bigdiv">
             @{ counter = 0;}
             @foreach (var item1 in Model.Challenges)
             {
@@ -61,7 +75,7 @@
                     {
                         if (item1.ID == challengeID)
                         {
-                            <div class="col-md-3 d-inline-block">
+                            <div class="col-md-3 d-inline-block" id="inlineblock">
                                 <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
                                     @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
                                     <button type="button" class="btn btn-success w-100" id="challengeButton" data="@item1">
@@ -76,7 +90,7 @@
                     }
                     if (solved == false)
                     {
-                        <div class="col-md-3 d-inline-block">
+                        <div class="col-md-3 d-inline-block" id="inlineblock">
                             <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
                                 @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
                                 <button type="button" class="btn btn-dark w-100" id="challengeButton" data="@item1">
