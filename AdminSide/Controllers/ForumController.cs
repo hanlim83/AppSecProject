@@ -209,6 +209,8 @@ namespace AdminSide.Controllers
                 await context1.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateCategoryDropDownList();
             return View(post);
         }
 
@@ -249,31 +251,31 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
-        // POST: Forum/PostReply
-        [HttpPost]
-        public async Task<IActionResult> PostReply(Comment comment, String PostID)
-        {
-            //Take in user object
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            //For username (can use it inside method also)
-            var username = user;
+        //// POST: Forum/PostReply
+        //[HttpPost]
+        //public async Task<IActionResult> PostReply(Comment comment, String PostID)
+        //{
+        //    //Take in user object
+        //    var user = await _userManager.GetUserAsync(HttpContext.User);
+        //    //For username (can use it inside method also)
+        //    var username = user;
 
-            if (user == null)
-            {
-                return NotFound();
-            }
+        //    if (user == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            Comment c = new Comment();
-            c.UserName = user.UserName;
-            c.Content = comment.Content;
-            c.DT = DateTime.Now;
-            c.CommentID = comment.CommentID;
-            c.PostID = int.Parse(PostID);
+        //    Comment c = new Comment();
+        //    c.UserName = user.UserName;
+        //    c.Content = comment.Content;
+        //    c.DT = DateTime.Now;
+        //    c.CommentID = comment.CommentID;
+        //    c.PostID = int.Parse(PostID);
 
-            context1.Add(c);
-            await context1.SaveChangesAsync();
-            return RedirectToAction("Details", new { id = PostID });
-        }
+        //    context1.Add(c);
+        //    await context1.SaveChangesAsync();
+        //    return RedirectToAction("Details", new { id = PostID });
+        //}
 
         // POST: Forum/Delete
         [HttpPost, ActionName("Delete")]

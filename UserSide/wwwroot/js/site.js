@@ -6,4 +6,11 @@
             $(this).parent().addClass('active');
         }
     });
+    var incerment = 1;
+    var table = $("#" + incerment);
+    while (table != null) {
+        $('#' + incerment).DataTable();
+        ++incerment;
+        var table = $("#" + incerment);
+    }
 });

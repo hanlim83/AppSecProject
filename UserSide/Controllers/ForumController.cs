@@ -208,6 +208,8 @@ namespace UserSide.Controllers
                 await context1.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateCategoryDropDownList();
             return View(post);
         }
 
