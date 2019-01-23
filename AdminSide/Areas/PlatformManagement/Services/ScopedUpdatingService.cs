@@ -225,10 +225,15 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         server.State = State.Stopped;
                                         Flag = true;
                                     }
-                                    if (server.Visibility == Visibility.Internet && (server.IPAddress != instance.PublicIpAddress || server.DNSHostname != instance.PublicDnsName))
+                                    if (server.Visibility == Visibility.Internet && (server.IPAddress != instance.PublicIpAddress || server.DNSHostname != instance.PublicDnsName) && server.State != State.Stopped)
                                     {
                                         server.IPAddress = instance.PublicIpAddress;
                                         server.DNSHostname = instance.PublicDnsName;
+                                        Flag = true;
+                                    } else if (server.Visibility == Visibility.Internet && (server.IPAddress != instance.PublicIpAddress || server.DNSHostname != instance.PublicDnsName))
+                                    {
+                                        server.IPAddress = "Public IP Address is not available when server is stopped";
+                                        server.DNSHostname = "Public DNS Hostname is not available when server is stopped";
                                         Flag = true;
                                     }
                                     else if ((server.Visibility == Visibility.Extranet || server.Visibility == Visibility.Intranet) && (server.IPAddress != instance.PrivateIpAddress || server.DNSHostname != instance.PrivateDnsName))
