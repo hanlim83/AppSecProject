@@ -377,13 +377,13 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             BucketName = "ectf-keypair",
                             Key = deleted.KeyPairName+".pem"
                         });
-                        if (!deleted.LinkedSubnet.LinkedVPC.AWSVPCDefaultSecurityGroup.Equals(deleted.AWSSecurityGroupReference))
-                        {
-                            await EC2Client.DeleteSecurityGroupAsync(new DeleteSecurityGroupRequest
-                            {
-                                GroupId = deleted.AWSSecurityGroupReference
-                            });
-                        }
+                        //if (!deleted.LinkedSubnet.LinkedVPC.AWSVPCDefaultSecurityGroup.Equals(deleted.AWSSecurityGroupReference))
+                        //{
+                        //    await EC2Client.DeleteSecurityGroupAsync(new DeleteSecurityGroupRequest
+                        //    {
+                        //        GroupId = deleted.AWSSecurityGroupReference
+                        //    });
+                        //}
                         _context.Servers.Remove(deleted);
                         await _context.SaveChangesAsync();
                         ViewData["Result"] = "Successfully Deleted!";
