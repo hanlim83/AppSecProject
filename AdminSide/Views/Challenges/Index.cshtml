@@ -2,48 +2,45 @@
 
 @{
     ViewData["Title"] = "Index";
-    int counter=0;
 }
 
 <br>
-<div class="col-md-8 offset-2">
+<div class="container">
     <div class="float-right">
-        <a asp-action="Create" asp-route-id="@Model.ID"><button type="button" class="btn btn-primary">New Challenge</button></a>
+        <a asp-action="Create" asp-route-id="@Model.ID"><input type="button" value="New challenge" class="btn btn btn-primary"></a>
     </div>
     <br>
     <br>
-    @foreach (var item in Model.CompetitionCategories)
+    @foreach (var category in Model.CompetitionCategories)
     {
-        
-        <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
+
+        <h2>@Html.DisplayFor(modelItem => category.CategoryName)</h2>
         <hr>
         <div>
             <row>
                 <!--To standardize size of box/styling in future updates-->
                 <div>
-                    @{ counter = 0;}
-                    @foreach (var item1 in Model.Challenges)
-                    {
-                        if (item1.CompetitionCategoryID == item.ID)
-                        {
-                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
-                                <button type="button" class="btn btn-dark">
-                                    @Html.DisplayFor(modelItem => item1.Name)
-                                    <br>
-                                    @Html.DisplayFor(modelItem => item1.Value)
-                                </button>
-                            </a>
-                            counter++;
-                        }
-                    }
-                    @if (counter == 0)
+                    @if (category.Challenges.Count == 0)
                     {
                         <p>This category has no challenges yet</p>
+                    }
+                    else
+                    {
+                        @foreach (var challenge in category.Challenges)
+                        {
+                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.ID">
+                                <button type="button" class="btn btn-dark">
+                                    @Html.DisplayFor(modelItem => challenge.Name)
+                                    <br>
+                                    @Html.DisplayFor(modelItem => challenge.Value)
+                                </button>
+                            </a>
+                        }
                     }
                 </div>
             </row>
         </div>
     }
     <br>
-    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Back to Competition Details</button></a>
+    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><input type="button" value="Back to Competition Details" class="btn btn btn-default"></a>
 </div>

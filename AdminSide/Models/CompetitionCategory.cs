@@ -18,15 +18,7 @@ namespace AdminSide.Models
 
         [ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
-        //Competition competition { get; set; }
 
-        //public ICollection<Challenge> Challenges { get; set; }
-
-        
-        //From SO
-        //public string[] selectedCategories { get; set; }
-
-        //public List<string> Categories { get; set; }
-        //public virtual ICollection<CompetitionCategory> Categories { get; set; }
+        public ICollection<Challenge> Challenges { get; set; }
     }
 }

@@ -40,7 +40,8 @@ namespace AdminSide.Controllers
 
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(c1 => c1.Challenges)
+                //.Include(c => c.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
