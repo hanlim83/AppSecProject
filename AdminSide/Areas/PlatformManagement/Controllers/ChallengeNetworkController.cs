@@ -488,6 +488,16 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             RouteTable Internet = await _context.RouteTables.FindAsync(2);
                             requestRT.RouteTableId = Internet.AWSVPCRouteTableReference;
                             subnet.RouteTableID = Internet.ID;
+                            await EC2Client.ModifySubnetAttributeAsync(new ModifySubnetAttributeRequest
+                            {
+                                SubnetId = responseS.Subnet.SubnetId,
+                                MapPublicIpOnLaunch = true
+                            });
+                            await EC2Client.ModifySubnetAttributeAsync(new ModifySubnetAttributeRequest
+                            {
+                                SubnetId = responseS.Subnet.SubnetId,
+                                AssignIpv6AddressOnCreation = true
+                            });
                         }
                         else if (subnet.Type == Models.SubnetType.Extranet)
                         {
