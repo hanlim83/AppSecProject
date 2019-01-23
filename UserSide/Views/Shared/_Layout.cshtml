@@ -28,6 +28,7 @@
               asp-fallback-href="~/lib/DataTables/datatables.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
     </environment>
+    <link rel="stylesheet" href="~/lib/progress-tracker/progress-tracker.css" />
 </head>
 <body>
     <nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
@@ -35,7 +36,7 @@
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"></button>
             <a class="navbar-brand" asp-controller="Home" asp-action="Index">ASPJ_MVC</a>
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
-                
+
                 <partial name="_LoginPartial" />
 
             </div>
@@ -44,7 +45,6 @@
     <div class="container-fluid body-content">
         @RenderBody()
     </div>
-
     <environment include="Development">
         <script src="~/lib/jquery/jquery.js"></script>
         <script src="~/lib/popper/popper.js"></script>
@@ -69,9 +69,9 @@
                 asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
                 integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
                 crossorigin="anonymous">
-            <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.js"
-                asp-fallback-src="~/lib/DataTables/datatables.min.js"></script>
         </script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.js"
+                asp-fallback-src="~/lib/DataTables/datatables.min.js"></script>
         <script src="~/js/site.min.js" data-turbolinks-track="reload" asp-append-version="true"></script>
     </environment>
     @RenderSection("Scripts", required: false)
