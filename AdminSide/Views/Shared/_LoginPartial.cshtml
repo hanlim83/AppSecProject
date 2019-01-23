@@ -5,13 +5,22 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <ul class="nav navbar-nav mr-auto">
-        <li class="nav-item"><a asp-area="" asp-controller="CategoryDefaults" asp-action="Index" class="nav-link">Default Categories</a></li>
-        <li class="nav-item"><a asp-area="" asp-controller="Competitions" asp-action="Index" class="nav-link">Competitions</a></li>
-        <li class="nav-item"><a asp-area="" asp-controller="Newsfeed" asp-action="Index" class="nav-link">Newsfeed</a></li>
-        <li class="nav-item"><a asp-area="PlatformManagement" asp-controller="" asp-action="Index" class="nav-link">Platform Management</a></li>
-        <li class="nav-item"><a asp-area="" asp-controller="Forum" asp-action="Index" class="nav-link">Forum</a></li>
-    </ul>
+<ul class="nav navbar-nav mr-auto">
+    <li class="nav-item"><a asp-area="" asp-controller="CategoryDefaults" asp-action="Index" class="nav-link">Default Categories</a></li>
+    <li class="nav-item"><a asp-area="" asp-controller="Competitions" asp-action="Index" class="nav-link">Competitions</a></li>
+    <li class="nav-item"><a asp-area="PlatformManagement" asp-controller="" asp-action="Index" class="nav-link">Platform Management</a></li>
+    <li class="nav-item"><a asp-area="" asp-controller="Forum" asp-action="Index" class="nav-link">Forum</a></li>
+    @*<li class="nav-item"><a asp-area="" asp-controller="Newsfeed" asp-action="Index" class="nav-link">Newsfeed</a></li>*@
+    <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Newsfeed
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+            <a asp-area="" asp-controller="Newsfeed" asp-action="Index" class="dropdown-item">Index</a>
+            <a asp-area="" asp-controller="Newsfeed" asp-action="ListSource" class="dropdown-item">List Source</a>
+        </div>
+    </li>
+</ul>
     <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
             <li class="nav-item">
