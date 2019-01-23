@@ -33,10 +33,15 @@
                 <span asp-validation-for="Flag" class="text-danger"></span>
             </div>
             @*<div class="form-group">
+                    <label asp-for="CompetitionCategoryID" class="control-label"></label>
+                    <select asp-for="CompetitionCategoryID" class="form-control" asp-items="ViewBag.SelectList"></select>
+                    <span asp-validation-for="CompetitionCategoryID" class="text-danger"></span>
+                </div>*@
+            <div class="form-group">
                 <label asp-for="CompetitionCategoryID" class="control-label"></label>
-                <select asp-for="CompetitionCategoryID" class="form-control" asp-items="ViewBag.SelectList"></select>
+                <select asp-for="CompetitionCategoryID" class="form-control" asp-items="@ViewBag.SelectList"></select>
                 <span asp-validation-for="CompetitionCategoryID" class="text-danger"></span>
-            </div>*@
+            </div>
             <div>
                 <input type="hidden" asp-for="CompetitionCategoryID" value="@Model.CompetitionCategoryID">
                 <span asp-validation-for="CompetitionCategoryID" class="text-danger"></span>
@@ -48,12 +53,12 @@
 
             <!--Temporary uncomment file changing-->
             @*<div class="form-group">
-                <p>Upload one or more files using this form:</p>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="customFile" name="files" multiple />
-                    <label class="custom-file-label" for="customFile">Choose file</label>
-                </div>
-            </div>*@
+                    <p>Upload one or more files using this form:</p>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="customFile" name="files" multiple />
+                        <label class="custom-file-label" for="customFile">Choose file</label>
+                    </div>
+                </div>*@
             <br>
             <br>
             <div class="form-group">
