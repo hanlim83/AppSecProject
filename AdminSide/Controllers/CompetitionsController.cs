@@ -88,6 +88,11 @@ namespace AdminSide.Controllers
             //Tested and working^
             //Console.WriteLine(model.SelectedCategories.ElementAt(0));
             //Console.WriteLine(competitionCategory.Categories.ElementAt(0).CategoryName);
+            if (model.CompetitionCategory == null)
+            {
+                return RedirectToAction("Create");
+            }
+
             model.Competition.Status = "Upcoming";
             if (ModelState.IsValid)
             {
