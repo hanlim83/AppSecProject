@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UserSide.Data;
 using UserSide.Models;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace UserSide.Controllers
 {
@@ -28,51 +28,13 @@ namespace UserSide.Controllers
 
         [Authorize]
         // GET: Forum Post
-        public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? page)
+        public async Task<IActionResult> Index()
         {
 
             //Take in user object
             var user = await _userManager.GetUserAsync(HttpContext.User);
             ////For username (can use it inside method also)
             var username = user;
-
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
-
-            if (searchString != null)
-            {
-                page = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-
-            ViewData["CurrentFilter"] = searchString;
-
-            var posts = from p in context1.Posts
-                        select p;
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                posts = posts.Where(p => p.UserName.Contains(searchString));
-            }
-
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    posts = posts.OrderByDescending(p => p.UserName);
-                    break;
-                case "Date":
-                    posts = posts.OrderBy(p => p.DT);
-                    break;
-                case "date_desc":
-                    posts = posts.OrderByDescending(p => p.DT);
-                    break;
-                default:
-                    posts = posts.OrderBy(p => p.UserName);
-                    break;
-            }
 
             var category = await context1.ForumCategories
                 .Include(p => p.Posts)
@@ -84,10 +46,7 @@ namespace UserSide.Controllers
                 return NotFound();
             }
 
-            //int pageSize = 3;
-
             return View(category);
-            //return View(await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
         }
 
         [Authorize]
@@ -170,6 +129,7 @@ namespace UserSide.Controllers
             return View(post);
         }
 
+        [Authorize]
         // GET: Forum/Delete
         public async Task<IActionResult> Delete(int? id)
         {
@@ -189,6 +149,7 @@ namespace UserSide.Controllers
             return View(post);
         }
 
+        [Authorize]
         // POST: Topic/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -213,6 +174,7 @@ namespace UserSide.Controllers
             return View(post);
         }
 
+        [Authorize]
         // POST: Forum/Edit
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
@@ -248,6 +210,7 @@ namespace UserSide.Controllers
             return View(post);
         }
 
+        [Authorize]
         // POST: Forum/PostReply
         [HttpPost]
         public async Task<IActionResult> PostReply(Comment comment, String PostID)
@@ -274,6 +237,7 @@ namespace UserSide.Controllers
             return RedirectToAction("Details",new {id = PostID});
         }
 
+        [Authorize]
         // POST: Forum/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<AdminSide.Models.ForumCategory>
+
+@{
+    ViewData["Title"] = "CategoryD";
+}
+
+<div class="container">
+    <br />
+    <h2>Category Details</h2>
+    <br />
+    <p>
+        <a asp-action="NewCategory"><input type="button" class="btn btn-primary" value="Create New Category"></a>
+    </p>
+</div>
+<div class="container">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.CategoryName)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.CategoryName)
+                    </td>
+                    <td>
+                        <form asp-action="CategoryD" method="post">
+                            <input type="hidden" name="CategoryID" value="@item.CategoryID" />
+                            <input type="submit" class="btn btn-danger" value="Delete" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div class="container">
+    <a asp-action="Index">Back to Forum Page</a>
+</div>
+
