@@ -1,5 +1,4 @@
 ﻿@model IEnumerable<UserSide.Models.ForumCategory>
-@*@model UserSide.Models.ForumCategory*@
 
 @{
     ViewData["Title"] = "Index";
@@ -40,16 +39,6 @@
     <p>
         <a asp-action="NewTopicF"> New Topic </a>
     </p>
-
-    <form asp-action="Index" method="get">
-        <div class="form-actions no-colour">
-            <p>
-                Find by name: <input type="text" name="SearchString" value="@ViewData["CurrentFilter"]" />
-                <input type="submit" value="Search" class="btn btn-default" /> |
-                <a asp-action="Index"> Back to Full List</a>
-            </p>
-        </div>
-    </form>
 </div>
 
 <!-- Panel Category 1 -->
@@ -66,17 +55,13 @@
                 <div id="collapse1" class=".collapse in">
                     <div class="card-body" style="padding: 10px;">
 
-                        <table class="table">
+                        <table id="@category.CategoryID" class="table">
                             <thead>
                                 <tr>
                                     <th> Title </th>
                                     <th> Content </th>
-                                    <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]"> Posted By </a></th>
-                                    <th><a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]"> Posted On </a></th>
-                                    @*<th> @Html.DisplayNameFor(model => model.Title) </th>
-                                        <th> @Html.DisplayNameFor(model => model.Content) </th>
-                                        <th><a asp-action="Index" asp-route-sortOrder="@ViewData["NameSortParm"]">@Html.DisplayNameFor(model => model.UserName)</a></th>
-                                        <th><a asp-action="Index" asp-route-sortOrder="@ViewData["DateSortParm"]">@Html.DisplayNameFor(model => model.DT)</a></th>*@
+                                    <th>> Posted By </th>
+                                    <th> Posted On </th>
                                     <th></th>
                                 </tr>
                             </thead>

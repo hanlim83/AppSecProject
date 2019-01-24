@@ -11,25 +11,25 @@
     <table class="table">
         <thead>
             <tr>
-                <th> @Html.DisplayNameFor(model => model.post.Title) </th>
-                <th> @Html.DisplayNameFor(model => model.post.Content) </th>
-                <th> @Html.DisplayNameFor(model => model.post.UserName) </th>
-                <th> @Html.DisplayNameFor(model => model.post.DT) </th>
+                <th> @Html.DisplayNameFor(model => model.Post.Title) </th>
+                <th> @Html.DisplayNameFor(model => model.Post.Content) </th>
+                <th> @Html.DisplayNameFor(model => model.Post.UserName) </th>
+                <th> @Html.DisplayNameFor(model => model.Post.DT) </th>
             </tr>
         </thead>
         <tbody>
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => Model.post.Title)
+                    @Html.DisplayFor(modelItem => Model.Post.Title)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => Model.post.Content)
+                    @Html.DisplayFor(modelItem => Model.Post.Content)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => Model.post.UserName)
+                    @Html.DisplayFor(modelItem => Model.Post.UserName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => Model.post.DT)
+                    @Html.DisplayFor(modelItem => Model.Post.DT)
                 </td>
             </tr>
         </tbody>
@@ -44,7 +44,7 @@
     @using (Html.BeginForm("PostReply", "Forum", FormMethod.Post))
     {
         <input type="text" name="Content" style="width:1050px; height:50px; font-size: 20px" placeholder="Type New Comment..." />
-        <input id="hiddenIDInput" type="hidden" name="PostID" value="@Model.post.PostID" />
+        <input id="hiddenIDInput" type="hidden" name="PostID" value="@Model.Post.PostID" />
         <br />
         <br />
         <input type="submit" value="Post Reply" class="btn btn-success" style="float:inherit" />
