@@ -1334,8 +1334,6 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             }
                             else if (deleted.Protocol == Protocol.ALL)
                             {
-                            }
-                            {
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "-1";
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = -1;
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = -1;
@@ -1646,9 +1644,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     }
                     return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
                 }
-                catch (AmazonEC2Exception)
+                catch (AmazonEC2Exception e)
                 {
-                    TempData["Exception"] = "Delete Firewall Rule Failed! - E";
+                    TempData["Exception"] = "Delete Firewall Rule Failed! "+e.Message;
                     return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
                 }
             }
