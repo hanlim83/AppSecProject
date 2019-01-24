@@ -1,4 +1,5 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
+using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
@@ -6,8 +7,8 @@ using Amazon.CloudWatchLogs.Model;
 using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
@@ -34,32 +35,54 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+            {
+                Response = null,
+                Streams = _context.CloudWatchLogStreams.ToList(),
+                SelectedValue = 0
+
+            };
+            return View(model);
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> Index(string Component)
+        public async Task<IActionResult> Index(string StreamID)
         {
-            if (Component == null)
-                return View();
+            if (StreamID == null)
+            {
+                PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+                {
+                    Response = null,
+                    Streams = _context.CloudWatchLogStreams.ToList(),
+                    SelectedValue = 0
+                };
+                return View(model);
+            }
             else
             {
-                if (Component.Equals("RDS"))
+                CloudWatchLogStream selectedStream = await _context.CloudWatchLogStreams.FindAsync(int.Parse(StreamID));
+                if (selectedStream != null)
                 {
                     GetLogEventsResponse response = await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest
                     {
-                        LogGroupName = "RDSOSMetrics",
-                        LogStreamName = "db-74DSOXWDBQWHTVNTY7RFXWRZYE"
+                        LogGroupName = selectedStream.LinkedGroup.Name.Replace("@", "/"),
+                        LogStreamName = selectedStream.Name
                     });
-                    foreach (OutputLogEvent e in response.Events)
+                    foreach(OutputLogEvent e in response.Events)
                     {
-                        e.Message = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(e.Message),Formatting.Indented);
+                        e.Timestamp = e.Timestamp.ToLocalTime();
                     }
-                    return View(response);
+                    PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+                    {
+                        Response = response,
+                        Streams = _context.CloudWatchLogStreams.ToList(),
+                        SelectedValue = int.Parse(StreamID)
+                    };
+                    return View(model);
                 }
                 else
-                    return View();
+                    return NotFound();
             }
         }
 

@@ -1,4 +1,4 @@
-﻿@model AdminSide.Areas.PlatformManagement.Models.ChallengeNetworkParentModel
+﻿@model AdminSide.Areas.PlatformManagement.Models.ChallengeNetworkParentViewModel
 @{
     ViewData["Title"] = "Challenge Network";
 }
@@ -39,9 +39,13 @@
                         </div>
                     </div>
                 }
-                @await Html.PartialAsync("SubnetList", Model.retrievedSubnets)
-                <hr>
-                @await Html.PartialAsync("RouteList", Model.retrievedRoutes)
+                @await Html.PartialAsync("SubnetList", Model.RetrievedSubnets)
+                @if (Model.RetrievedSubnets.Count() != 0)
+                {
+                    <br />
+                    <hr>
+                }
+                @await Html.PartialAsync("RouteList", Model.RetrievedRoutes)
             </div>
         </div>
     </div>
