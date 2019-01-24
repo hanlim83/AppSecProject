@@ -26,12 +26,14 @@ namespace UserSide
                 try
                 {
                     //var contextC = services.GetRequiredService<CompetitionContext>();
-                    var contextF = services.GetRequiredService<ForumContext>();
                     //DbInitializer.InitializeCompetitions(contextC);
-                    DbInitializer.InitializeForum(contextF);
-
+                    var contextF = services.GetRequiredService<ForumContext>();
                     var contextChat = services.GetRequiredService<ChatContext>();
+                    var contextIdentity = services.GetRequiredService<ApplicationDbContext>();
+                    DbInitializer.InitializeForum(contextF);
                     DbInitializer.InitializeChat(contextChat);
+                    DbInitializer.InitializeIdentity(contextIdentity);
+
                 }
                 catch (Exception ex)
                 {

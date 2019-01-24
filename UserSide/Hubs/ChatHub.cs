@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Threading.Tasks;
 
 namespace UserSide.Hubs
 {
+    [Authorize]
     public class ChatHub : Hub
     {
      
+
         #region HubMethods
         //public Task SendMessage(string user, string message)
         //{

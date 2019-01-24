@@ -1,5 +1,6 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
+using AdminSide.Areas.PlatformManagement.Services;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using Amazon.Extensions.NETCore.Setup;
@@ -8,11 +9,13 @@ using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ActionConstraints;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -40,17 +43,23 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         private ChallengeServersCreationFormModel creationReference;
 
-        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
+        private readonly IApplicationLifetime _appLifetime;
+        private readonly ILogger _logger;
+
+        public IBackgroundTaskQueue Backgroundqueue { get; }
+
+        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client, IBackgroundTaskQueue Queue, IApplicationLifetime appLifetime, ILogger<ChallengeServersController> logger)
         {
             this._context = context;
             this.EC2Client = ec2Client;
             AmazonS3Config config = new AmazonS3Config
             {
-                ForcePathStyle = true,
-                UseAccelerateEndpoint = true
+                ForcePathStyle = true
             };
-
             this.S3Client = new AmazonS3Client(config);
+            Backgroundqueue = Queue;
+            _appLifetime = appLifetime;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -102,7 +111,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 model.serverDNS = selected.DNSHostname;
                 String keyPairString = null;
                 TransferUtility fileTransferUtility = new TransferUtility(S3Client);
-                fileTransferUtility.Download(@"C:\Tempt\"+selected.KeyPairName + ".pem", "ectf-keypair", selected.KeyPairName+".pem");
+                fileTransferUtility.Download(@"C:\Tempt\" + selected.KeyPairName + ".pem", "ectf-keypair", selected.KeyPairName + ".pem");
                 using (FileStream fileDownloaded = new FileStream(@"C:\Tempt\" + selected.KeyPairName + ".pem", FileMode.Open, FileAccess.Read))
                 {
                     using (StreamReader reader = new StreamReader(fileDownloaded))
@@ -125,7 +134,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         model.retrievedPassword = response.GetDecryptedPassword(keyPairString);
                         model.Available = true;
                     }
-                } else
+                }
+                else
                 {
                     model.keyPairDownloadURL = S3Client.GetPreSignedURL(new GetPreSignedUrlRequest
                     {
@@ -369,22 +379,27 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     TerminateInstancesResponse response = await EC2Client.TerminateInstancesAsync(request);
                     if (response.HttpStatusCode == HttpStatusCode.OK)
                     {
-                        await EC2Client.DeleteKeyPairAsync(new DeleteKeyPairRequest
+                        Backgroundqueue.QueueBackgroundWorkItem(async token =>
                         {
-                            KeyName = deleted.KeyPairName
-                        });
-                        await S3Client.DeleteObjectAsync(new DeleteObjectRequest
-                        {
-                            BucketName = "ectf-keypair",
-                            Key = deleted.KeyPairName+".pem"
-                        });
-                        if (!deleted.LinkedSubnet.LinkedVPC.AWSVPCDefaultSecurityGroup.Equals(deleted.AWSSecurityGroupReference))
-                        {
-                            await EC2Client.DeleteSecurityGroupAsync(new DeleteSecurityGroupRequest
+                            _logger.LogInformation("Deletion of server's resources scheduled");
+                            await Task.Delay(TimeSpan.FromMinutes(1), token);
+                            await EC2Client.DeleteKeyPairAsync(new DeleteKeyPairRequest
                             {
-                                GroupId = deleted.AWSSecurityGroupReference
+                                KeyName = deleted.KeyPairName
                             });
-                        }
+                            await S3Client.DeleteObjectAsync(new DeleteObjectRequest
+                            {
+                                BucketName = "ectf-keypair",
+                                Key = deleted.KeyPairName + ".pem"
+                            }); if (!deleted.LinkedSubnet.LinkedVPC.AWSVPCDefaultSecurityGroup.Equals(deleted.AWSSecurityGroupReference))
+                            {
+                                await EC2Client.DeleteSecurityGroupAsync(new DeleteSecurityGroupRequest
+                                {
+                                    GroupId = deleted.AWSSecurityGroupReference
+                                });
+                            }
+                            _logger.LogInformation("Deletion of server's resources done!");
+                        });
                         _context.Servers.Remove(deleted);
                         await _context.SaveChangesAsync();
                         ViewData["Result"] = "Successfully Deleted!";
@@ -411,16 +426,16 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             Server selected = await _context.Servers.FindAsync(Int32.Parse(serverID));
             if (selected != null)
             {
-                StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
-                {
-                    InstanceIds = new List<string> {
-                    selected.AWSEC2Reference
-            }
-                });
-                if (response.HttpStatusCode == HttpStatusCode.OK)
-                    return View(selected);
-                else
-                    return StatusCode(500);
+                //    StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+                //    {
+                //        InstanceIds = new List<string> {
+                //        selected.AWSEC2Reference
+                //}
+                //    });
+                //    if (response.HttpStatusCode == HttpStatusCode.OK)
+                return View(selected);
+                //else
+                //    return StatusCode(500);
             }
             else
                 return NotFound();
@@ -1335,8 +1350,6 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             }
                             else if (deleted.Protocol == Protocol.ALL)
                             {
-                            }
-                            {
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].IpProtocol = "-1";
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].FromPort = -1;
                                 requestRevokeSecurityGroupIngress.IpPermissions[0].ToPort = -1;
@@ -1647,9 +1660,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     }
                     return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
                 }
-                catch (AmazonEC2Exception)
+                catch (AmazonEC2Exception e)
                 {
-                    TempData["Exception"] = "Delete Firewall Rule Failed! - E";
+                    TempData["Exception"] = "Delete Firewall Rule Failed! " + e.Message;
                     return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
                 }
             }

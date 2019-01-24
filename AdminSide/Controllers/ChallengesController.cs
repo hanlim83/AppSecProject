@@ -7,7 +7,6 @@ using AdminSide.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
-using System.Net.Http.Headers;
 using System.IO;
 using Amazon.S3.Transfer;
 using Amazon.S3;
@@ -41,7 +40,8 @@ namespace AdminSide.Controllers
 
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(c1 => c1.Challenges)
+                //.Include(c => c.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
@@ -69,6 +69,24 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
+
+            ViewData["CompetitionID"] = challenge.CompetitionID;
+
+            var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .Include(c1 => c1.Challenges)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
+
+            var dictionary = new Dictionary<int, string>
+            {
+
+            };
+            foreach (var category in competition.CompetitionCategories)
+            {
+                dictionary.Add(category.ID, category.CategoryName);
+            }
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
 
             return View(challenge);
         }
@@ -207,57 +225,6 @@ namespace AdminSide.Controllers
                 var fileTransferUtility = new TransferUtility(S3Client);
                 await fileTransferUtility.UploadAsync(uploadRequest);
             }
-        }
-
-        // GET: Challenges/Edit/5
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var challenge = await _context.Challenges.FindAsync(id);
-            if (challenge == null)
-            {
-                return NotFound();
-            }
-            return View(challenge);
-        }
-
-        // POST: Challenges/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge)
-        {
-            if (id != challenge.ID)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(challenge);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ChallengeExists(challenge.ID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(challenge);
         }
 
         // GET: Challenges/Delete/5

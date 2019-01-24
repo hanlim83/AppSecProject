@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amazon.S3;
@@ -79,7 +81,7 @@ namespace UserSide.Controllers
             }
             else
             {
-                return RedirectToAction("Index", "Competitions");
+                return RedirectToAction("Index", "Competitions", new { check = true });
             }
         }
 
@@ -177,10 +179,11 @@ namespace UserSide.Controllers
             //    await _context.SaveChangesAsync();
             //    return RedirectToAction(nameof(Index));
             //}
-            if (challenge.CompetitionID == null)
-            {
-                return NotFound();
-            }
+            
+            //if (challenge.CompetitionID == null)
+            //{
+            //    return NotFound();
+            //}
 
             var temp_challenge = await _context.Challenges
                 .FirstOrDefaultAsync(m => m.ID == challenge.ID);
@@ -188,10 +191,9 @@ namespace UserSide.Controllers
             {
                 return NotFound();
             }
-
+            // Flag is correct
             if (challenge.Flag.Equals(temp_challenge.Flag))
             {
-                //Flag is correct
                 //Add entry to TeamChallenge
                 TeamChallenge teamChallenge = new TeamChallenge();
                 teamChallenge.ChallengeId = localvarchallenge.ID;
@@ -199,16 +201,42 @@ namespace UserSide.Controllers
                 _context.Add(teamChallenge);
                 await _context.SaveChangesAsync();
 
+                //Add entry to chain
+                //Block and block data
+                Block block = new Block();
+                block.TimeStamp = DateTime.Now;
+                block.CompetitionID = challenge.CompetitionID;
+                block.TeamID = team.TeamID;
+                block.ChallengeID = localvarchallenge.ID;
+                block.TeamChallengeID = teamChallenge.TeamChallengeID;
+                block.Score = localvarchallenge.Value;
+                //Previous Hash
+                Blockchain blockchain = new Blockchain(_context);
+                Block latestBlock = await blockchain.GetLatestBlock();
+                block.PreviousHash = latestBlock.Hash;
+                //Current Hash
+                string data = block.TimeStamp + ";" + block.CompetitionID + ";" + block.TeamID + ";" + block.ChallengeID + ";" + block.TeamChallengeID + ";" + block.Score + ";" + block.PreviousHash;
+                block.Hash = GenerateSHA512String(data);
+
+                _context.Add(block);
+                await _context.SaveChangesAsync();
+
                 //Add points to team score
                 team.Score += localvarchallenge.Value;
-                //team.TeamChallenges = new Collection<TeamChallenge>();
-                //team.TeamChallenges.Add(teamChallenge);
                 _context.Update(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
             }
             //Wrong flag
             return RedirectToAction("Details", "Challenges", new { id });
+        }
+
+        private static string GenerateSHA512String(string inputString)
+        {
+            SHA512 sha512 = SHA512.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(inputString);
+            byte[] hash = sha512.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
 
         private async Task<bool> ValidateUserJoined(int id)
