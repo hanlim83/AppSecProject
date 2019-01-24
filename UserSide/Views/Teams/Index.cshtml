@@ -25,7 +25,8 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Teams)
+            @*@{var SortedList = Model.Teams.OrderByDescending(t => t.Score).ToList(); }*@
+            @foreach (var item in Model.Teams.OrderByDescending(t => t.Score).ToList())
             {
                 <tr>
                     <td>

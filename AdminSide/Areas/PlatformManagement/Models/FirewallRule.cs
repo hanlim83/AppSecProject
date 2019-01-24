@@ -4,7 +4,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
 {
     public enum Type
     {
-        IMPLICT_DENY,CUSTOM,HTTP,HTTPS,SSH,Telnet,FTP,ALL,ICMP,ICMPv6
+        IMPLICT_DENY,CUSTOM,HTTP,HTTPS,SSH,RDPT,RDPU,Telnet,FTP,ALL,ICMP,ICMPv6
     }
 
     public enum Protocol
