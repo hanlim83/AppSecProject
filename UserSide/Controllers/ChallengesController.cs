@@ -39,7 +39,7 @@ namespace UserSide.Controllers
         {
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
                 .Include(c => c.Teams)
@@ -83,6 +83,7 @@ namespace UserSide.Controllers
                             }
                         }
                     }
+                    ViewData["Archived"] = false;
                     return View(competition);
                 }
                 else
@@ -92,6 +93,7 @@ namespace UserSide.Controllers
             }
             else
             {
+                ViewData["Archived"] = true;
                 return View(competition);
             }
         }
