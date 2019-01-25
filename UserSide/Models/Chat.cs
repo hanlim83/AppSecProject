@@ -13,9 +13,8 @@ namespace UserSide.Models
         public int ChatID { get; set; }
         public int MsgCount { get; set; }
 
-        public UserChat UserChat {get; set;}
-        [ForeignKey("UserId")]
-        public string UserId { get; set; }
+        public string UserOne { get; set; }
+        public string UserTwo { get; set; }
         //public GroupChat GroupChat { get; set; }
         //public int GroupId { get; set; }
 
