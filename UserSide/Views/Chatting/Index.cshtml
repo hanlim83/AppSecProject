@@ -16,7 +16,10 @@
                 @Html.DisplayNameFor(model => model.MsgCount)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserChat)
+                @Html.DisplayNameFor(model => model.UserOne)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserTwo)
             </th>
             <th></th>
         </tr>
@@ -28,7 +31,10 @@
                 @Html.DisplayFor(modelItem => item.MsgCount)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.UserChat.UserId)
+                @Html.DisplayFor(modelItem => item.UserOne)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserTwo)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.ChatID">Edit</a> |
