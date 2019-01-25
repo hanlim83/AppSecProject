@@ -6,8 +6,7 @@
 }
 
 <title>@ViewData["Title"] - Challenges</title>
-@*<link href="~/StyleSheet.css" rel="stylesheet"/>*@
-<!--Using internal style sheet temporarily-->
+
 <style>
     #divCompetition {
         margin-left: auto;
@@ -15,15 +14,28 @@
     }
 
     #challengeButton {
-        margin: 10px;
+        margin: 10px 0px 10px 0px;
         /*height: 70px;
         width: 200px;*/
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    #bigdiv {
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    #inlineblock {
+        padding-left: 0px;
+        padding-right: 0px;
     }
 </style>
 
 <br>
 <div class="container">
-    @*<a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">View Scoreboard</button></a>*@
     <div class="btn-group d-flex" role="group">
         <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Challenges" class="btn btn btn-outline-info w-100 active"></a>
         <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Scoreboard" class="btn btn btn-outline-info w-100"></a>
@@ -33,41 +45,44 @@
     @{ var SolveChallengeList = new List<int>(); }
     @*check here to populate green or black(means haven't solve)
         return team id from controller*@
-    @foreach (var team in Model.Teams)
+    @if ((bool)ViewData["Archived"] != true)
     {
-        if (team.TeamID == (int)ViewData["TeamID"])
+        foreach (var team in Model.Teams)
         {
-            foreach (var teamchallenge in team.TeamChallenges)
+            if (team.TeamID == (int)ViewData["TeamID"])
             {
-                if (teamchallenge.TeamId == team.TeamID)
+                foreach (var teamchallenge in team.TeamChallenges)
                 {
-                    SolveChallengeList.Add(teamchallenge.ChallengeId);
+                    if (teamchallenge.TeamId == team.TeamID)
+                    {
+                        SolveChallengeList.Add(teamchallenge.ChallengeId);
+                    }
                 }
             }
         }
     }
-    @foreach (var item in Model.CompetitionCategories)
+    @foreach (var category in Model.CompetitionCategories)
     {
-        <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
+        <h2>@Html.DisplayFor(modelItem => category.CategoryName)</h2>
         <hr>
-        <div class="col-md-12">
-            @{ counter = 0;}
-            @foreach (var item1 in Model.Challenges)
+        <div class="col-md-12" id="bigdiv">
+            @if ((bool)ViewData["Archived"] != true)
             {
-                if (item1.CompetitionCategoryID == item.ID)
+                counter = 0;
+                @foreach (var challenge in category.Challenges)
                 {
                     bool solved = false;
                     @foreach (var challengeID in SolveChallengeList)
                     {
-                        if (item1.ID == challengeID)
+                        if (challenge.ID == challengeID)
                         {
-                            <div class="col-md-3 d-inline-block">
-                                <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
+                            <div class="col-md-3 d-inline-block" id="inlineblock">
+                                <a asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.ID">
                                     @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
-                                    <button type="button" class="btn btn-success w-100" id="challengeButton" data="@item1">
-                                        @Html.DisplayFor(modelItem => item1.Name)
+                                    <button type="button" class="btn btn-success w-100" id="challengeButton" data="@challenge">
+                                        @Html.DisplayFor(modelItem => challenge.Name)
                                         <br>
-                                        @Html.DisplayFor(modelItem => item1.Value)
+                                        @Html.DisplayFor(modelItem => challenge.Value)
                                     </button>
                                 </a>
                             </div>
@@ -76,33 +91,53 @@
                     }
                     if (solved == false)
                     {
-                        <div class="col-md-3 d-inline-block">
-                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@item1.ID">
+                        <div class="col-md-3 d-inline-block" id="inlineblock">
+                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.ID">
                                 @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
-                                <button type="button" class="btn btn-dark w-100" id="challengeButton" data="@item1">
-                                    @Html.DisplayFor(modelItem => item1.Name)
+                                <button type="button" class="btn btn-dark w-100" id="challengeButton" data="@challenge">
+                                    @Html.DisplayFor(modelItem => challenge.Name)
                                     <br>
-                                    @Html.DisplayFor(modelItem => item1.Value)
+                                    @Html.DisplayFor(modelItem => challenge.Value)
                                 </button>
                             </a>
                         </div>
                     }
                     counter++;
                 }
+                @if (counter == 0)
+                {
+                    <p>This category has no challenges yet</p>
+                }
             }
-            @if (counter == 0)
+            else
             {
-                <p>This category has no challenges yet</p>
+                counter = 0;
+                @foreach (var challenge in category.Challenges)
+                {
+                    <div class="col-md-3 d-inline-block" id="inlineblock">
+                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.ID">
+                            @*<button type="button" class="btn btn-light" data-toggle="modal" data-target="#exampleModalCenter" data="@item1">*@
+                            <button type="button" class="btn btn-dark w-100" id="challengeButton" data="@challenge">
+                                @Html.DisplayFor(modelItem => challenge.Name)
+                                <br>
+                                @Html.DisplayFor(modelItem => challenge.Value)
+                            </button>
+                        </a>
+                    </div>
+                    counter++;
+                }
+                @if (counter == 0)
+                {
+                    <p>This category has no challenges yet</p>
+                }
             }
         </div>
     }
     <br>
-    @*<a asp-controller="Competitions" asp-action="Index"><button type="button" class="btn btn-default">Back</button></a>*@
     <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-default"></a>
-
 </div>
 
-<!-- Modal -->
+@*Modal
 <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
@@ -121,4 +156,4 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@

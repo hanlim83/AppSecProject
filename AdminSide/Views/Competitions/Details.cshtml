@@ -11,40 +11,41 @@
         <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Teams" class="btn btn btn-outline-info w-100"></a>
     </div>
     <br>
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.CompetitionName)
-        </dt>
+    <h1>
+        @Html.DisplayNameFor(model => model.CompetitionName)
+    </h1>
+    <p>
+        @Html.DisplayFor(model => model.CompetitionName)
+    </p>
+    <h1>
+        @Html.DisplayNameFor(model => model.Status)
+    </h1>
+    <p>
+        @Html.DisplayFor(model => model.Status)
+    </p>
+    <h1>
+        @Html.DisplayNameFor(model => model.BucketName)
+    </h1>
+    <p>
+        @Html.DisplayFor(model => model.BucketName)
+    </p>
+    <table class="table">
+        <tr>
+            <th>Testing</th>
+        </tr>
+        @foreach (var item in Model.CompetitionCategories)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CategoryName)
+                </td>
+            </tr>
+        }
+    </table>
+    @*<dl class="dl-horizontal">
+
         <dd>
-            @Html.DisplayFor(model => model.CompetitionName)
+
         </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt>
-            @Html.DisplayNameFor(model => model.BucketName)
-        </dt>
-        <dd>
-            @Html.DisplayFor(model => model.BucketName)
-        </dd>
-        <dd>
-            <table class="table">
-                <tr>
-                    <th>Testing</th>
-                </tr>
-                @foreach (var item in Model.CompetitionCategories)
-                {
-                    <tr>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.CategoryName)
-                        </td>
-                    </tr>
-                }
-            </table>
-        </dd>
-    </dl>
-    <h1>ADMIN DASHBOARD</h1>
+    </dl>*@
 </div>

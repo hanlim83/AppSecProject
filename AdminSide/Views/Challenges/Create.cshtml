@@ -4,6 +4,12 @@
     ViewData["Title"] = "Create";
 }
 
+<style>
+    .custom-file-input ~ .custom-file-label::after {
+        
+    }
+</style>
+
 <br>
 <div class="container">
     <h2>Create Challenge</h2>
@@ -62,7 +68,7 @@
             </div>*@
         <!--Testing nice UI-->
         <div class="form-group">
-            <p>Upload one or more files using this form:</p>
+            <p>Upload file using this form:</p>
             <div class="custom-file">
                 <input type="file" class="custom-file-input" id="customFile" name="files" multiple />
                 <label class="custom-file-label" for="customFile">Choose file</label>
@@ -87,3 +93,10 @@
     <a asp-action="Index">Back to List</a>
 </div>
 -->
+
+<script>
+    $('input[type="file"]').change(function (e) {
+        var fileName = e.target.files[0].name;
+        $('.custom-file-label').html(fileName);
+    });
+</script>
