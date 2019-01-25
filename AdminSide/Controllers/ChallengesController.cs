@@ -73,7 +73,7 @@ namespace AdminSide.Controllers
 
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
 
@@ -134,7 +134,8 @@ namespace AdminSide.Controllers
             
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
+                //.Include(c1 => c1.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
@@ -165,7 +166,8 @@ namespace AdminSide.Controllers
         {
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
+                //.Include(c1 => c1.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
 

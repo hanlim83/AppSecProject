@@ -211,6 +211,7 @@ namespace UserSide.Controllers
                 TeamChallenge teamChallenge = new TeamChallenge();
                 teamChallenge.ChallengeId = localvarchallenge.ID;
                 teamChallenge.TeamId = team.TeamID;
+                teamChallenge.Solved = true;
                 _context.Add(teamChallenge);
                 await _context.SaveChangesAsync();
 
