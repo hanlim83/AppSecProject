@@ -402,18 +402,18 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         });
                         _context.Servers.Remove(deleted);
                         await _context.SaveChangesAsync();
-                        ViewData["Result"] = "Successfully Deleted!";
+                        TempData["Result"] = "Successfully Deleted!";
                         return RedirectToAction("");
                     }
                     else
                     {
-                        ViewData["Result"] = "Deletion Failed!";
+                        TempData["Result"] = "Deletion Failed!";
                         return RedirectToAction("");
                     }
                 }
                 catch (AmazonEC2Exception e)
                 {
-                    ViewData["Result"] = e.Message;
+                    TempData["Result"] = e.Message;
                     return RedirectToAction("");
                 }
             }
@@ -518,10 +518,6 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     Vrequest.Size = ServerStorage;
                     retrieved.StorageAssigned = ServerStorage;
                 }
-                else
-                {
-
-                }
                 Tenancy previous = retrieved.Tenancy;
                 if (ServerTenancy.Equals("Dedicated Instance") && retrieved.Tenancy != Tenancy.DedicatedInstance)
                 {
@@ -533,10 +529,6 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     Prequest.Tenancy = HostTenancy.Host;
                     retrieved.Tenancy = Tenancy.DedicatedHardware;
                 }
-                else
-                {
-
-                }
                 if (Irequest.InstanceType != null)
                 {
                     try
@@ -545,6 +537,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     }
                     catch (AmazonEC2Exception)
                     {
+                        TempData["Exception"] = "Failed to Modify Server Workload";
                         return RedirectToAction("");
                     }
                 }
@@ -556,6 +549,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     }
                     catch (AmazonEC2Exception)
                     {
+                        TempData["Exception"] = "Failed to Modify Server Storage Size";
                         return RedirectToAction("");
                     }
                 }
@@ -574,6 +568,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             retrieved.AWSEC2Reference
                         }
                     });
+                    TempData["Result"] = "Modification Sucessful!";
                     return RedirectToAction("");
                 }
                 catch (DbUpdateConcurrencyException)
@@ -611,6 +606,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     retrieved.Tenancy = previous;
                     _context.Servers.Update(retrieved);
                     await _context.SaveChangesAsync();
+                    TempData["Exception"] = "Failed to Modify Server Tenancy";
                     return RedirectToAction("");
                 }
             }
@@ -634,6 +630,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     retrieved.State = State.Starting;
                     _context.Servers.Update(retrieved);
                     await _context.SaveChangesAsync();
+                    TempData["Result"] = "Server is now starting";
                     return RedirectToAction("");
                 }
                 else
@@ -653,6 +650,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     retrieved.State = State.Stopping;
                     _context.Servers.Update(retrieved);
                     await _context.SaveChangesAsync();
+                    TempData["Result"] = "Server is now stopping";
                     return RedirectToAction("");
                 }
                 else
@@ -987,7 +985,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    ViewData["Exception"] = "Creation Failed! - M";
+                                    ViewData["Exception"] = "Creation Failed!";
                                     ViewData["ServerID"] = modified.ID;
                                     return View();
                                 }
@@ -1273,7 +1271,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 }
                                 else
                                 {
-                                    ViewData["Exception"] = "Creation Failed! - M";
+                                    ViewData["Exception"] = "Creation Failed!";
                                     ViewData["ServerID"] = modified.ID;
                                     return View();
                                 }
@@ -1658,6 +1656,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
                         }
                     }
+                    TempData["Result"] = "Firewall Rule Deleted Sucessfully!";
                     return RedirectToAction("ModifyServer", new { serverID = deleted.ServerID });
                 }
                 catch (AmazonEC2Exception e)

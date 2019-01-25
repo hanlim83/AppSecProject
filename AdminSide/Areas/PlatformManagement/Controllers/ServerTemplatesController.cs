@@ -105,7 +105,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     _context.Templates.Update(found);
                     await _context.SaveChangesAsync();
-                    ViewData["Result"] = "Sucessfullly Modified!";
+                    TempData["Result"] = "Sucessfullly Modified!";
                     return RedirectToAction("");
                 }
                 catch (DbUpdateConcurrencyException)
@@ -113,12 +113,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     found = await _context.Templates.FindAsync(modified.ID);
                     if (found == null)
                     {
-                        ViewData["Result"] = "Template Not Found! May have been deleted by another user";
+                        TempData["Result"] = "Template Not Found! May have been deleted by another user";
                         return RedirectToAction("");
                     }
                     else
                     {
-                        ViewData["Result"] = "Template has been ediited by another user, your changes were not saved";
+                        TempData["Result"] = "Template has been ediited by another user, your changes were not saved";
                         return RedirectToAction("");
                     }
                 }
@@ -140,12 +140,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     _context.Templates.Remove(deleted);
                     await _context.SaveChangesAsync();
-                    ViewData["Result"] = "Deleted Sucessfully!";
+                    TempData["Result"] = "Deleted Sucessfully!";
                     return RedirectToAction("");
                 }
                 else
                 {
-                    ViewData["Result"] = "Delete Failed!";
+                    TempData["Result"] = "Delete Failed!";
                     return RedirectToAction("");
                 }
             }
