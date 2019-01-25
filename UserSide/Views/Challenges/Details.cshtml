@@ -54,6 +54,12 @@
             </div>
         </form>
     </div>
+    @if ((bool)ViewData["WrongFlag"] == true)
+    {
+        <div class="alert alert-danger" role="alert">
+            <p style="margin:0px;">Incorrect flag. Try again!</p>
+        </div>
+    }
     <div>
         <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back" class="btn btn btn-default"></a>
     </div>
