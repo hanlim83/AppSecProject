@@ -23,7 +23,7 @@ namespace AdminSide.Models
         public string Flag { get; set; }
         public string FileName { get; set; }
 
-        [ForeignKey("CompetitionID")]
+        //[ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
         [Display(Name = "Competition Category")]
         [ForeignKey("CompetitionCategoryID")]

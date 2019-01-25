@@ -60,7 +60,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 {
                     GroupIds = new List<string>
                 {
-                    "sg-0559c27d2fd168141"
+                    "sg-05613fe8f8f7a54c4"
                 }
                 });
                 if (responseDescribeSecurityGroups.SecurityGroups[0] != null)
