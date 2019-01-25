@@ -12,5 +12,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string AWSVPCReference { get; set; }
         public string AWSVPCDefaultSecurityGroup { get; set; }
         public VPCType type { get; set; }
+        public string BaseIPv4CIDR { get; set; }
+        public string BaseIPv6CIDR { get; set; }
     }
 }
