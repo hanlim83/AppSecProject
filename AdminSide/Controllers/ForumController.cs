@@ -28,51 +28,13 @@ namespace AdminSide.Controllers
 
         [Authorize]
         // GET: Forum Post
-        public async Task<IActionResult> Index(string sortOrder, string searchString, string currentFilter, int? page)
+        public async Task<IActionResult> Index()
         {
 
             //Take in user object
             var user = await _userManager.GetUserAsync(HttpContext.User);
             ////For username (can use it inside method also)
             var username = user;
-
-            ViewData["CurrentSort"] = sortOrder;
-            ViewData["NameSortParm"] = String.IsNullOrEmpty(sortOrder) ? "name_desc" : "";
-            ViewData["DateSortParm"] = sortOrder == "Date" ? "date_desc" : "Date";
-
-            if (searchString != null)
-            {
-                page = 1;
-            }
-            else
-            {
-                searchString = currentFilter;
-            }
-
-            ViewData["CurrentFilter"] = searchString;
-
-            var posts = from p in context1.Posts
-                        select p;
-            if (!String.IsNullOrEmpty(searchString))
-            {
-                posts = posts.Where(p => p.UserName.Contains(searchString));
-            }
-
-            switch (sortOrder)
-            {
-                case "name_desc":
-                    posts = posts.OrderByDescending(p => p.UserName);
-                    break;
-                case "Date":
-                    posts = posts.OrderBy(p => p.DT);
-                    break;
-                case "date_desc":
-                    posts = posts.OrderByDescending(p => p.DT);
-                    break;
-                default:
-                    posts = posts.OrderBy(p => p.UserName);
-                    break;
-            }
 
             var category = await context1.ForumCategories
                 .Include(p => p.Posts)
@@ -84,10 +46,7 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            //int pageSize = 3;
-
             return View(category);
-            //return View(await PaginatedList<Post>.CreateAsync(posts.AsNoTracking(), page ?? 1, pageSize));
         }
 
         [Authorize]
@@ -108,7 +67,7 @@ namespace AdminSide.Controllers
             List<Comment> comments = context1.Comments.FromSql("SELECT * FROM dbo.Comment WHERE PostID = " + post.PostID).ToList();
             PostViewModel model = new PostViewModel
             {
-                post = post,
+                Post = post,
                 Comments = comments
             };
 
@@ -185,13 +144,21 @@ namespace AdminSide.Controllers
         }
 
         [Authorize]
+        // GET: Category/Details
+        public async Task<IActionResult> CategoryD()
+        {
+            return View(await context1.ForumCategories.ToListAsync());
+        }
+
+        [Authorize]
         // GET: Category/New
         public IActionResult NewCategory()
         {
             return View();
         }
 
-        // POST: Topic/New
+        [Authorize]
+        // POST: Topic/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> NewTopicF([Bind("Title,Content,UserName, DT, CategoryID")] Post post)
@@ -200,7 +167,7 @@ namespace AdminSide.Controllers
             {
                 //Take in user object
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                ////For username (can use it inside method also)
+                //For username (can use it inside method also)
                 var username = user;
                 post.UserName = user.UserName;
                 post.DT = DateTime.Now;
@@ -209,9 +176,12 @@ namespace AdminSide.Controllers
                 await context1.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+
+            PopulateCategoryDropDownList();
             return View(post);
         }
 
+        [Authorize]
         // POST: Forum/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -275,6 +245,7 @@ namespace AdminSide.Controllers
             return RedirectToAction("Details", new { id = PostID });
         }
 
+        [Authorize]
         // POST: Forum/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -286,7 +257,28 @@ namespace AdminSide.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        // POST: Topic/New
+        [Authorize]
+        // POST: Category/Details
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CategoryD(string CategoryID)
+        {
+            ForumCategory forumCategory = await context1.ForumCategories.FindAsync(int.Parse(CategoryID));
+            if (forumCategory != null)
+            {
+                context1.ForumCategories.Remove(forumCategory);
+                await context1.SaveChangesAsync();
+                return View(await context1.ForumCategories.ToListAsync());
+
+            }
+            else
+            {
+                return View(await context1.ForumCategories.ToListAsync());
+            }
+        }
+
+        [Authorize]
+        // POST: Category/New
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> NewCategory([Bind("CategoryName")] ForumCategory category)
@@ -295,7 +287,7 @@ namespace AdminSide.Controllers
             {
                 context1.Add(category);
                 await context1.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("CategoryD");
             }
             return View(category);
         }

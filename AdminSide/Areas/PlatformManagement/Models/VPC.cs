@@ -4,7 +4,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
 {
     public enum VPCType
     {
-        Platform,DefaultVM,VM
+        DefaultVM,Platform,VM
     }
     public class VPC
     {

@@ -109,17 +109,21 @@ namespace UserSide.Areas.Identity.Pages.Account
                     else
                     {
                         ModelState.AddModelError(string.Empty, "Invalid login attempt.");
+                        ViewData["ReCaptchaKey"] = _configuration.GetSection("GoogleReCaptcha:key").Value;
                         return Page();
                     }
                 }
                 else
                 {
-                    return RedirectToAction("Login", "Identity/Account");
+                    ViewData["ReCaptchaKey"] = _configuration.GetSection("GoogleReCaptcha:key").Value;
+                    return Page();
+                    //return RedirectToAction("Login", "Identity/Account");
                 }
             }
             // If we got this far, something failed, redisplay form
-            //return Page();
-            return RedirectToAction("Login", "Identity/Account");
+            ViewData["ReCaptchaKey"] = _configuration.GetSection("GoogleReCaptcha:key").Value;
+            return Page();
+            //return RedirectToAction("Login", "Identity/Account");
         }
 
         public static bool ReCaptchaPassed(string gRecaptchaResponse, string secret, ILogger logger)

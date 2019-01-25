@@ -185,6 +185,8 @@ namespace AdminSide
             services.AddHostedService<ConsumeScopedServicesHostedService>();
             services.AddScoped<IScopedUpdatingService, ScopedUpdatingService>();
             services.AddScoped<IScopedSetupService, ScopedSetupService>();
+            services.AddHostedService<QueuedHostedService>();
+            services.AddSingleton<IBackgroundTaskQueue, BackgroundTaskQueue>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

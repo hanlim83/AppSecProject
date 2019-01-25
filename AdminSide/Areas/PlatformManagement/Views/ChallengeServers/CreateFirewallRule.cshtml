@@ -26,6 +26,8 @@
                     <option value="HTTP">HTTP</option>
                     <option value="HTTPS">HTTPS</option>
                     <option value="SSH">SSH</option>
+                    <option value="RDPT">RDP (TCP)</option>
+                    <option value="RDPU">RDP (UDP)</option>
                     <option value="FTP">FTP</option>
                     <option value="ICMP">ICMP</option>
                     <option value="ICMPv6">ICMPv6</option>
@@ -113,6 +115,18 @@
                 $("#protoType").val('TCP');
                 $('#protoType option:not(:selected)').prop('disabled', true);
                 $("#portInput").val(22);
+                $('#portInput').prop('readonly', true);
+                break;
+            case "RDPT":
+                $("#protoType").val('TCP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(3389);
+                $('#portInput').prop('readonly', true);
+                break;
+            case "RDPU":
+                $("#protoType").val('UDP');
+                $('#protoType option:not(:selected)').prop('disabled', true);
+                $("#portInput").val(3389);
                 $('#portInput').prop('readonly', true);
                 break;
             case "FTP":

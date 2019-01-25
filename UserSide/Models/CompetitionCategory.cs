@@ -16,5 +16,7 @@ namespace UserSide.Models
 
         [ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
+
+        public ICollection<Challenge> Challenges { get; set; }
     }
 }

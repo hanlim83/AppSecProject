@@ -92,7 +92,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
             var R53Feed = await FeedReader.ReadAsync("https://status.aws.amazon.com/rss/route53.rss");
             var R53Feed1 = R53Feed.Items.ElementAt(0);
-            if (R53Feed1.Title.StartsWith("Service is operating normally"))
+            if (R53Feed1.Title.StartsWith("Service is operating normally") || R53Feed1.Title.Contains("[RESOLVED]"))
                 ViewData["R53Status"] = "OK";
             else if (R53Feed1.Title.StartsWith("Informational message") || R53Feed1.Title.StartsWith("Performance issues"))
                 ViewData["R53Status"] = "WARNING";
@@ -128,9 +128,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
             List<Server> allServers = await _context.Servers.ToListAsync();
             ViewData["ServerTotalCount"] = allServers.Count();
-            List<Server> errorServers = await _context.Servers.FromSql("SELECT * FROM dbo.Server WHERE State = 4").ToListAsync();
+            List<Server> errorServers = await _context.Servers.FromSql("SELECT * FROM dbo.Servers WHERE State = 4").ToListAsync();
             ViewData["ServerErrorCount"] = errorServers.Count();
-            List<Server> runningServers = await _context.Servers.FromSql("SELECT * FROM dbo.Server WHERE State = 1").ToListAsync();
+            List<Server> runningServers = await _context.Servers.FromSql("SELECT * FROM dbo.Servers WHERE State = 1").ToListAsync();
             ViewData["ServerRunningCount"] = runningServers.Count();
             List<Subnet> allSubnets = await _context.Subnets.ToListAsync();
             ViewData["SubnetTotalCount"] = allSubnets.Count();
@@ -138,13 +138,13 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 ViewData["ServerHealth"] = "OK";
             else
                 ViewData["ServerHealth"] = "NOT OK";
-            List<Subnet> intranetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnet WHERE Type = 2").ToListAsync();
+            List<Subnet> intranetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnets WHERE Type = 2").ToListAsync();
             ViewData["SubnetIntranetCount"] = intranetSubnets.Count();
-            List<Subnet> extranetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnet WHERE Type = 1").ToListAsync();
+            List<Subnet> extranetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnets WHERE Type = 1").ToListAsync();
             ViewData["SubnetExtranetCount"] = extranetSubnets.Count();
-            List<Subnet> internetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnet WHERE Type = 0").ToListAsync();
+            List<Subnet> internetSubnets = await _context.Subnets.FromSql("SELECT * FROM dbo.Subnets WHERE Type = 0").ToListAsync();
             ViewData["SubnetInternetCount"] = internetSubnets.Count();
-            List<Route> problemRoutes = await _context.Routes.FromSql("SELECT * FROM dbo.Route WHERE Status = 1").ToListAsync();
+            List<Route> problemRoutes = await _context.Routes.FromSql("SELECT * FROM dbo.Routes WHERE Status = 1").ToListAsync();
             if (problemRoutes.Count() == 0)
                 ViewData["RouteHealth"] = "OK";
             else

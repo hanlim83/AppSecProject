@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace AdminSide.Models
 {
-    /*public enum StatusType
-    {
-        Starting, Active, Inactive
-    }*/
+    //public enum Status
+    //{
+    //    Upcoming, Active, Inactive
+    //}
 
     public class Competition
     {
@@ -19,13 +19,12 @@ namespace AdminSide.Models
         [Required]
         [Display(Name = "Competition Name")]
         public string CompetitionName { get; set; }
-        [Required]
         public string Status { get; set; }
         //[Required]
         //Add regex here
         [Display(Name = "Bucket Name")]
         public string BucketName { get; set; }
-
+        
         public ICollection<CompetitionCategory> CompetitionCategories { get; set; }
         public ICollection<Challenge> Challenges { get; set; }
         public ICollection<Team> Teams { get; set; }

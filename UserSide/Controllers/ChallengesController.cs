@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Amazon.S3;
@@ -35,51 +37,64 @@ namespace UserSide.Controllers
         // GET: Challenges
         public async Task<IActionResult> Index(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamChallenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
+
             if (competition == null)
             {
                 return NotFound();
             }
-            
-            if (ValidateUserJoined(id).Result == true)
+
+            if (competition.Status.Equals("Upcoming"))
             {
-                //Optimize this next time
-                var competition2 = await _context.Competitions
-                .Include(c => c.Teams)
-                .ThenInclude(t => t.TeamUsers)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ID == id);
-
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-
-                foreach (var Team in competition2.Teams)
+                return RedirectToAction("Index", "Competitions", new { check = true });
+            }
+            else if (competition.Status.Equals("Active"))
+            {
+                if (ValidateUserJoined(id).Result == true)
                 {
-                    foreach (var TeamUser in Team.TeamUsers)
+                    if (competition == null)
                     {
-                        if (TeamUser.UserId.Equals(user.Id))
+                        return NotFound();
+                    }
+                    //Optimize this next time
+                    var competition2 = await _context.Competitions
+                    .Include(c => c.Teams)
+                    .ThenInclude(t => t.TeamUsers)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.ID == id);
+
+                    var user = await _userManager.GetUserAsync(HttpContext.User);
+
+                    foreach (var Team in competition2.Teams)
+                    {
+                        foreach (var TeamUser in Team.TeamUsers)
                         {
-                            ViewData["TeamID"] = Team.TeamID;
+                            if (TeamUser.UserId.Equals(user.Id))
+                            {
+                                ViewData["TeamID"] = Team.TeamID;
+                            }
                         }
                     }
+                    ViewData["Archived"] = false;
+                    return View(competition);
                 }
-                return View(competition);
+                else
+                {
+                    return RedirectToAction("Index", "Competitions", new { check = true });
+                }
             }
             else
             {
-                return RedirectToAction("Index", "Competitions");
+                ViewData["Archived"] = true;
+                return View(competition);
             }
         }
 
@@ -114,7 +129,7 @@ namespace UserSide.Controllers
             }
             ViewData["CompetitionID"] = challenge.CompetitionID;
             ViewData["ChallengeID"] = challenge.ID;
-            
+
             if (ValidateUserJoined(challenge.CompetitionID).Result == true)
             {
                 return View(challenge);
@@ -177,10 +192,11 @@ namespace UserSide.Controllers
             //    await _context.SaveChangesAsync();
             //    return RedirectToAction(nameof(Index));
             //}
-            if (challenge.CompetitionID == null)
-            {
-                return NotFound();
-            }
+
+            //if (challenge.CompetitionID == null)
+            //{
+            //    return NotFound();
+            //}
 
             var temp_challenge = await _context.Challenges
                 .FirstOrDefaultAsync(m => m.ID == challenge.ID);
@@ -188,10 +204,9 @@ namespace UserSide.Controllers
             {
                 return NotFound();
             }
-
+            // Flag is correct
             if (challenge.Flag.Equals(temp_challenge.Flag))
             {
-                //Flag is correct
                 //Add entry to TeamChallenge
                 TeamChallenge teamChallenge = new TeamChallenge();
                 teamChallenge.ChallengeId = localvarchallenge.ID;
@@ -199,16 +214,42 @@ namespace UserSide.Controllers
                 _context.Add(teamChallenge);
                 await _context.SaveChangesAsync();
 
+                //Add entry to chain
+                //Block and block data
+                Block block = new Block();
+                block.TimeStamp = DateTime.Now;
+                block.CompetitionID = challenge.CompetitionID;
+                block.TeamID = team.TeamID;
+                block.ChallengeID = localvarchallenge.ID;
+                block.TeamChallengeID = teamChallenge.TeamChallengeID;
+                block.Score = localvarchallenge.Value;
+                //Previous Hash
+                Blockchain blockchain = new Blockchain(_context);
+                Block latestBlock = await blockchain.GetLatestBlock();
+                block.PreviousHash = latestBlock.Hash;
+                //Current Hash
+                string data = block.TimeStamp + ";" + block.CompetitionID + ";" + block.TeamID + ";" + block.ChallengeID + ";" + block.TeamChallengeID + ";" + block.Score + ";" + block.PreviousHash;
+                block.Hash = GenerateSHA512String(data);
+
+                _context.Add(block);
+                await _context.SaveChangesAsync();
+
                 //Add points to team score
                 team.Score += localvarchallenge.Value;
-                //team.TeamChallenges = new Collection<TeamChallenge>();
-                //team.TeamChallenges.Add(teamChallenge);
                 _context.Update(team);
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
             }
             //Wrong flag
             return RedirectToAction("Details", "Challenges", new { id });
+        }
+
+        private static string GenerateSHA512String(string inputString)
+        {
+            SHA512 sha512 = SHA512.Create();
+            byte[] bytes = Encoding.UTF8.GetBytes(inputString);
+            byte[] hash = sha512.ComputeHash(bytes);
+            return Convert.ToBase64String(hash);
         }
 
         private async Task<bool> ValidateUserJoined(int id)
