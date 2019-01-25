@@ -91,8 +91,6 @@ namespace UserSide
             services.Configure<PasswordHasherOptions>(
                  o => o.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3);
 
-
-
             //Using RDS
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
@@ -118,12 +116,12 @@ namespace UserSide
             GetRdsConnectionStringChat()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-        .AddRazorPagesOptions(options =>
-        {
-            options.AllowAreas = true;
-            options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
-            options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
-        });
+            .AddRazorPagesOptions(options =>
+            {
+                options.AllowAreas = true;
+                options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+                options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+            });
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -158,7 +156,7 @@ namespace UserSide
             //Chat Signalr
             services.AddSignalR();
 
-           
+
             //User 
             // services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         }
