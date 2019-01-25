@@ -11,7 +11,9 @@ namespace UserSide.Models
         [Key]
         public string UserId { get; set; }
 
-        public string UserName { get; set; }
+        public string UserOne{ get; set; }
+
+        public string UserTwo { get; set; }
 
         public ICollection<Chat> Chats { get; set; }
     }

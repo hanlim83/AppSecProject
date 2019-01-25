@@ -11,6 +11,7 @@ namespace UserSide.Models
     {
         [Key]
         public int TeamChallengeID { get; set; }
+        public bool Solved { get; set; }
 
         [ForeignKey("TeamId")]
         public int TeamId { get; set; }

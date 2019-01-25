@@ -32,7 +32,8 @@ namespace AdminSide.Controllers
         {
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
+                //.Include(c1 => c1.Challenges)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
                 .Include(c => c.Teams)

@@ -26,7 +26,7 @@ namespace AdminSide.Models
         //[ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
         [Display(Name = "Competition Category")]
-        [ForeignKey("CompetitionCategoryID")]
+        //[ForeignKey("CompetitionCategoryID")]
         public int CompetitionCategoryID { get; set; }
     }
 }
