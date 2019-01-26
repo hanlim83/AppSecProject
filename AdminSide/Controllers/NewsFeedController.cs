@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using CodeHollow.FeedReader;
 using AdminSide.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Controllers
 {
+    [Authorize]
     public class NewsFeedController : Controller
     {
     
