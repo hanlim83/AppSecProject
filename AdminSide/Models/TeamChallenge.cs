@@ -13,9 +13,7 @@ namespace AdminSide.Models
         public int TeamChallengeID { get; set; }
         public bool Solved { get; set; }
 
-        [ForeignKey("TeamId")]
         public int TeamId { get; set; }
-        [ForeignKey("ChallengeId")]
         public int ChallengeId { get; set; }
     }
 }

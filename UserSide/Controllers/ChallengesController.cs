@@ -129,6 +129,7 @@ namespace UserSide.Controllers
 
             if (ValidateUserJoined(challenge.CompetitionID).Result == true)
             {
+                ViewData["Invalid"] = false;
                 ViewData["WrongFlag"] = false;
                 return View(challenge);
             }
@@ -142,12 +143,36 @@ namespace UserSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Details([Bind("ID, Flag, CompetitionID")] Challenge challenge, int? id)
         {
+            if (challenge.Flag == null)
+            {
+                var temp_challenge1 = await _context.Challenges
+                    .FirstOrDefaultAsync(m => m.ID == challenge.ID);
+
+                var competition1 = await _context.Competitions.FindAsync(temp_challenge1.CompetitionID);
+                string bucketName = competition1.BucketName;
+                var category = await _context.CompetitionCategories.FindAsync(temp_challenge1.CompetitionCategoryID);
+                string folderName = category.CategoryName;
+                if (temp_challenge1.FileName != null)
+                {
+                    string fileName = challenge.FileName;
+                    Regex pattern = new Regex("[+]");
+                    string tempFileName = pattern.Replace(fileName, "%2B");
+                    tempFileName.Replace(' ', '+');
+                    ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
+                }
+                ViewData["CompetitionID"] = temp_challenge1.CompetitionID;
+                ViewData["ChallengeID"] = temp_challenge1.ID;
+
+                ViewData["Invalid"] = true;
+                ViewData["WrongFlag"] = false;
+                return View(temp_challenge1);
+            }
+
             Team team = null;
 
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .ThenInclude(cc => cc.Challenges)
-                //.Include(c => c.Challenges)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
                 .AsNoTracking()
@@ -279,6 +304,7 @@ namespace UserSide.Controllers
 
                 //if (ValidateUserJoined(Challenge.CompetitionID).Result == true)
                 //{
+                ViewData["Invalid"] = false;
                 ViewData["WrongFlag"] = true;
                 return View(Challenge);
                 //}
