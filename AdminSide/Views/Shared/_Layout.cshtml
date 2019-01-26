@@ -76,6 +76,12 @@
                 asp-fallback-src="~/lib/DataTables/datatables.min.js"></script>
         <script src="~/js/site.min.js" data-turbolinks-track="reload" asp-append-version="true"></script>
     </environment>
+    <script>
+        $('input[type="file"]').change(function (e) {
+            var fileName = e.target.files[0].name;
+            $('.custom-file-label').html(fileName);
+        });
+    </script>
     @RenderSection("Scripts", required: false)
 </body>
 </html>

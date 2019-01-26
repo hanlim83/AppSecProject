@@ -55,7 +55,10 @@
                 {
                     if (teamchallenge.TeamId == team.TeamID)
                     {
-                        SolveChallengeList.Add(teamchallenge.ChallengeId);
+                        if (teamchallenge.Solved == true)
+                        {
+                            SolveChallengeList.Add(teamchallenge.ChallengeId);
+                        }
                     }
                 }
             }
@@ -134,7 +137,7 @@
         </div>
     }
     <br>
-    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-default"></a>
+    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-primary"></a>
 </div>
 
 @*Modal
