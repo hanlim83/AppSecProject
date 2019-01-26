@@ -8,6 +8,16 @@
 
     <h2> Edit Topic </h2>
 
+    @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Alert"])))
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Invalid Search Input</h4>
+            <p>Please search again with different phrasing. This might help to get your result.</p>
+            <hr>
+
+        </div>
+    }
+
     <form asp-action="NewTopicF">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <br />

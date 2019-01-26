@@ -6,6 +6,16 @@
 <div class="container">
 
     <h2> Create New Topic </h2>
+
+    @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Alert"])))
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading"> Script code found. </h4>
+            <p>Please submit a post without script.</p>
+            <hr>
+        </div>
+    }
+
     <form asp-action="NewTopicF">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <br />
