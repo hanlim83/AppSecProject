@@ -75,5 +75,12 @@
         <script src="~/js/site.min.js" data-turbolinks-track="reload" asp-append-version="true"></script>
     </environment>
     @RenderSection("Scripts", required: false)
+
+<script>
+        $('input[type="file"]').change(function (e) {
+            var fileName = e.target.files[0].name;
+            $('.custom-file-label').html(fileName);
+        });
+</script>
 </body>
 </html>

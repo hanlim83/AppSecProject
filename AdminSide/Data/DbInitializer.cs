@@ -196,7 +196,7 @@ namespace AdminSide.Data
         {
             context.Database.EnsureCreated();
 
-            if (context.Competitions.Any())
+            if (context.CategoryDefault.Any())
             {
                 return;   // DB has been seeded
             }
