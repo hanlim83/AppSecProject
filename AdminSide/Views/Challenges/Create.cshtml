@@ -52,6 +52,5 @@
             <input type="submit" value="Create" class="btn btn-success" />
         </div>
     </form>
-    <!--Check this-->
-    <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID"><input type="button" value="Back" class="btn btn btn-primary"></a>
+    <a asp-controller="Challenges" asp-action="Index" asp-route-id="@ViewData["CompetitionID"]"><input type="button" value="Back" class="btn btn btn-primary"></a>
 </div>
