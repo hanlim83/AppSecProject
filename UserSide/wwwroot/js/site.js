@@ -6,8 +6,8 @@
             $(this).parent().addClass('active');
         }
     });
-    var incerment = 1;
-    var table = $("#" + incerment);
+    var increment = 1;
+    var table = $("#" + increment);
     while (table[0] != null) {
         $('#' + incerment).DataTable({
             responsive: true

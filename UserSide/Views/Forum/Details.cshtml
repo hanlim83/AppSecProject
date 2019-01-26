@@ -4,11 +4,11 @@
 }
 <br />
 <div class="container">
-    <h2> Details of the Post (Admin View) </h2>
+    <h2> Details of the Post </h2>
 </div>
 
 <div class="container">
-    <table class="table">
+    <table class="table table-responsive" style="table-layout:fixed">
         <thead>
             <tr>
                 <th> @Html.DisplayNameFor(model => model.Post.Title) </th>
@@ -36,6 +36,7 @@
     </table>
 </div>
 <div class="container" @*style="padding-left:150px;*@">
+
     @foreach (var comment in Model.Comments)
     {
         @await Html.PartialAsync("ShowComment", comment)
@@ -47,7 +48,7 @@
         <input id="hiddenIDInput" type="hidden" name="PostID" value="@Model.Post.PostID" />
         <br />
         <br />
-        <input type="submit" value="Post Reply" class="btn btn-success" style="float:inherit" />
+        <input type="submit" value="Post Reply" class="btn btn-outline-success" style="float:inherit" />
     }
 </div>
 <div class="container">
