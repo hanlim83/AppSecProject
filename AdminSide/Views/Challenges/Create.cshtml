@@ -4,12 +4,6 @@
     ViewData["Title"] = "Create";
 }
 
-<style>
-    .custom-file-input ~ .custom-file-label::after {
-        
-    }
-</style>
-
 <br>
 <div class="container">
     <h2>Create Challenge</h2>
@@ -37,16 +31,6 @@
             <input asp-for="Flag" class="form-control" />
             <span asp-validation-for="Flag" class="text-danger"></span>
         </div>
-        <!--
-        <div class="form-group">
-            <label asp-for="CompetitionID" class="control-label"></label>
-            <select asp-for="CompetitionID" class="form-control" asp-items="ViewBag.CompetitionID"></select>
-        </div>
-        <div class="form-group">
-            <label asp-for="CompetitionCategoryID" class="control-label"></label>
-            <select asp-for="CompetitionCategoryID" class="form-control" asp-items="ViewBag.CompetitionCategoryID"></select>
-        </div>
-        -->
         <div class="form-group">
             <label asp-for="CompetitionCategoryID" class="control-label"></label>
             <select asp-for="CompetitionCategoryID" class="form-control" asp-items="@ViewBag.SelectList"></select>
@@ -56,47 +40,24 @@
             <input type="hidden" asp-for="CompetitionID" value="@ViewData["CompetitionID"]">
             <span asp-validation-for="CompetitionID" class="text-danger"></span>
         </div>
-        @*@foreach (var item in Model.Competition.CompetitionCategories)
-            {
-                <h2>@Html.DisplayFor(modelItem => item.CategoryName)</h2>
-                <hr>
-            }*@
-        <!--Commenting out to test real file input-->
-        @*<div class="custom-file">
-                <input type="file" class="custom-file-input" id="customFile">
-                <label class="custom-file-label" for="customFile">Choose file</label>
-            </div>*@
-        <!--Testing nice UI-->
         <div class="form-group">
             <p>Upload file using this form:</p>
             <div class="custom-file">
                 <input type="file" class="custom-file-input" id="customFile" name="files" multiple />
-                <label class="custom-file-label" for="customFile">Choose file</label>
+                <label class="custom-file-label" id="filename" for="customFile">Choose file</label>
             </div>
         </div>
-
-        @*<div class="form-group">
-                <div class="col-md-10">
-                    <p>Upload one or more files using this form:</p>
-                    <input type="file" name="files" multiple />
-                </div>
-            </div>*@
-        <br>
         <br>
         <div class="form-group">
-            <input type="submit" value="Create" class="btn btn-default" />
+            <input type="submit" value="Create" class="btn btn-success" />
         </div>
     </form>
+    <a asp-controller="Challenges" asp-action="Index" asp-route-id="@ViewData["CompetitionID"]"><input type="button" value="Back" class="btn btn btn-primary"></a>
 </div>
-<!--
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
--->
 
 <script>
-    $('input[type="file"]').change(function (e) {
-        var fileName = e.target.files[0].name;
-        $('.custom-file-label').html(fileName);
-    });
+        $('input[type="file"]').change(function (e) {
+            var fileName = e.target.files[0].name;
+            $('.custom-file-label').html(fileName);
+        });
 </script>

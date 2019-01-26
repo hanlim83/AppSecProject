@@ -177,7 +177,10 @@ namespace UserSide.Controllers
             {
                 if (teamChallenges.ChallengeId == challenge.ID)
                 {
-                    return RedirectToAction("Details", "Challenges", new { id });
+                    if (teamChallenges.Solved == true)
+                    {
+                        return RedirectToAction("Details", "Challenges", new { id });
+                    }
                 }
             }
 
@@ -243,10 +246,13 @@ namespace UserSide.Controllers
             else
             {
                 //Wrong flag
-                //return RedirectToAction("Details", "Challenges", new { id });
-                //return View(challenge);
+                TeamChallenge teamChallenge = new TeamChallenge();
+                teamChallenge.ChallengeId = localvarchallenge.ID;
+                teamChallenge.TeamId = team.TeamID;
+                teamChallenge.Solved = false;
+                _context.Add(teamChallenge);
+                await _context.SaveChangesAsync();
 
-                //Testing
                 var Challenge = await _context.Challenges
                     .FirstOrDefaultAsync(m => m.ID == id);
                 if (Challenge == null)

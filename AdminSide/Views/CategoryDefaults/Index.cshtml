@@ -4,13 +4,13 @@
     ViewData["Title"] = "Index";
 }
 
-<!--Edit UI to specify this page is to speed up multi-select when creating competitions-->
 <br>
 <div class="container">
     <h2>Default Categories</h2>
+    <p>Speeds up CTF Creation</p>
     <hr />
     <div class="float-right">
-        <a asp-action="Create"><button type="button" class="btn btn-primary">New Default Category</button></a>
+        <a asp-action="Create"><input type="button" value="New Default Category" class="btn btn btn-primary"></a>
     </div>
     <br>
     <br>
@@ -20,7 +20,9 @@
                 <th>
                     @Html.DisplayNameFor(model => model.CategoryName)
                 </th>
-                <th></th>
+                <th>
+                    Actions
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -31,8 +33,8 @@
                         @Html.DisplayFor(modelItem => item.CategoryName)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.ID"><input type="button" value="Edit" class="btn btn btn-default"></a>
-                        <a asp-action="Delete" asp-route-id="@item.ID"><input type="button" value="Delete" class="btn btn btn-default"></a>
+                        <a asp-action="Edit" asp-route-id="@item.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary"></a>
+                        <a asp-action="Delete" asp-route-id="@item.ID"><input type="button" value="Delete" class="btn btn btn-outline-danger"></a>
                     </td>
                 </tr>
             }
