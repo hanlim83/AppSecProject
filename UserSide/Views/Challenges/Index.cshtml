@@ -43,8 +43,6 @@
 
     <hr>
     @{ var SolveChallengeList = new List<int>(); }
-    @*check here to populate green or black(means haven't solve)
-        return team id from controller*@
     @if ((bool)ViewData["Archived"] != true)
     {
         foreach (var team in Model.Teams)
