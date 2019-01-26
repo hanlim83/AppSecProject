@@ -1,20 +1,19 @@
-﻿using Microsoft.Extensions.Logging;
-using AdminSide.Areas.PlatformManagement.Data;
+﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
-using Amazon.EC2;
-using Amazon.EC2.Model;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Internal;
-using System;
-using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
-using State = AdminSide.Areas.PlatformManagement.Models.State;
-using System.Data.SqlClient;
 using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
-using System.ComponentModel;
+using Amazon.CloudWatchLogs.Model;
+using Amazon.EC2;
+using Amazon.EC2.Model;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Threading.Tasks;
+using State = AdminSide.Areas.PlatformManagement.Models.State;
 
 namespace AdminSide.Areas.PlatformManagement.Services
 {
@@ -88,7 +87,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         server.IPAddress = instance.PublicIpAddress;
                                         server.DNSHostname = instance.PublicDnsName;
                                         Flag = true;
-                                    } else if (server.Visibility == Visibility.Internet && (server.IPAddress != instance.PublicIpAddress || server.DNSHostname != instance.PublicDnsName))
+                                    }
+                                    else if (server.Visibility == Visibility.Internet && (server.IPAddress != instance.PublicIpAddress || server.DNSHostname != instance.PublicDnsName))
                                     {
                                         server.IPAddress = "Public IP Address is not available when server is stopped";
                                         server.DNSHostname = "Public DNS Hostname is not available when server is stopped";
@@ -101,7 +101,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         Flag = true;
                                     }
                                     if (Flag == true)
+                                    {
                                         context.Servers.Update(server);
+                                    }
+
                                     break;
                                 }
                             }
@@ -109,16 +112,96 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     }
                     context.SaveChanges();
                 }
+                if (context.CloudWatchLogGroups.Any() && context.CloudWatchLogStreams.Any())
+                {
+                    _logger.LogInformation("Update Background Service is checking cloudwatch groups");
+                    List<CloudWatchLogGroup> allStreams = await context.CloudWatchLogGroups.ToListAsync();
+                    foreach (CloudWatchLogGroup g in allStreams)
+                    {
+                        DescribeLogStreamsResponse response = await cwlClient.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
+                        {
+                            LogGroupName = g.Name.Replace("@", "/")
+                        });
+                        foreach (LogStream ls in response.LogStreams)
+                        {
+                            Boolean Flag = false;
+                            foreach (CloudWatchLogStream CWLS in g.LogStreams)
+                            {
+                                if (ls.Arn.Equals(CWLS.ARN))
+                                {
+                                    Flag = true;
+                                    break;
+                                }
+                            }
+                            if (Flag == false)
+                            {
+                                CloudWatchLogStream newS = new CloudWatchLogStream
+                                {
+                                    ARN = ls.Arn,
+                                    CreationTime = ls.CreationTime,
+                                    FirstEventTime = ls.FirstEventTimestamp,
+                                    LastEventTime = ls.LastEventTimestamp,
+                                    Name = ls.LogStreamName,
+                                    LinkedGroupID = g.ID
+                                };
+                                if (g.Name.Equals("VMVPCLogs"))
+                                    newS.DisplayName = "Network Flow Log For Challenge Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                                else if (g.Name.Equals("PlatformVPCLogs"))
+                                    newS.DisplayName = "Network Flow Log For Platform Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                                else if (g.Name.Equals("RDSOSMetrics"))
+                                {
+                                    if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                        newS.DisplayName = "SQL Database CPU Usage";
+                                }
+                                else if (g.Name.Equals("@aws@elasticbeanstalk@User-Side@IIS-Log"))
+                                    newS.DisplayName = "IIS Logs for User Side Web Server";
+                                else if (g.Name.Equals("@aws@elasticbeanstalk@Admin-Side@IIS-Log"))
+                                    newS.DisplayName = "IIS Logs for Admin Side Web Server";
+                                else if (g.Name.Equals("@aws@elasticbeanstalk@User-Side@EBDeploy-Log"))
+                                    newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for User Side";
+                                else if (g.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBDeploy-Log"))
+                                    newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for Admin Side";
+                                else if (g.Name.Equals("@aws@elasticbeanstalk@User-Side@EBHooks-Log"))
+                                    newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for User Side";
+                                else if (g.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBHooks-Log"))
+                                    newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for Admin Side";
+                                else
+                                    newS.DisplayName = newS.Name;
+                                if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                    context.CloudWatchLogStreams.Add(newS);
+                            }
+                        }
+                        foreach (CloudWatchLogStream CWLS in g.LogStreams)
+                        {
+                            Boolean Flag = false;
+                            foreach (LogStream ls in response.LogStreams)
+                            {
+                                if (CWLS.ARN.Equals(ls.Arn))
+                                {
+                                    Flag = true;
+                                    break;
+                                }
+                            }
+                            if (Flag == false)
+                            {
+                                context.CloudWatchLogStreams.Remove(CWLS);
+                            }
+                        }
+                    }
+                    await context.SaveChangesAsync();
+                }
                 _logger.LogInformation("Update Background Service has completed!");
-            } catch (SqlException e)
+            }
+            catch (SqlException e)
             {
-                _logger.LogInformation("Update Background Service faced an SQL exception! "+e.Message+" | "+e.Source);
+                _logger.LogInformation("Update Background Service faced an SQL exception! " + e.Message + " | " + e.Source);
                 return;
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 _logger.LogInformation("Update Background Service faced an exception! " + e.Message + " | " + e.Source);
                 return;
-            } 
+            }
         }
     }
 }
