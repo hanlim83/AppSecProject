@@ -12,7 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AdminSide.Areas.Identity.Pages.Account
 {
-    [AllowAnonymous]
+    [Authorize]
+    //the line above makes a page protected and will redirect user back to login
+    //[AllowAnonymous]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
