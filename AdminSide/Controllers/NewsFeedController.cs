@@ -10,9 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using CodeHollow.FeedReader;
 using AdminSide.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Controllers
 {
+    [Authorize]
     public class NewsFeedController : Controller
     {
     
@@ -191,7 +193,8 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,sourceName,sourceURL")] FeedSource feedSource)
         {
-            if (ModelState.IsValid)
+           
+                if (ModelState.IsValid)
             {
                 _context.Add(feedSource);
                 await _context.SaveChangesAsync();
