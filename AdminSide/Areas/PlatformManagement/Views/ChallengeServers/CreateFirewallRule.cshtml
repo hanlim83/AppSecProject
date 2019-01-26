@@ -10,10 +10,24 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])))
+        @if (!String.IsNullOrEmpty(Convert.ToString(TempData["Result"])))
         {
-            <div class="alert alert-danger" role="alert">
-                @ViewData["Exception"]
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger" role="alert">
+                        @TempData["Result"]
+                    </div>
+                </div>
+            </div>
+        }
+        @if (!String.IsNullOrEmpty(Convert.ToString(TempData["Exception"])))
+        {
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger" role="alert">
+                        @TempData["Exception"]
+                    </div>
+                </div>
             </div>
         }
         <form asp-action="CreateFirewallRule">

@@ -28,5 +28,6 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public string TemplateDescription { get; set; }
         public bool SpecificMinimumSize { get; set; }
         public int MinimumStorage { get; set; }
+        public string AWSSnapshotReference { get; set; }
     }
 }

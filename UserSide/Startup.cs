@@ -153,12 +153,14 @@ namespace UserSide
             //Route53 Initialization
             services.AddAWSService<IAmazonRoute53Domains>();
 
+
+
             //Chat Signalr
             services.AddSignalR();
 
 
             //User 
-            // services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
+            services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -194,6 +196,8 @@ namespace UserSide
             {
                 routes.MapHub<ChatHub>("/chatHub");
             });
+
+            
 
             app.UseMvc(routes =>
             {
