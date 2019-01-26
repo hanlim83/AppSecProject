@@ -36,7 +36,7 @@
                         @Html.DisplayFor(modelItem => item.Score)
                     </td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.TeamID">Details</a>
+                        <a asp-controller="Teams" asp-action="Details" asp-route-id="@item.TeamID" data-turbolinks="false">Details</a>
                     </td>
                 </tr>
             }

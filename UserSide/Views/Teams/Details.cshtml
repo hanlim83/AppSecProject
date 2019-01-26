@@ -4,28 +4,35 @@
     ViewData["Title"] = "Details";
 }
 
+<style>
+    .center {
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
 <br>
-<div class="container">
-    <h2>Details</h2>
+<div class="container" data-turbolinks="false">
+    <h1 class="center">@Model.TeamName</h1>
+    <h2 class="center">@Model.Score Points</h2>
     <div>
-        <h4>Team</h4>
+        @*<h4>Team</h4>*@
         <hr />
-        <dl class="dl-horizontal">
-            <dt>
-                @Html.DisplayNameFor(model => model.TeamName)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.TeamName)
-            </dd>
+        <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+        <button class="btn invisible" id="backButton">&lt; Back</button>
+        <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+        @*<dl class="dl-horizontal">
             <dt>
                 @Html.DisplayNameFor(model => model.Score)
             </dt>
             <dd>
                 @Html.DisplayFor(model => model.Score)
             </dd>
-        </dl>
+        </dl>*@
     </div>
+    <br>
     <div>
-        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back to Teams" class="btn btn btn-default"></a>
+        <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back to Teams" class="btn btn btn-primary"></a>
     </div>
 </div>
