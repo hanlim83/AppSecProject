@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -11,7 +9,6 @@ using Amazon.S3;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using UserSide.Data;
 using UserSide.Models;
@@ -37,51 +34,64 @@ namespace UserSide.Controllers
         // GET: Challenges
         public async Task<IActionResult> Index(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamChallenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
+
             if (competition == null)
             {
                 return NotFound();
             }
-            
-            if (ValidateUserJoined(id).Result == true)
+
+            if (competition.Status.Equals("Upcoming"))
             {
-                //Optimize this next time
-                var competition2 = await _context.Competitions
-                .Include(c => c.Teams)
-                .ThenInclude(t => t.TeamUsers)
-                .AsNoTracking()
-                .FirstOrDefaultAsync(m => m.ID == id);
-
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-
-                foreach (var Team in competition2.Teams)
+                return RedirectToAction("Index", "Competitions", new { check = true });
+            }
+            else if (competition.Status.Equals("Active"))
+            {
+                if (ValidateUserJoined(id).Result == true)
                 {
-                    foreach (var TeamUser in Team.TeamUsers)
+                    if (competition == null)
                     {
-                        if (TeamUser.UserId.Equals(user.Id))
+                        return NotFound();
+                    }
+                    //Optimize this next time
+                    var competition2 = await _context.Competitions
+                    .Include(c => c.Teams)
+                    .ThenInclude(t => t.TeamUsers)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.ID == id);
+
+                    var user = await _userManager.GetUserAsync(HttpContext.User);
+
+                    foreach (var Team in competition2.Teams)
+                    {
+                        foreach (var TeamUser in Team.TeamUsers)
                         {
-                            ViewData["TeamID"] = Team.TeamID;
+                            if (TeamUser.UserId.Equals(user.Id))
+                            {
+                                ViewData["TeamID"] = Team.TeamID;
+                            }
                         }
                     }
+                    ViewData["Archived"] = false;
+                    return View(competition);
                 }
-                return View(competition);
+                else
+                {
+                    return RedirectToAction("Index", "Competitions", new { check = true });
+                }
             }
             else
             {
-                return RedirectToAction("Index", "Competitions", new { check = true });
+                ViewData["Archived"] = true;
+                return View(competition);
             }
         }
 
@@ -116,9 +126,10 @@ namespace UserSide.Controllers
             }
             ViewData["CompetitionID"] = challenge.CompetitionID;
             ViewData["ChallengeID"] = challenge.ID;
-            
+
             if (ValidateUserJoined(challenge.CompetitionID).Result == true)
             {
+                ViewData["WrongFlag"] = false;
                 return View(challenge);
             }
             else
@@ -135,7 +146,8 @@ namespace UserSide.Controllers
 
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c => c.Challenges)
+                .ThenInclude(cc => cc.Challenges)
+                //.Include(c => c.Challenges)
                 .Include(c => c.Teams)
                 .ThenInclude(t => t.TeamUsers)
                 .AsNoTracking()
@@ -165,7 +177,10 @@ namespace UserSide.Controllers
             {
                 if (teamChallenges.ChallengeId == challenge.ID)
                 {
-                    return RedirectToAction("Details", "Challenges", new { id });
+                    if (teamChallenges.Solved == true)
+                    {
+                        return RedirectToAction("Details", "Challenges", new { id });
+                    }
                 }
             }
 
@@ -179,7 +194,7 @@ namespace UserSide.Controllers
             //    await _context.SaveChangesAsync();
             //    return RedirectToAction(nameof(Index));
             //}
-            
+
             //if (challenge.CompetitionID == null)
             //{
             //    return NotFound();
@@ -198,6 +213,7 @@ namespace UserSide.Controllers
                 TeamChallenge teamChallenge = new TeamChallenge();
                 teamChallenge.ChallengeId = localvarchallenge.ID;
                 teamChallenge.TeamId = team.TeamID;
+                teamChallenge.Solved = true;
                 _context.Add(teamChallenge);
                 await _context.SaveChangesAsync();
 
@@ -227,8 +243,46 @@ namespace UserSide.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction("Index", "Challenges", new { id = challenge.CompetitionID });
             }
-            //Wrong flag
-            return RedirectToAction("Details", "Challenges", new { id });
+            else
+            {
+                //Wrong flag
+                TeamChallenge teamChallenge = new TeamChallenge();
+                teamChallenge.ChallengeId = localvarchallenge.ID;
+                teamChallenge.TeamId = team.TeamID;
+                teamChallenge.Solved = false;
+                _context.Add(teamChallenge);
+                await _context.SaveChangesAsync();
+
+                var Challenge = await _context.Challenges
+                    .FirstOrDefaultAsync(m => m.ID == id);
+                if (Challenge == null)
+                {
+                    return NotFound();
+                }
+                //Stop field from being populated at View
+                Challenge.Flag = null;
+
+                var Competition = await _context.Competitions.FindAsync(Challenge.CompetitionID);
+                string bucketName = Competition.BucketName;
+                var category = await _context.CompetitionCategories.FindAsync(Challenge.CompetitionCategoryID);
+                string folderName = category.CategoryName;
+                if (Challenge.FileName != null)
+                {
+                    string fileName = Challenge.FileName;
+                    Regex pattern = new Regex("[+]");
+                    string tempFileName = pattern.Replace(fileName, "%2B");
+                    tempFileName.Replace(' ', '+');
+                    ViewData["FileLink"] = "https://s3-ap-southeast-1.amazonaws.com/" + bucketName + "/" + folderName + "/" + tempFileName;
+                }
+                ViewData["CompetitionID"] = Challenge.CompetitionID;
+                ViewData["ChallengeID"] = Challenge.ID;
+
+                //if (ValidateUserJoined(Challenge.CompetitionID).Result == true)
+                //{
+                ViewData["WrongFlag"] = true;
+                return View(Challenge);
+                //}
+            }
         }
 
         private static string GenerateSHA512String(string inputString)

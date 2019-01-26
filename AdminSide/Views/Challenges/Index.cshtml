@@ -4,6 +4,32 @@
     ViewData["Title"] = "Index";
 }
 
+<style>
+    #divCompetition {
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    #challengeButton {
+        margin: 10px 0px 10px 0px;
+        height: 74px;
+        padding-left: 0px;
+        padding-right: 0px;
+        margin-left: 0px;
+        margin-right: 0px;
+    }
+
+    #bigdiv {
+        margin-left: 0px;
+        padding-left: 0px;
+    }
+
+    #inlineblock {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+</style>
+
 <br>
 <div class="container">
     <div class="float-right">
@@ -16,29 +42,26 @@
 
         <h2>@Html.DisplayFor(modelItem => category.CategoryName)</h2>
         <hr>
-        <div>
-            <row>
-                <!--To standardize size of box/styling in future updates-->
-                <div>
-                    @if (category.Challenges.Count == 0)
-                    {
-                        <p>This category has no challenges yet</p>
-                    }
-                    else
-                    {
-                        @foreach (var challenge in category.Challenges)
-                        {
-                            <a asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.ID">
-                                <button type="button" class="btn btn-dark">
-                                    @Html.DisplayFor(modelItem => challenge.Name)
-                                    <br>
-                                    @Html.DisplayFor(modelItem => challenge.Value)
-                                </button>
-                            </a>
-                        }
-                    }
-                </div>
-            </row>
+        <div class="col-md-12" id="bigdiv">
+            @if (category.Challenges.Count == 0)
+            {
+                <p>This category has no challenges yet</p>
+            }
+            else
+            {
+                @foreach (var challenge in category.Challenges)
+                {
+                    <div class="col-md-2 d-inline-block" id="inlineblock">
+                        <a asp-controller="Challenges" asp-action="Details" asp-route-id="@challenge.ID">
+                            <button type="button" class="btn btn-dark w-100" id="challengeButton">
+                                @Html.DisplayFor(modelItem => challenge.Name)
+                                <br>
+                                @Html.DisplayFor(modelItem => challenge.Value)
+                            </button>
+                        </a>
+                    </div>
+                }
+            }
         </div>
     }
     <br>

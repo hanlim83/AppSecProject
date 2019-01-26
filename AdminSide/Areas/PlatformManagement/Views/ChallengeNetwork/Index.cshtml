@@ -9,32 +9,22 @@
     <div class="col-lg-9">
         <div class="row">
             <div class="col-lg-12">
-                @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Result"])) && Convert.ToString(ViewData["Result"]) != "Successfully Deleted!")
+                @if (!String.IsNullOrEmpty(Convert.ToString(TempData["Result"])))
                 {
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="alert alert-danger" role="alert">
-                                @ViewData["Result"]
-                            </div>
-                        </div>
-                    </div>
-                }
-                @if (Convert.ToString(ViewData["Result"]) == "Successfully Deleted!")
-                {
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="alert alert-success" role="alert">
-                                @ViewData["Result"]
-                            </div>
-                        </div>
-                    </div>
-                }
-                @if (Convert.ToString(TempData["Result"]) == "Successfully Created!" || Convert.ToString(TempData["Result"]) == "Successfully Modified!")
-                {
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="alert alert-success" role="alert">
                                 @TempData["Result"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (!String.IsNullOrEmpty(Convert.ToString(TempData["Exception"])))
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger" role="alert">
+                                @TempData["Exception"]
                             </div>
                         </div>
                     </div>

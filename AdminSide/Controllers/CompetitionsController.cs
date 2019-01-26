@@ -88,16 +88,14 @@ namespace AdminSide.Controllers
             //Tested and working^
             //Console.WriteLine(model.SelectedCategories.ElementAt(0));
             //Console.WriteLine(competitionCategory.Categories.ElementAt(0).CategoryName);
-            
+            if (model.SelectedCategories == null)
+            {
+                return RedirectToAction("Create");
+            }
+
+            model.Competition.Status = "Upcoming";
             if (ModelState.IsValid)
             {
-                //_context.Add(model.competition);
-                //await _context.SaveChangesAsync();
-                //var competitionID = model.competition.ID;
-
-                //CompetitionCategory competitionCategory = new CompetitionCategory();
-
-
                 //Generate bucketname programtically
                 model.Competition.BucketName = GenerateBucketName(model.Competition.CompetitionName);
                 model.Competition.CompetitionCategories = new Collection<CompetitionCategory>();
@@ -216,6 +214,15 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
+
+            var dictionary = new Dictionary<string, string>();
+
+            dictionary.Add("Upcoming", "Upcoming");
+            dictionary.Add("Active", "Active");
+            dictionary.Add("Inactive", "Inactive");
+
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+
             return View(competition);
         }
 
@@ -251,6 +258,7 @@ namespace AdminSide.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            
             return View(competition);
         }
 
@@ -280,10 +288,10 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            //var competition = await _context.Competitions.FindAsync(id);
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .FirstOrDefaultAsync(m => m.ID == id);
+
             foreach (var category in competition.CompetitionCategories)
             {
                 await ClearBucket(competition.BucketName, category.CategoryName);

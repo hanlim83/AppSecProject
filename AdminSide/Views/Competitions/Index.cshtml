@@ -8,8 +8,8 @@
 
 <style>
     #actionButton {
-        width:112px;
-        margin-bottom:10px;
+        width: 112px;
+        margin-bottom: 10px;
     }
 </style>
 
@@ -21,6 +21,42 @@
     <br>
     <h2>Upcoming CTF</h2>
     <hr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompetitionName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (item.Status.Equals("Upcoming"))
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CompetitionName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.ID"><input type="button" value="View Details" class="btn btn btn-outline-info" id="actionButton"></a>
+                            <a asp-action="Edit" asp-route-id="@item.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary" id="actionButton"></a>
+                            <a asp-action="Delete" asp-route-id="@item.ID"><input type="button" value="Delete" class="btn btn btn-outline-danger" id="actionButton"></a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
     <br>
     <h2>Ongoing CTF</h2>
     <hr>
@@ -33,29 +69,70 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Status)
                 </th>
-                <th></th>
+                <th>
+                    Actions
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.CompetitionName)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Status)
-                    </td>
-                    <td>
-                        <a asp-action="Details" asp-route-id="@item.ID"><input type="button" value="View Details" class="btn btn btn-default" id="actionButton"></a>
-                        <a asp-action="Edit" asp-route-id="@item.ID"><input type="button" value="Edit" class="btn btn btn-default" id="actionButton"></a>
-                        <a asp-action="Delete" asp-route-id="@item.ID"><input type="button" value="Delete" class="btn btn btn-default" id="actionButton"></a>
-                    </td>
-                </tr>
+                if (item.Status.Equals("Active"))
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CompetitionName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.ID"><input type="button" value="View Details" class="btn btn btn-outline-info" id="actionButton"></a>
+                            <a asp-action="Edit" asp-route-id="@item.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary" id="actionButton"></a>
+                            <a asp-action="Delete" asp-route-id="@item.ID"><input type="button" value="Delete" class="btn btn btn-outline-danger" id="actionButton"></a>
+                        </td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
     <br>
     <h2>Past CTF</h2>
     <hr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.CompetitionName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Status)
+                </th>
+                <th>
+                    Actions
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                if (item.Status.Equals("Inactive"))
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CompetitionName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            <a asp-action="Details" asp-route-id="@item.ID"><input type="button" value="View Details" class="btn btn btn-outline-info" id="actionButton"></a>
+                            <a asp-action="Edit" asp-route-id="@item.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary" id="actionButton"></a>
+                            <a asp-action="Delete" asp-route-id="@item.ID"><input type="button" value="Delete" class="btn btn btn-outline-danger" id="actionButton"></a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
 </div>

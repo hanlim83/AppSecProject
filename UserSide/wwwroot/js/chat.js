@@ -25,3 +25,36 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     });
     event.preventDefault();
 });
+
+//group msg ?
+document.getElementById("groupmsg").addEventListener("click", async (event) => {
+    var groupName = document.getElementById("group-name").value;
+    var groupMsg = document.getElementById("group-message-text").value;
+    try {
+        await connection.invoke("SendMessageToGroup", groupName, groupMsg);
+    }
+    catch (e) {
+        console.error(e.toString());
+    }
+    event.preventDefault();
+});
+document.getElementById("join-group").addEventListener("click", async (event) => {
+    var groupName = document.getElementById("group-name").value;
+    try {
+        await connection.invoke("AddToGroup", groupName);
+    }
+    catch (e) {
+        console.error(e.toString());
+    }
+    event.preventDefault();
+});
+document.getElementById("leave-group").addEventListener("click", async (event) => {
+    var groupName = document.getElementById("group-name").value;
+    try {
+        await connection.invoke("RemoveFromGroup", groupName);
+    }
+    catch (e) {
+        console.error(e.toString());
+    }
+    event.preventDefault();
+});
