@@ -392,7 +392,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         Backgroundqueue.QueueBackgroundWorkItem(async token =>
                         {
                             _logger.LogInformation("Deletion of server's resources scheduled");
-                            await Task.Delay(TimeSpan.FromMinutes(1), token);
+                            await Task.Delay(TimeSpan.FromMinutes(3), token);
                             await EC2Client.DeleteKeyPairAsync(new DeleteKeyPairRequest
                             {
                                 KeyName = deleted.KeyPairName

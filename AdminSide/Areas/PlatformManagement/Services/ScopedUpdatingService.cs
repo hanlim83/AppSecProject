@@ -190,6 +190,23 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     }
                     await context.SaveChangesAsync();
                 }
+                if (context.Templates.Any())
+                {
+                    DescribeSnapshotsResponse response = await ec2Client.DescribeSnapshotsAsync(new DescribeSnapshotsRequest());
+                    List<Template> templates = await context.Templates.FromSql("SELECT * FROM dbo.Templates WHERE AWSSnapshotReference = NULL").ToListAsync();
+                    foreach(Template t in templates)
+                    {
+                        foreach(Snapshot s in response.Snapshots)
+                        {
+                            if (s.Description.Contains(t.AWSAMIReference))
+                            {
+                                t.AWSSnapshotReference = s.SnapshotId;
+                                break;
+                            }
+                        }
+                    }
+                    await context.SaveChangesAsync();
+                }
                 _logger.LogInformation("Update Background Service has completed!");
             }
             catch (SqlException e)
