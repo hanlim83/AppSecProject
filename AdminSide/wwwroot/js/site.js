@@ -11,13 +11,4 @@
             $(this).addClass('active');
         }
     });
-    var incerment = 1;
-    var table = $("#" + incerment);
-    while (table[0] != null) {
-        $('#' + incerment).DataTable({
-            responsive: true
-        });
-        ++incerment;
-        var table = $("#" + incerment);
-    }
 });

@@ -15,7 +15,7 @@ namespace AdminSide.Models
         [Display(Name = "Posted By")]
         public string UserName { get; set; }
 
-        [StringLength(50, MinimumLength = 5)]
+        [StringLength(50, MinimumLength = 3)]
         public string Title { get; set; }
 
         public string Content { get; set; }

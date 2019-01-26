@@ -1,12 +1,15 @@
 ﻿@model UserSide.Models.Comment
 
 <br />
-<span style="margin-right:15px; font-size:16px; color:darkblue">
-    @Model.UserName
-</span>
-<span style="margin-right:15px; font-size:16px; color:darkblue">
-    @Model.Content
-</span>
-<span style="margin-right:15px; font-size:16px; color:darkblue">
-    @Model.DT
-</span>
+<div class="container embed-responsive">
+    <span style="margin-right:15px; font-size:16px; color:darkblue; white-space:nowrap">
+        @Model.UserName
+    </span>
+    <span style="margin-right:15px; font-size:16px; color:darkblue; white-space:nowrap">
+        @Model.Content
+    </span>
+    <span style="margin-right:15px; font-size:16px; color:darkblue; white-space: nowrap;">
+        @Model.DT
+    </span>
+</div>
+

@@ -15,9 +15,9 @@ namespace UserSide.Models
         [Display(Name = "Posted By")]
         public string UserName { get; set; }
 
-        [StringLength(50, MinimumLength = 5)]
+        [StringLength(50, MinimumLength = 3)]
         public string Title { get; set; }
-
+        
         public string Content { get; set; }
 
         [DataType(DataType.Date)]
@@ -27,9 +27,6 @@ namespace UserSide.Models
 
         [ForeignKey("CategoryID")]
         public int CategoryID { get; set; }
-
-        [ForeignKey("CategoryName")]
-        public string CategoryName { get; set; }
 
         public ICollection<Comment> Comments { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace AdminSide.Models
 {
@@ -18,10 +19,10 @@ namespace AdminSide.Models
         public string Flag { get; set; }
         public string FileName { get; set; }
 
-        //[ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
         [Display(Name = "Competition Category")]
-        //[ForeignKey("CompetitionCategoryID")]
         public int CompetitionCategoryID { get; set; }
+
+        public ICollection<TeamChallenge> TeamChallenges { get; set; }
     }
 }

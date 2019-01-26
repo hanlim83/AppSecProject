@@ -9,7 +9,7 @@
     <h2>Category Details</h2>
     <br />
     <p>
-        <a asp-action="NewCategory"><input type="button" class="btn btn-primary" value="Create New Category"></a>
+        <a asp-action="NewCategory"><input type="button" class="btn btn-outline-primary" value="Create New Category"></a>
     </p>
 </div>
 <div class="container">
@@ -32,7 +32,7 @@
                     <td>
                         <form asp-action="CategoryD" method="post">
                             <input type="hidden" name="CategoryID" value="@item.CategoryID" />
-                            <input type="submit" class="btn btn-danger" value="Delete" />
+                            <input type="submit" class="btn btn-outline-danger" value="Delete" />
                         </form>
                     </td>
                 </tr>

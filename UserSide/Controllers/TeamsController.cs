@@ -133,6 +133,72 @@ namespace UserSide.Controllers
 
             ViewData["Total"] = team.TeamChallenges.Count();
 
+            //var challenge = await _context.Challenges
+            //    .Include(c => c.TeamChallenges)
+            //    .AsNoTracking()
+            //    .ToListAsync();
+
+            //var competitionCategory = await _context.CompetitionCategories
+            //    .AsNoTracking()
+            //    .ToListAsync();
+
+            var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .ThenInclude(cc => cc.Challenges)
+                .ThenInclude(ch => ch.TeamChallenges)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == team.CompetitionID);
+
+            List<DataPoint> categoryDataPoints = new List<DataPoint>();
+
+            int TotalSolved = 0;
+
+            List<string> colorList = new List<string>()
+            {
+                "#FF9E00",
+                "#009EFF",
+                "#783DF2",
+                "#3DE3F2",
+                "#52D406",
+                "#F2F03D"
+            };
+
+            int colorCounter = 0;
+            foreach (var category in competition.CompetitionCategories)
+            {
+                int categorySolvedCounter = 0;
+                foreach (var challenge in category.Challenges)
+                {
+                    foreach (var teamChallenge in challenge.TeamChallenges)
+                    {
+                        if (teamChallenge.Solved == true && teamChallenge.TeamId == team.TeamID)
+                        {
+                            //categoryDataPoints.Add(new DataPoint(1, category.CategoryName, "#00FF08"));
+                            categorySolvedCounter++;
+                            TotalSolved++;
+                        }
+                    }
+                }
+                categoryDataPoints.Add(new DataPoint(categorySolvedCounter, category.CategoryName, colorList[colorCounter]));
+                colorCounter++;
+            }
+
+            //foreach (var item in team.TeamChallenges)
+            //{
+            //    if (item.Solved == true)
+            //    {
+            //        categoryDataPoints.Add(new DataPoint(1, , "#00FF08"));
+            //        TotalSolved++;
+            //    }
+            //}
+
+            //categoryDataPoints.Add(new DataPoint(solve, "Solve", "#00FF08"));
+            //categoryDataPoints.Add(new DataPoint(fail, "Fails", "#ff0000"));
+
+            ViewBag.CategoryBreakdown = JsonConvert.SerializeObject(categoryDataPoints);
+
+            ViewData["TotalSolved"] = TotalSolved;
+
             return View(team);
         }
 

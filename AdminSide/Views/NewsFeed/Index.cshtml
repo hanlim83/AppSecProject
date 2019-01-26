@@ -68,9 +68,19 @@
             <h4 class="alert-heading">No Search Result!</h4>
             <p>Please search again with different phrasing. This might help to get your result.</p>
             <hr>
-           
+
         </div>
     }
+    @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Alert"])))
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Invalid Search Input</h4>
+            <p>Please search again with different phrasing. This might help to get your result.</p>
+            <hr>
+
+        </div>
+    }
+
     <table class="table table-hover">
         <thead>
             <tr>
@@ -84,27 +94,27 @@
         <tbody>
             @if (Model != null)
             {
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.sourceCat)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Title)
-                    </td>
-                    <td>
-                        <a href="@item.Link" />
-                        @Html.DisplayFor(modelItem => item.Link)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.Description)
-                    </td>
-                    @*<td>
-                            @Html.DisplayFor(modelItem => item.PubDate)
-                        </td>*@
-                </tr>
-            }
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.sourceCat)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td>
+                            <a href="@item.Link" />
+                            @Html.DisplayFor(modelItem => item.Link)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Description)
+                        </td>
+                        @*<td>
+                                @Html.DisplayFor(modelItem => item.PubDate)
+                            </td>*@
+                    </tr>
+                }
             }
         </tbody>
     </table>
@@ -125,6 +135,10 @@
     // When the user clicks on the button, scroll to the top of the document
     function topFunction() {
         document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    }</script>
+    }
+
+    var search = document.getElementById("searchBar").value;
+    
+</script>
 
 

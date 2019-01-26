@@ -50,12 +50,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 Subnet Deletesubnet = await _context.Subnets.FindAsync(Int32.Parse(subnetID));
                 if (Deletesubnet == null)
                 {
-                    ViewData["Result"] = "Invaild Subnet!";
+                    TempData["Result"] = "Invaild Subnet!";
                     return View(await _context.Subnets.ToListAsync());
                 }
                 else if (Deletesubnet.editable == false)
                 {
-                    ViewData["Result"] = "You cannot delete a default subnet!";
+                    TempData["Result"] = "You cannot delete a default subnet!";
                     return View(await _context.Subnets.ToListAsync());
                 }
                 else
@@ -102,7 +102,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             {
                                 _context.Subnets.Remove(Deletesubnet);
                                 await _context.SaveChangesAsync();
-                                ViewData["Result"] = "Successfully Deleted!";
+                                TempData["Result"] = "Successfully Deleted!";
                                 ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
                                 {
                                     RetrievedSubnets = await _context.Subnets.ToListAsync(),
@@ -112,7 +112,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             }
                             else
                             {
-                                ViewData["Result"] = "Failed!";
+                                TempData["Result"] = "Failed!";
                                 ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
                                 {
                                     RetrievedSubnets = await _context.Subnets.ToListAsync(),
@@ -123,7 +123,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         }
                         catch (AmazonEC2Exception e)
                         {
-                            ViewData["Result"] = e.Message;
+                            TempData["Result"] = e.Message;
                             ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
                             {
                                 RetrievedSubnets = await _context.Subnets.ToListAsync(),

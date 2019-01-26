@@ -57,9 +57,9 @@
                     </h4>
                 </div>
                 <div id="collapse1" class=".collapse in">
-                    <div class="card-body" style="padding: 10px;">
+                    <div class="card-body table-responsive-md" style="padding: 10px;">
 
-                        <table class="table">
+                        <table class="table table-hover" style="table-layout:fixed">
                             <thead>
                                 <tr>
                                     <th> Title </th>
@@ -72,25 +72,25 @@
                             <tbody>
                                 @foreach (var item in category.Posts)
                                 {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Title)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.Content)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.UserName)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => item.DT)
-                                        </td>
-                                        <td>
-                                            <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |
-                                            <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |
-                                            <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
-                                        </td>
-                                    </tr>
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Title)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Content)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.UserName)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.DT)
+                                    </td>
+                                    <td>
+                                        <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |
+                                        <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |
+                                        <a asp-action="Delete" asp-route-id="@item.PostID">Delete</a>
+                                    </td>
+                                </tr>
                                 }
                             </tbody>
                         </table>
