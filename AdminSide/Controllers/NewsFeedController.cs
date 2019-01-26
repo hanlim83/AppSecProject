@@ -193,7 +193,8 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,sourceName,sourceURL")] FeedSource feedSource)
         {
-            if (ModelState.IsValid)
+           
+                if (ModelState.IsValid)
             {
                 _context.Add(feedSource);
                 await _context.SaveChangesAsync();
