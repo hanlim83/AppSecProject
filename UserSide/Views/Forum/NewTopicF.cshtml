@@ -6,6 +6,16 @@
 <div class="container">
 
     <h2> Create New Topic </h2>
+
+    @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Alert"])))
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading"> Script code found. </h4>
+            <p>Please submit a post without script.</p>
+            <hr>
+        </div>
+    }
+
     <form asp-action="NewTopicF">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <br />
@@ -25,24 +35,14 @@
             <input asp-for="Content" class="form-control" id="con" placeholder="Enter Content Here" />
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
-        @*@Html.HiddenFor(model => model.DT, Model.DT = DateTime.Now)*@
-
-        <!-- For Files, TBC -->
-        @*<div class="form-group">
-            <label for=""></label>
-            <input type="file" class="form-control-file" id="File1">
-        </div>*@
         <br />
+        @Html.AntiForgeryToken()
         <div class="form-group"></div>
         <button class="btn btn-outline-secondary" asp-area="" asp-controller="Forum" asp-action="Index">Cancel</button> &nbsp;
         <input type="submit" value="Submit" class="btn btn-outline-primary" />
     </form>
 </div>
 <br />
-
-<div class="container">
-    <a asp-action="Index">Back to Forum Page</a>
-</div>
 
 @*/* facebook comment */
     <br />
