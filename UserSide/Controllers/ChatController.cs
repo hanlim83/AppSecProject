@@ -67,7 +67,9 @@ namespace UserSide.Controllers
             //    });
 
             //ViewBag.related = item;
-          
+            ViewBag.UserList = _userManager.Users.ToList();
+
+
 
             await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
             return View(await _context.Chats.ToListAsync());
@@ -105,6 +107,7 @@ namespace UserSide.Controllers
             //}
             //need to remove showing current user
             var uList = _userManager.Users.ToListAsync();
+            var currUser = _userManager.GetUserId(HttpContext.User);
 
             var dictionary = new Dictionary<string, string>
             {
@@ -112,8 +115,14 @@ namespace UserSide.Controllers
             };
             foreach (var user in uList.Result)
             {
-                dictionary.Add(user.Id, user.UserName);
+                if (!user.Id.Equals(currUser))
+                {
+                    dictionary.Add(user.Id, user.UserName);
+                }
+                
             }
+            
+
             ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
 
             

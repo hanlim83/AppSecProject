@@ -40,38 +40,48 @@
                     <th></th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var item in Model)
                 {
                 <tr>
-
                     @if (UserManager.GetUserId(User).Equals(item.UserOne))
                     {
                         <td>
                             @Html.DisplayFor(modelItem => item.MsgCount)
                         </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.UserTwo)
-                        </td>
+                        foreach (var u in ViewBag.UserList)
+                        {
+                            @if (u.Id.Equals(item.UserTwo))
+                            {
+                                <td>
+                                    @u.UserName
+                                </td>
+                            }
+                        }
                         <td>
                             <form>
-                                <button type="submit" class="btn btn-default" asp-action="TalkView">Chat</button>
+                                <button type="submit" class="btn btn-primary" asp-action="TalkView">Chat</button>
                             </form>
                         </td>
                     }
-                    @if (UserManager.GetUserName(User).Equals(item.UserTwo))
+                    @if (UserManager.GetUserId(User).Equals(item.UserTwo))
                     {
                         <td>
                             @Html.DisplayFor(modelItem => item.MsgCount)
                         </td>
-                        <td>
-                            <div id="group-name">
-                                @Html.DisplayFor(modelItem => item.UserOne)
-                            </div>
-                        </td>
+                        foreach (var u in ViewBag.UserList)
+                        {
+                            @if (u.Id.Equals(item.UserOne))
+                            {
+                                <td>
+                                    @u.UserName
+                                </td>
+                            }
+                        }
                         <td>
                             <form asp-action="TalkView">
-                                <button type="submit" class="btn btn-default" id="join-group" >Chat</button>
+                                <button type="submit" class="btn btn-primary" id="join-group">Chat</button>
                             </form>
                         </td>
                     }
