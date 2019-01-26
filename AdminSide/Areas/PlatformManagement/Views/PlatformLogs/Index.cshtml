@@ -25,14 +25,14 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="alert alert-info" role="alert">
-                                All Log Entries except for SQL Server Error Logs, will now be shown as raw entries without any entries
+                                All Log Entries except for SQL Server Error Logs, will now be shown as raw entries without any filtering
                             </div>
                         </div>
                     </div>
                 }
                 <form asp-action="" method="post" class="form-inline">
                     <label class="my-1 mr-2" for="logGroup">Select which component of the platform to view logs for:</label>
-                    <select id="selection" class="custom-select my-1 mr-sm-2" id="Component" name="StreamID" required>
+                    <select id="selection" class="custom-select my-1 mr-sm-2" name="StreamID" required>
                         @foreach (var stream in Model.Streams)
                         {
                             <option value="@stream.ID">@stream.DisplayName</option>
@@ -44,7 +44,7 @@
                 </form>
             </div>
         </div>
-        <div id="CWEventsDisplay" class="row">
+        <div id="CWEventsDisplay" class="row" style="display:none;">
             <div class="col-lg-12">
                 @if (Model.Response != null)
                 {
@@ -286,7 +286,8 @@
 </div>
 @section Scripts {
     <script>
-    var previous = @Model.SelectedValue;
+        $(document).ready(function () {
+            var previous = @Model.SelectedValue;
     if (previous == null || previous == -1)
         document.getElementById("selection").selectedIndex = -1;
     else {
@@ -309,9 +310,11 @@
             ],
             responsive: true,
             deferRender: true,
-            scroller: true
+            "pagingType": "full_numbers"
         });
         $('#CWresults').removeAttr("style");
         $('#CWresults *').removeAttr("style");
+            $('#CWEventsDisplay').removeAttr("style");
+        });
     </script>
 }
