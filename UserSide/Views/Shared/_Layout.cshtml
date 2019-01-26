@@ -15,10 +15,10 @@
         <link rel="stylesheet" href="~/lib/DataTables/datatables.css" />
     </environment>
     <environment exclude="Development">
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/css/bootstrap.min.css"
               asp-fallback-href="~/lib/bootstrap/css/bootstrap.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute"
-              integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous" />
+              integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS" crossorigin="anonymous" />
         <link rel="stylesheet" href="~/css/site.min.css" data-turbolinks-track="reload" asp-append-version="true" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/turbolinks/5.2.0/turbolinks.js"
                 asp-fallback-src="~/lib/turbolinks/turbolinks.js"
@@ -29,12 +29,132 @@
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
     </environment>
     <link rel="stylesheet" href="~/lib/progress-tracker/progress-tracker.css" />
+
+    <script>
+window.onload = function () {
+
+var total = @ViewData["Total"];
+var visitorsData = {
+	"New vs Returning Visitors": [{
+		click: visitorsChartDrilldownHandler,
+		cursor: "pointer",
+		explodeOnClick: false,
+		innerRadius: "75%",
+		legendMarkerType: "square",
+		name: "New vs Returning Visitors",
+		radius: "100%",
+		showInLegend: true,
+		startAngle: 90,
+		type: "doughnut",
+		dataPoints: @Html.Raw(ViewBag.SovlePercentage)
+	}],
+	@*"New Visitors": [{
+		color: "#E7823A",
+		name: "New Visitors",
+		type: "column",
+		xValueType: "dateTime",
+		dataPoints:  @Html.Raw(ViewBag.NewVisitors)
+	}],
+	"Returning Visitors": [{
+		color: "#546BC1",
+		name: "Returning Visitors",
+		type: "column",
+		xValueType: "dateTime",
+		dataPoints:  @Html.Raw(ViewBag.ReturningVisitors)
+	}]*@
+};
+
+var newVSReturningVisitorsOptions = {
+	animationEnabled: true,
+	theme: "light2",
+	title: {
+		text: "Solve Percentage"
+	},
+	//subtitles: [{
+	//	text: "Click on Any Segment to Drilldown",
+	//	backgroundColor: "#2eacd1",
+	//	fontSize: 16,
+	//	fontColor: "white",
+	//	padding: 5
+	//}],
+	legend: {
+		fontFamily: "calibri",
+		fontSize: 14,
+		itemTextFormatter: function (e) {
+			return e.dataPoint.name + ": " + Math.round(e.dataPoint.y / total * 100) + "%";
+		}
+	},
+	data: []
+};
+
+//var visitorsDrilldownedChartOptions = {
+//	animationEnabled: true,
+//	theme: "light2",
+//	axisX: {
+//		labelFontColor: "#717171",
+//		lineColor: "#a2a2a2",
+//		tickColor: "#a2a2a2"
+//	},
+//	axisY: {
+//		gridThickness: 0,
+//		includeZero: false,
+//		labelFontColor: "#717171",
+//		lineColor: "#a2a2a2",
+//		tickColor: "#a2a2a2",
+//		lineThickness: 1
+//	},
+//	data: []
+//};
+
+var chart = new CanvasJS.Chart("chartContainer", newVSReturningVisitorsOptions);
+chart.options.data = visitorsData["New vs Returning Visitors"];
+chart.render();
+
+function visitorsChartDrilldownHandler(e) {
+	chart = new CanvasJS.Chart("chartContainer", visitorsDrilldownedChartOptions);
+	chart.options.data = visitorsData[e.dataPoint.name];
+	chart.options.title = { text: e.dataPoint.name }
+	chart.render();
+	$("#backButton").toggleClass("invisible");
+}
+
+//$("#backButton").click(function () {
+//	$(this).toggleClass("invisible");
+//	chart = new CanvasJS.Chart("chartContainer", newVSReturningVisitorsOptions);
+//	chart.options.data = visitorsData["New vs Returning Visitors"];
+//	chart.render();
+//});
+
+}
+    </script>
+    <style>
+        #backButton {
+            border-radius: 4px;
+            padding: 8px;
+            border: none;
+            font-size: 16px;
+            background-color: #2eacd1;
+            color: white;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+
+        .invisible {
+            display: none;
+        }
+    </style>
 </head>
 <body>
+    @RenderSection("Scripts", required: false)
+
     <nav class="navbar navbar-expand-sm navbar-dark fixed-top bg-dark">
         <div class="container">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"></button>
-            <a class="navbar-brand" asp-controller="Home" asp-action="Index">ASPJ_MVC</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" asp-controller="Home" asp-action="Index">eCTF</a>
             <div class="navbar-collapse collapse" id="navbarSupportedContent">
 
                 <partial name="_LoginPartial" />
@@ -45,6 +165,7 @@
     <div class="container-fluid body-content">
         @RenderBody()
     </div>
+
     <environment include="Development">
         <script src="~/lib/jquery/jquery.js"></script>
         <script src="~/lib/popper/popper.js"></script>
@@ -59,21 +180,20 @@
                 integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
                 crossorigin="anonymous">
         </script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js"
                 asp-fallback-src="~/lib/popper/popper.js"
-                integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+                integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut"
                 crossorigin="anonymous">
         </script>
-        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js"
                 asp-fallback-src="~/lib/bootstrap/js/bootstrap.min.js"
                 asp-fallback-test="window.jQuery && window.jQuery.fn && window.jQuery.fn.modal"
-                integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+                integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
                 crossorigin="anonymous">
         </script>
         <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.js"
                 asp-fallback-src="~/lib/DataTables/datatables.min.js"></script>
         <script src="~/js/site.min.js" data-turbolinks-track="reload" asp-append-version="true"></script>
     </environment>
-    @RenderSection("Scripts", required: false)
 </body>
 </html>

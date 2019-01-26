@@ -36,11 +36,11 @@
                         @Html.DisplayFor(modelItem => item.Score)
                     </td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@item.TeamID">Details</a>
+                        <a asp-controller="Teams" asp-action="Details" asp-route-id="@item.TeamID" data-turbolinks="false">Details</a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-default"></a>
+    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-primary"></a>
 </div>

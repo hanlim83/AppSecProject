@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace AdminSide.Models
 {
@@ -23,10 +18,10 @@ namespace AdminSide.Models
         public string Flag { get; set; }
         public string FileName { get; set; }
 
-        [ForeignKey("CompetitionID")]
+        //[ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
         [Display(Name = "Competition Category")]
-        [ForeignKey("CompetitionCategoryID")]
+        //[ForeignKey("CompetitionCategoryID")]
         public int CompetitionCategoryID { get; set; }
     }
 }

@@ -41,7 +41,6 @@ namespace AdminSide.Controllers
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .ThenInclude(c1 => c1.Challenges)
-                //.Include(c => c.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
@@ -74,7 +73,7 @@ namespace AdminSide.Controllers
 
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
 
@@ -132,12 +131,11 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
-
-            //var vm = new ChallengesViewModelIEnumerable();
-
+            
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
+                //.Include(c1 => c1.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
@@ -157,7 +155,6 @@ namespace AdminSide.Controllers
             ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
 
             return View();
-            //return View();
         }
 
         // POST: Challenges/Create
@@ -169,7 +166,8 @@ namespace AdminSide.Controllers
         {
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
-                .Include(c1 => c1.Challenges)
+                .ThenInclude(cc => cc.Challenges)
+                //.Include(c1 => c1.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
 
@@ -269,7 +267,6 @@ namespace AdminSide.Controllers
                 Key = folderName + "/" + fileName
             };
 
-            //Console.WriteLine("Deleting an object");
             await S3Client.DeleteObjectAsync(deleteObjectRequest);
         }
 

@@ -62,13 +62,12 @@
             <br>
             <br>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
+                <input type="submit" value="Save" class="btn btn-success" />
             </div>
         </form>
     </div>
     <div>
-        @*<a asp-controller="Challenges" asp-action="Edit" asp-route-id="@Model.ID"><button type="button" class="btn btn-default">Edit</button></a>*@
-        <a asp-controller="Challenges" asp-action="Delete" asp-route-id="@Model.ID"><input type="button" value="Delete" class="btn btn btn-default"></a>
-        <a asp-action="Index">Back to List</a>
+        <a asp-controller="Challenges" asp-action="Delete" asp-route-id="@Model.ID"><input type="button" value="Delete" class="btn btn btn-danger"></a>
+        <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.CompetitionID"><input type="button" value="Back" class="btn btn btn-primary"></a>
     </div>
 </div>

@@ -8,7 +8,7 @@
 </div>
 
 <div class="container">
-    <table class="table">
+    <table class="table table-responsive" style="table-layout:fixed">
         <thead>
             <tr>
                 <th> @Html.DisplayNameFor(model => model.Post.Title) </th>
@@ -47,7 +47,7 @@
         <input id="hiddenIDInput" type="hidden" name="PostID" value="@Model.Post.PostID" />
         <br />
         <br />
-        <input type="submit" value="Post Reply" class="btn btn-success" style="float:inherit" />
+        <input type="submit" value="Post Reply" class="btn btn-outline-success" style="float:inherit" />
     }
 </div>
 <div class="container">

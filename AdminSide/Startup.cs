@@ -103,6 +103,10 @@ namespace AdminSide
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
+            //Using Password hasher V3
+            services.Configure<PasswordHasherOptions>(
+                 o => o.CompatibilityMode = PasswordHasherCompatibilityMode.IdentityV3);
+
             //Identity Db Context
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
@@ -141,16 +145,16 @@ namespace AdminSide
             GetRdsConnectionStringNewsFeed()));
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-        .AddRazorPagesOptions(options =>
-        {
-            options.AllowAreas = true;
-            options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
-            options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
-        })
-        .AddMvcOptions(options =>
-        {
-            options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
-        });
+            .AddRazorPagesOptions(options =>
+            {
+                options.AllowAreas = true;
+                options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
+                options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
+            })
+            .AddMvcOptions(options =>
+            {
+                options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute());
+            });
 
             services.ConfigureApplicationCookie(options =>
             {
@@ -227,8 +231,6 @@ namespace AdminSide
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            //IdentityDbInitializer.Initialize(context, userManager).Wait();
         }
     }
 

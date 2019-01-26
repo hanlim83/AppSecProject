@@ -19,7 +19,7 @@ namespace UserSide.Models
         public string BucketName { get; set; }
 
         public ICollection<CompetitionCategory> CompetitionCategories { get; set; }
-        public ICollection<Challenge> Challenges { get; set; }
+        //public ICollection<Challenge> Challenges { get; set; }
         public ICollection<Team> Teams { get; set; }
     }
 }
