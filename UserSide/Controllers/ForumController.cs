@@ -129,25 +129,25 @@ namespace UserSide.Controllers
             return View(post);
         }
 
-        [Authorize]
-        // GET: Forum/Delete
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
+        //[Authorize]
+        //// GET: Forum/Delete
+        //public async Task<IActionResult> Delete(int? id)
+        //{
+        //    if (id == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var post = await context1.Posts
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.PostID == id);
-            if (post == null)
-            {
-                return NotFound();
-            }
+        //    var post = await context1.Posts
+        //        .AsNoTracking()
+        //        .SingleOrDefaultAsync(m => m.PostID == id);
+        //    if (post == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            return View(post);
-        }
+        //    return View(post);
+        //}
 
         [Authorize]
         // POST: Topic/Create
@@ -237,17 +237,17 @@ namespace UserSide.Controllers
             return RedirectToAction("Details",new {id = PostID});
         }
 
-        [Authorize]
-        // POST: Forum/Delete
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var post = await context1.Posts.FindAsync(id);
-            context1.Posts.Remove(post);
-            await context1.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+        //[Authorize]
+        //// POST: Forum/Delete
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(int id)
+        //{
+        //    var post = await context1.Posts.FindAsync(id);
+        //    context1.Posts.Remove(post);
+        //    await context1.SaveChangesAsync();
+        //    return RedirectToAction(nameof(Index));
+        //}
 
         // Checking if Post Exists
         private bool PostExists(int id)

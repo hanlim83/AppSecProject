@@ -35,6 +35,7 @@
 
 <!-- Everything before the Panel Category -->
 <div class="container">
+    <br />
     <h2> Forum Page </h2>
     <p>
         <a asp-action="NewTopicF"> New Topic </a>
@@ -60,7 +61,7 @@
                                 <tr>
                                     <th> Title </th>
                                     <th> Content </th>
-                                    <th>> Posted By </th>
+                                    <th> Posted By </th>
                                     <th> Posted On </th>
                                     <th></th>
                                 </tr>
@@ -83,7 +84,7 @@
                                         </td>
                                         <td>
                                             <a asp-action="Edit" asp-route-id="@item.PostID">Edit</a> |
-                                            <a asp-action="Details" asp-route-id="@item.PostID">Details</a> |
+                                            <a asp-action="Details" asp-route-id="@item.PostID">Details</a>
                                         </td>
                                     </tr>
                                 }

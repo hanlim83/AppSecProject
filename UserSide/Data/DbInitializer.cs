@@ -58,7 +58,6 @@ namespace UserSide.Data
             {
             new ForumCategory { CategoryName="General" },
             new ForumCategory { CategoryName="Crypto" },
-            new ForumCategory { CategoryName="Forensics" }
             };
 
             foreach (ForumCategory c in category)
