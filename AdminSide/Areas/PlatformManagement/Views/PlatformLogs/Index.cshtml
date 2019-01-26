@@ -284,7 +284,8 @@
         </div>
     </div>
 </div>
-<script>
+@section Scripts {
+    <script>
     var previous = @Model.SelectedValue;
     if (previous == null || previous == -1)
         document.getElementById("selection").selectedIndex = -1;
@@ -297,4 +298,20 @@
             }
         }
     }
-</script>
+        var table = $('#CWresults').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                'pdfHtml5',
+                'print'
+            ],
+            responsive: true,
+            deferRender: true,
+            scroller: true
+        });
+        $('#CWresults').removeAttr("style");
+        $('#CWresults *').removeAttr("style");
+    </script>
+}

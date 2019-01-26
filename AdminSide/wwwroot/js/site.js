@@ -11,24 +11,6 @@
             $(this).addClass('active');
         }
     });
-
-    var table = $('#CWresults').DataTable({
-        dom: 'Bfrtip',
-        buttons: [
-            'copyHtml5',
-            'excelHtml5',
-            'csvHtml5',
-            'pdfHtml5',
-            'print'
-        ],
-        responsive: true,
-        deferRender: true,
-        scroller: true
-    });
-    $('#CWresults').attr('style', function (i, style) {
-        return style && style.replace(/width[^;]+;?/g, '');
-    });
-
     var incerment = 1;
     var table = $("#" + incerment);
     while (table[0] != null) {
@@ -39,10 +21,3 @@
         var table = $("#" + incerment);
     }
 });
-function deleteSubnetInput(ID) {
-    $('#subnetDeletionInput').val(ID);
-    $('#deleteSubnet').modal()
-}
-function modifyServerInput(ID) {
-    $('#modifyServerInput').val(ID);
-}
