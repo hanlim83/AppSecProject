@@ -247,16 +247,6 @@ namespace UserSide.Controllers
                 c.CommentID = comment.CommentID;
                 c.PostID = int.Parse(PostID);
 
-                //StringBuilder sbComments = new StringBuilder();
-                //sbComments.Append(HttpUtility.HtmlEncode(comment.Content));
-
-                //sbComments.Replace("&lt;b&gt;", "<b>");
-                //sbComments.Replace("&lt;/b&gt;", "</b>");
-                //sbComments.Replace("&lt;u&gt;", "<u>");
-                //sbComments.Replace("&lt;/u&gt;", "</u>");
-
-                //comment.Content = sbComments.ToString();
-
                 context1.Add(c);
                 await context1.SaveChangesAsync();
             }
@@ -292,7 +282,7 @@ namespace UserSide.Controllers
         // Validate Input for Special Characters
         public Boolean ValidateCheck(String input)
         {
-            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
+            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
             {
                 return true;
             }
