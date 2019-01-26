@@ -16,6 +16,7 @@ using System.Web;
 
 namespace UserSide.Controllers
 {
+    [Authorize]
     public class ForumController : Controller
     {
 
@@ -28,7 +29,6 @@ namespace UserSide.Controllers
             _userManager = userManager;
         }
 
-        [Authorize]
         // GET: Forum Post
         public async Task<IActionResult> Index()
         {
@@ -51,7 +51,6 @@ namespace UserSide.Controllers
             return View(category);
         }
 
-        [Authorize]
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
         {
@@ -81,7 +80,6 @@ namespace UserSide.Controllers
             return View(model);
         }
 
-        [Authorize]
         // GET: Topic/Create
         public IActionResult NewTopicF()
         {
@@ -89,7 +87,6 @@ namespace UserSide.Controllers
             return View();
         }
 
-        [Authorize]
         // GET: Forum/Edit
         public async Task<IActionResult> Edit(int? id)
         {
@@ -131,7 +128,6 @@ namespace UserSide.Controllers
             return View(post);
         }
 
-        //[Authorize]
         //// GET: Forum/Delete
         //public async Task<IActionResult> Delete(int? id)
         //{
@@ -151,7 +147,6 @@ namespace UserSide.Controllers
         //    return View(post);
         //}
 
-        [Authorize]
         // POST: Topic/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -177,7 +172,6 @@ namespace UserSide.Controllers
             return View(post);
         }
 
-        [Authorize]
         // POST: Forum/Edit
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
@@ -213,7 +207,6 @@ namespace UserSide.Controllers
             return View(post);
         }
 
-        [Authorize]
         // POST: Forum/PostReply
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -251,8 +244,6 @@ namespace UserSide.Controllers
             return RedirectToAction("Details", new { id = PostID });
         }
 
-
-        //[Authorize]
         //// POST: Forum/Delete
         //[HttpPost, ActionName("Delete")]
         //[ValidateAntiForgeryToken]
