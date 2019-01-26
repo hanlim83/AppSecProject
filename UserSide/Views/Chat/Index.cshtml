@@ -66,11 +66,13 @@
                             @Html.DisplayFor(modelItem => item.MsgCount)
                         </td>
                         <td>
-                            @Html.DisplayFor(modelItem => item.UserOne)
+                            <div id="group-name">
+                                @Html.DisplayFor(modelItem => item.UserOne)
+                            </div>
                         </td>
                         <td>
-                            <form>
-                                <button type="submit" class="btn btn-default" asp-action="TalkView">Chat</button>
+                            <form asp-action="TalkView">
+                                <button type="submit" class="btn btn-default" id="join-group" >Chat</button>
                             </form>
                         </td>
                     }

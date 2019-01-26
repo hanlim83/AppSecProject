@@ -23,7 +23,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="UserOne" class="control-label"></label>
-                @Html.DropDownList("UserOne", new SelectList(ViewBag.Users, "UserOne"))
+                @Html.DropDownList("Chat with: ", new SelectList(ViewBag.Users, "UserOne"), new { @class = "Form-Control"})
             </div>
             <div class="form-group">
                 <input type="submit" value="CreateChat" class="btn btn-default" />

@@ -58,3 +58,11 @@ document.getElementById("leave-group").addEventListener("click", async (event) =
     }
     event.preventDefault();
 });
+(async () => {
+    try {
+        await connection.start();
+    }
+    catch (e) {
+        console.error(e.toString());
+    }
+})();
