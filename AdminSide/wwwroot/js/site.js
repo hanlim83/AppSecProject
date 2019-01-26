@@ -11,15 +11,27 @@
             $(this).addClass('active');
         }
     });
-    $('#CWresults').DataTable({
-        colReorder: true,
-        responsive: true
+
+    var table = $('#CWresults').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copyHtml5',
+            'excelHtml5',
+            'csvHtml5',
+            'pdfHtml5',
+            'print'
+        ],
+        responsive: true,
+        deferRender: true,
+        scroller: true
     });
 
     var incerment = 1;
     var table = $("#" + incerment);
     while (table[0] != null) {
-        $('#' + incerment).DataTable();
+        $('#' + incerment).DataTable({
+            responsive: true
+        });
         ++incerment;
         var table = $("#" + incerment);
     }

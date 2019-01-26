@@ -9,7 +9,9 @@
     var incerment = 1;
     var table = $("#" + incerment);
     while (table[0] != null) {
-        $('#' + incerment).DataTable();
+        $('#' + incerment).DataTable({
+            responsive: true
+        });
         ++incerment;
         var table = $("#" + incerment);
     }
