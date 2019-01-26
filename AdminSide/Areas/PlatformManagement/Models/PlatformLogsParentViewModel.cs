@@ -12,5 +12,6 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public GetLogEventsResponse Response { get; set; }
         public int SelectedValue { get; set; }
         public List<RDSSQLLog> SQLlogs { get; set; }
+        public List<IISLog>IISLogs { get; set; }
     }
 }

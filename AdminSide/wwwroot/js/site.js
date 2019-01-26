@@ -25,6 +25,9 @@
         deferRender: true,
         scroller: true
     });
+    $('#CWresults').attr('style', function (i, style) {
+        return style && style.replace(/width[^;]+;?/g, '');
+    });
 
     var incerment = 1;
     var table = $("#" + incerment);

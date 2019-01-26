@@ -44,76 +44,180 @@
                 </form>
             </div>
         </div>
-        <div class="row">
+        <div id="CWEventsDisplay" class="row">
             <div class="col-lg-12">
-                <div class="table-responsive">
-                    <br />
-                    @if (Model.Response != null && ViewData["Mode"].Equals("Generic"))
-                    {
-                        <table id="CWresults" class="table">
-                            <thead>
+                @if (Model.Response != null && ViewData["Mode"].Equals("Generic"))
+                {
+                    <table id="CWresults" class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Time-Stamp
+                                </th>
+                                <th>
+                                    Log
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loggedEvent in Model.Response.Events)
+                            {
                                 <tr>
-                                    <th>
-                                        TimeStamp
-                                    </th>
-                                    <th>
-                                        Log
-                                    </th>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Timestamp)
+                                    </td>
+                                    <td>
+                                        <div>
+                                            @Html.DisplayFor(modelItem => loggedEvent.Message)
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var loggedEvent in Model.Response.Events)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => loggedEvent.Timestamp)
-                                        </td>
-                                        <td>
-                                            <div>
-                                                @Html.DisplayFor(modelItem => loggedEvent.Message)
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                            }
+                        </tbody>
+                    </table>
 
-                    } @if (Model.Response == null && Model.SQLlogs != null)
-                    {
-                        <table id="CWresults" class="table">
-                            <thead>
+                } @if (Model.Response == null && Model.SQLlogs != null)
+                {
+                    <table id="CWresults" class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Time-Stamp
+                                </th>
+                                <th>
+                                    Process Information
+                                </th>
+                                <th>
+                                    Log Text
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loggedEvent in Model.SQLlogs)
+                            {
                                 <tr>
-                                    <th>
-                                        TimeStamp
-                                    </th>
-                                    <th>
-                                        Process Information
-                                    </th>
-                                    <th>
-                                        Log Text
-                                    </th>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.LogDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.ProcessInfo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Text)
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var loggedEvent in Model.SQLlogs)
-                                {
-                                    <tr>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => loggedEvent.LogDate)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => loggedEvent.ProcessInfo)
-                                        </td>
-                                        <td>
-                                            @Html.DisplayFor(modelItem => loggedEvent.Text)
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
+                            }
+                        </tbody>
+                    </table>
 
-                    }
-                </div>
+                } @if (Model.Response == null && Model.IISLogs != null && ViewData["Mode"].Equals("Automatic"))
+                {
+                    <table id="CWresults" class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Time-Stamp
+                                </th>
+                                @*<th>
+                                    IIS Server IP
+                                </th>*@
+                                <th>
+                                    HTTP Method
+                                </th>
+                                <th>
+                                    Path
+                                </th>
+                                <th>
+                                    Query
+                                </th>
+                                @*<th>
+                                    Listening Port
+                                </th>*@
+                                <th>
+                                    User Identity
+                                </th>
+                                <th>
+                                    Source IP
+                                </th>
+                                <th>
+                                    Source User Agent
+                                </th>
+                                <th>
+                                    Referer
+                                </th>
+                                <th>
+                                    HTTP Status Code
+                                </th>
+                                <th>
+                                    Sub-Status Code
+                                </th>
+                                <th>
+                                    Win32 Status Code
+                                </th>
+                                <th>
+                                    Time Taken (In miliseconds)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loggedEvent in Model.IISLogs)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.TimeStamp)
+                                    </td>
+                                    @*<td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.ServerIP)
+                                    </td>*@
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.HTTPMethod)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Path)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Query)
+                                    </td>
+
+                                    @*<td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.DestPort)
+                                    </td>*@
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.AuthenticatedUser)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SourceIP)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SourceUserAgent)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Referer)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.HTTPStatusCode)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SubstatusCode)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Win32StatusCode)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Duration)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
             </div>
         </div>
     </div>

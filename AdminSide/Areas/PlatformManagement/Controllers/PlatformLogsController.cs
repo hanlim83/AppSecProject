@@ -39,9 +39,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             this._userManager = userManager;
         }
 
-        public IActionResult Index(string OverrideMode)
+        public IActionResult Index(string Override)
         {
-            if (string.IsNullOrEmpty(OverrideMode))
+            if (string.IsNullOrEmpty(Override))
             {
                 ViewData["Mode"] = "Automatic";
                 PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
@@ -51,9 +51,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     SelectedValue = -1
                 };
                 return View(model);
-            } else if (OverrideMode.Equals("true"))
+            } else if (Override.Equals("true"))
             {
-                ViewData["Mode"] = "Automatic";
+                ViewData["Mode"] = "Generic";
                 PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
                 {
                     Response = null,
@@ -64,7 +64,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             }
             else
             {
-                ViewData["Mode"] = "Generic";
+                ViewData["Mode"] = "Automatic";
                 PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
                 {
                     Response = null,
@@ -106,6 +106,57 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 else if (ViewMode.Equals("Generic"))
                     ViewData["Mode"] = "Automatic";
                 return View(model);
+            } else if (ViewMode.Equals("Automatic"))
+            {
+                CloudWatchLogStream selectedStream = await _context.CloudWatchLogStreams.FindAsync(int.Parse(StreamID));
+                if (selectedStream != null)
+                {
+                    GetLogEventsResponse response = await CloudwatchLogsClient.GetLogEventsAsync(new GetLogEventsRequest
+                    {
+                        LogGroupName = selectedStream.LinkedGroup.Name.Replace("@", "/"),
+                        LogStreamName = selectedStream.Name
+                    });
+                    PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+                    {
+                        Response = null,
+                        Streams = _context.CloudWatchLogStreams.ToList(),
+                        SelectedValue = int.Parse(StreamID)
+                    };
+                    if (selectedStream.DisplayName.Contains("IIS"))
+                    {
+                        List<IISLog> logs = new List<IISLog>();
+                        foreach (OutputLogEvent e in response.Events)
+                        {
+                            if (!e.Message.StartsWith('#'))
+                            {
+                                string[] spiltedRecord = e.Message.Split();
+                                IISLog l = new IISLog
+                                {
+                                    TimeStamp = e.Timestamp,
+                                    ServerIP = spiltedRecord[0],
+                                    HTTPMethod = spiltedRecord[1],
+                                    Path = spiltedRecord[2],
+                                    Query = spiltedRecord[3],
+                                    DestPort = int.Parse(spiltedRecord[4]),
+                                    AuthenticatedUser = spiltedRecord[5],
+                                    SourceIP = spiltedRecord[6],
+                                    SourceUserAgent = spiltedRecord[7],
+                                    Referer = spiltedRecord[8],
+                                    HTTPStatusCode = int.Parse(spiltedRecord[9]),
+                                    SubstatusCode = int.Parse(spiltedRecord[10]),
+                                    Win32StatusCode = int.Parse(spiltedRecord[11]),
+                                    Duration = int.Parse(spiltedRecord[12]),
+                                };
+                                logs.Add(l);
+                            }
+                        }
+                        model.IISLogs = logs;
+                    }
+                    ViewData["Mode"] = "Automatic";
+                    return View(model);
+                }
+                else
+                    return NotFound();
             }
             else
             {
