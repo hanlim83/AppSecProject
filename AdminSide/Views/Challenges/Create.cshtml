@@ -54,3 +54,10 @@
     </form>
     <a asp-controller="Challenges" asp-action="Index" asp-route-id="@ViewData["CompetitionID"]"><input type="button" value="Back" class="btn btn btn-primary"></a>
 </div>
+
+<script>
+        $('input[type="file"]').change(function (e) {
+            var fileName = e.target.files[0].name;
+            $('.custom-file-label').html(fileName);
+        });
+</script>
