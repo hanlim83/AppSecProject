@@ -22,12 +22,23 @@ namespace AdminSide.Data
                 {
                     new Template
                     {
+                        Name = "Microsoft Windows Server 2019 Base Template",
+                        Type = TemplateType.Default,
+                        DateCreated = DateTime.Parse("26/1/2019"),
+                        OperatingSystem = "Microsoft Windows Server 2019 Base",
+                        AWSAMIReference = "ami-0077b703cac9baa12",
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 30
+                    },
+                    new Template
+                    {
                         Name = "Amazon Linux 2 LTS Template",
                         Type = TemplateType.Default,
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Amazon Linux 2 LTS",
                         AWSAMIReference = "ami-0b84d2c53ad5250c2",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 8
                     },
                     new Template
                     {
@@ -36,7 +47,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Amazon Linux 2018.3",
                         AWSAMIReference = "ami-05b3bcf7f311194b3",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 8
                     },
                     new Template
                     {
@@ -45,7 +57,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Red Hat Enterprise Linux 7.5",
                         AWSAMIReference = "ami-76144b0a",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 10
                     },
                     new Template
                     {
@@ -54,7 +67,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "SUSE Linux Enterprise Server 15",
                         AWSAMIReference = "ami-0920c364049458e86",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 10
                     },
                     new Template
                     {
@@ -63,7 +77,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Ubuntu Server 18.04 LTS",
                         AWSAMIReference = "ami-0c5199d385b432989",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 8
                     },
                     new Template
                     {
@@ -72,7 +87,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Ubuntu Server 14.04 LTS",
                         AWSAMIReference = "ami-039950f07c4a0d878",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 8
                     },
                     new Template
                     {
@@ -81,7 +97,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Microsoft Windows Server 2016 Base",
                         AWSAMIReference = "ami-04385f3f533c85af7",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 30
                     },
                     new Template
                     {
@@ -90,7 +107,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Microsoft Windows Server 2012 R2 Base",
                         AWSAMIReference = "ami-059b411d0e166914e",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 30
                     },
                     new Template
                     {
@@ -99,7 +117,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Microsoft Windows Server 2012 Base",
                         AWSAMIReference = "ami-0caa1a0b06b16e0c0",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 30
                     },
                     new Template
                     {
@@ -108,7 +127,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Microsoft Windows Server 2008 R2 Base",
                         AWSAMIReference = "ami-0428d47da132d9763",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 30
                     },
                     new Template
                     {
@@ -117,7 +137,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Microsoft Windows Server 2008 SP2 Base",
                         AWSAMIReference = "ami-07bae34c7bd0d31d0",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 30
                     },
                     new Template
                     {
@@ -126,7 +147,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Ubuntu Server 16.04 LTS",
                         AWSAMIReference = "ami-0eb1f21bbd66347fe",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 8
                     },
                     new Template
                     {
@@ -135,7 +157,8 @@ namespace AdminSide.Data
                         DateCreated = DateTime.Parse("1/1/2019"),
                         OperatingSystem = "Microsoft Windows Server 2003 R2 Base",
                         AWSAMIReference = "ami-0407dbd3ff0dca87c",
-                        SpecificMinimumSize = false
+                        SpecificMinimumSize = true,
+                        MinimumStorage = 30
                     },
                     new Template
                     {
@@ -145,7 +168,8 @@ namespace AdminSide.Data
                         OperatingSystem = "Kali Linux 2018.3",
                         AWSAMIReference = "ami-0db99f1dca7fe5ee2",
                         SpecificMinimumSize = true,
-                        MinimumStorage = 25
+                        MinimumStorage = 25,
+                        AWSSnapshotReference = "snap-0bd354666ed0d1609"
                     },
                     new Template
                     {
@@ -156,7 +180,8 @@ namespace AdminSide.Data
                         AWSAMIReference = "ami-04c4105e8f4bf70eb",
                         SpecificMinimumSize = true,
                         MinimumStorage = 15,
-                        TemplateDescription = "Default Amazon 2 LTS Template with Splunk Enterprise 7 Pre-loaded \nUser Name: eCTFAdmin \nPassword:eCTFP@ss"
+                        TemplateDescription = "Default Amazon 2 LTS Template with Splunk Enterprise 7 Pre-loaded \nUser Name: eCTFAdmin \nPassword:eCTFP@ss",
+                        AWSSnapshotReference = "snap-0aaaa31ee20e240ea"
                     }
                 };
                 foreach (Template t in defaultTemplates)
