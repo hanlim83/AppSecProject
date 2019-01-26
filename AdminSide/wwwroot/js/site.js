@@ -23,7 +23,9 @@
         ],
         responsive: true,
         deferRender: true,
-        scroller: true
+        scroller: true,
+        "pagingType": "full_numbers",
+        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]]
     });
     $('#CWresults').attr('style', function (i, style) {
         return style && style.replace(/width[^;]+;?/g, '');
