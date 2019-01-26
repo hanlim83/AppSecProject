@@ -161,8 +161,18 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         {
             if (selectedTemplate != null)
             {
-                TempData["selectedTemplate"] = selectedTemplate;
-                return View(await _context.Subnets.ToListAsync());
+                Template selected = await _context.Templates.FindAsync(int.Parse(selectedTemplate));
+                if (selected != null)
+                {
+                    ViewData["selectedTemplate"] = selected.ID;
+                    if (selected.SpecificMinimumSize == true)
+                        ViewData["minimumSize"] = selected.MinimumStorage;
+                    else
+                        ViewData["minimumSize"] = 8;
+                    return View(await _context.Subnets.ToListAsync());
+                }
+                else
+                    return NotFound();
             }
             else
                 return RedirectToAction("SelectTemplate");
