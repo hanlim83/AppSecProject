@@ -118,7 +118,6 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     });
                     PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
                     {
-                        Response = null,
                         Streams = _context.CloudWatchLogStreams.ToList(),
                         SelectedValue = int.Parse(StreamID)
                     };
@@ -132,8 +131,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 string[] spiltedRecord = e.Message.Split();
                                 IISLog l = new IISLog
                                 {
-                                    TimeStamp = e.Timestamp,
-                                    ServerIP = spiltedRecord[0],
+                                    TimeStamp = e.Timestamp.ToLocalTime(),
+                                ServerIP = spiltedRecord[0],
                                     HTTPMethod = spiltedRecord[1],
                                     Path = spiltedRecord[2],
                                     Query = spiltedRecord[3],
@@ -151,6 +150,53 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                             }
                         }
                         model.IISLogs = logs;
+                    } else if (selectedStream.DisplayName.Contains("eni"))
+                    {
+                        List<ENILog> logs = new List<ENILog>();
+                        foreach (OutputLogEvent e in response.Events)
+                        {
+                            if (!e.Message.Contains("NODATA"))
+                            {
+                                string[] spiltedRecord = e.Message.Split();
+                                ENILog l = new ENILog
+                                {
+                                    TimeStamp = e.Timestamp.ToLocalTime(),
+                                    Version = int.Parse(spiltedRecord[0]),
+                                    AccountID = long.Parse(spiltedRecord[1]),
+                                    Interface = spiltedRecord[2],
+                                    SourceAddress = spiltedRecord[3],
+                                    DestinationAddress = spiltedRecord[4],
+                                    SourcePort = spiltedRecord[5],
+                                    DestinationPort = spiltedRecord[6],
+                                    Packets = int.Parse(spiltedRecord[8]),
+                                    Bytes = int.Parse(spiltedRecord[9]),
+                                    StartTime = long.Parse(spiltedRecord[10]),
+                                    EndTime = long.Parse(spiltedRecord[11]),
+                                    Action = spiltedRecord[12],
+                                    LogAction = spiltedRecord[13]
+                                };
+                                if (spiltedRecord[7].Equals("1"))
+                                    l.Protocol = "ICMP";
+                                else if (spiltedRecord[7].Equals("4"))
+                                    l.Protocol = "IPv4";
+                                else if (spiltedRecord[7].Equals("6"))
+                                    l.Protocol = "TCP";
+                                else if (spiltedRecord[7].Equals("17"))
+                                    l.Protocol = "UDP";
+                                else if (spiltedRecord[7].Equals("41"))
+                                    l.Protocol = "IPv6";
+                                logs.Add(l);
+                            }
+                        }
+                        model.ENILogs = logs;
+                    }
+                    else
+                    {
+                        foreach (OutputLogEvent e in response.Events)
+                        {
+                            e.Timestamp = e.Timestamp.ToLocalTime();
+                        }
+                        model.Response = response;
                     }
                     ViewData["Mode"] = "Automatic";
                     return View(model);
