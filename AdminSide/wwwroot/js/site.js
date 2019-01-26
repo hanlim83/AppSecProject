@@ -21,6 +21,12 @@
         var table = $("#" + increment);
     }
 });
+$('#NewsFeedTable').DataTable(
+    {
+        "search": false,
+        "responsive" : true
+    }
+);
 function deleteSubnetInput(ID) {
     $('#subnetDeletionInput').val(ID);
     $('#deleteSubnet').modal()
