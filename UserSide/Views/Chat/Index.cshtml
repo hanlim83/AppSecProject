@@ -25,7 +25,6 @@
 
     <!--Individual-->
 
-    @UserManager.GetUserId(User);
 
     <div class="container">
        
@@ -46,7 +45,7 @@
                 {
                 <tr>
 
-                    @if (UserManager.GetUserName(User).Equals(item.UserOne))
+                    @if (UserManager.GetUserId(User).Equals(item.UserOne))
                     {
                         <td>
                             @Html.DisplayFor(modelItem => item.MsgCount)
@@ -79,7 +78,6 @@
 
                 </tr>
                 }
-                <
                    
             </tbody>
         </table>

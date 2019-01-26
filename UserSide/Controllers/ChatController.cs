@@ -12,6 +12,7 @@ using UserSide.Models;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace UserSide.Controllers
 {
@@ -103,7 +104,19 @@ namespace UserSide.Controllers
             //    contact.add(username);
             //}
             //need to remove showing current user
-            ViewBag.Users = _userManager.Users.Select(u => u.UserName).ToList();
+            var uList = _userManager.Users.ToListAsync();
+
+            var dictionary = new Dictionary<string, string>
+            {
+
+            };
+            foreach (var user in uList.Result)
+            {
+                dictionary.Add(user.Id, user.UserName);
+            }
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+
+            
             return View();
         }
 
@@ -116,16 +129,16 @@ namespace UserSide.Controllers
                 var User = await _userManager.GetUserAsync(HttpContext.User);
                 var selectUser = await _userManager.Users.ToListAsync();
 
-                foreach (var u in selectUser)
-                {
-                    if (u.Id == chat.UserOne)
-                    {
-                        chat.UserOne = u.UserName;
-                    }
-                }
+                //foreach (var u in selectUser)
+                //{
+                //    if (u.Id == chat.UserOne)
+                //    {
+                //        chat.UserOne = u.UserName;
+                //    }
+                //}
 
 
-                //chat.UserTwo = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+                chat.UserTwo = User.Id;
 
                 _context.Add(chat);
                 await _context.SaveChangesAsync();

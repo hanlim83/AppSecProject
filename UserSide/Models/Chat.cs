@@ -11,6 +11,7 @@ namespace UserSide.Models
     {
         [Key]
         public int ChatID { get; set; }
+        [Display(Name ="Message not read")]
         public int MsgCount { get; set; }
 
         public string UserOne { get; set; }
