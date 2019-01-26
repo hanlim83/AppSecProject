@@ -6,10 +6,24 @@
 <h2>Modify</h2>
 <h4>Subnet</h4>
 <hr />
-@if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Exception"])))
+@if (!String.IsNullOrEmpty(Convert.ToString(TempData["Result"])))
 {
-    <div class="alert alert-danger" role="alert">
-        @TempData["Exception"]
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-danger" role="alert">
+                @TempData["Result"]
+            </div>
+        </div>
+    </div>
+}
+@if (!String.IsNullOrEmpty(Convert.ToString(TempData["Exception"])))
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-danger" role="alert">
+                @TempData["Exception"]
+            </div>
+        </div>
     </div>
 }
 <div class="row">
@@ -162,7 +176,7 @@
 </div>
 <div class="row">
     <div class="col-lg-12">
-        <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back</button>        
+        <button type="button" class="btn btn-secondary float-left" data-toggle="modal" data-target="#confirmationModal">Go back</button>
     </div>
 </div>
 

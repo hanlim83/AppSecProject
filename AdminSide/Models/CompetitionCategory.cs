@@ -16,7 +16,6 @@ namespace AdminSide.Models
         [Display(Name = "Category Name")]
         public string CategoryName { get; set; }
 
-        [ForeignKey("CompetitionID")]
         public int CompetitionID { get; set; }
 
         public ICollection<Challenge> Challenges { get; set; }

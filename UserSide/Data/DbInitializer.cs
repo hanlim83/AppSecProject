@@ -58,7 +58,6 @@ namespace UserSide.Data
             {
             new ForumCategory { CategoryName="General" },
             new ForumCategory { CategoryName="Crypto" },
-            new ForumCategory { CategoryName="Forensics" }
             };
 
             foreach (ForumCategory c in category)
@@ -92,17 +91,17 @@ namespace UserSide.Data
                 return;   // DB has been seeded
             }
 
-            var Chat = new UserChat[]
-            {
-                new UserChat{UserId="1",UserName="Stephen Curry"},
-                new UserChat{UserId="2",UserName="Lebron James"}
-            };
+            //var Chat = new UserChat[]
+            //{
+            //    new UserChat{UserId="1",UserName="Stephen Curry"},
+            //    new UserChat{UserId="2",UserName="Lebron James"}
+            //};
 
-            foreach (UserChat c in Chat)
-            {
-                context.UserChats.Add(c);
-            }
-            context.SaveChanges();
+            //foreach (UserChat c in Chat)
+            //{
+            //    context.UserChats.Add(c);
+            //}
+            //context.SaveChanges();
 
             //var Group = new GroupChat[]
             //{
@@ -115,6 +114,16 @@ namespace UserSide.Data
             //    context.GroupChats.Add(g);
             //}
             //context.SaveChanges();
+            var text = new Chat[]
+           {
+                new Chat{UserOne="Stephen",UserTwo="James",MsgCount=12},
+                new Chat{UserOne="Id 1",UserTwo="ID 2",MsgCount=2}
+           };
+
+            foreach (Chat t in text)
+            {
+                context.Chats.Add(t);
+            }
 
             var Talk = new Message[]
             {
@@ -128,16 +137,7 @@ namespace UserSide.Data
             }
             context.SaveChanges();
 
-            var text = new Chat[]
-            {
-                new Chat{UserId="1"},
-                new Chat{UserId="2"}
-            };
-
-            foreach (Chat t in text)
-            {
-                context.Chats.Add(t);
-            }
+           
             context.SaveChanges();
         }
 

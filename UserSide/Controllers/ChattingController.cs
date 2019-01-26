@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -13,17 +15,18 @@ namespace UserSide.Controllers
     public class ChattingController : Controller
     {
         private readonly ChatContext _context;
+        private readonly UserManager<IdentityUser> _userManager;
 
-        public ChattingController(ChatContext context)
+        public ChattingController(ChatContext context, UserManager<IdentityUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Chatting
         public async Task<IActionResult> Index()
         {
-            var chatContext = _context.Chats.Include(c => c.UserChat);
-            return View(await chatContext.ToListAsync());
+            return View(await _context.Chats.ToListAsync());
         }
 
         // GET: Chatting/Details/5
@@ -35,7 +38,6 @@ namespace UserSide.Controllers
             }
 
             var chat = await _context.Chats
-                .Include(c => c.UserChat)
                 .FirstOrDefaultAsync(m => m.ChatID == id);
             if (chat == null)
             {
@@ -45,27 +47,43 @@ namespace UserSide.Controllers
             return View(chat);
         }
 
-        // GET: Chatting/Create
+        // GET: Chatting/xCreate
         public IActionResult Create()
         {
-            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId");
+            //ViewData["UserId"] = new SelectList(_context.UserChats, "UserId");
+       
+            ViewBag.Users = _userManager.Users.Select(u => u.UserName).ToList();
             return View();
         }
+
 
         // POST: Chatting/Create
         // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("ChatID,MsgCount,UserId")] Chat chat)
+        public async Task<IActionResult> Create([Bind("ChatID,MsgCount,UserOne")] Chat chat)
         {
             if (ModelState.IsValid)
             {
+                var User = await _userManager.GetUserAsync(HttpContext.User);
+                var selectUser = await _userManager.Users.ToListAsync();
+
+                foreach (var u in selectUser)
+                {  
+                    if (u.Id == chat.UserOne)
+                    {
+                        chat.UserOne = u.UserName;
+                    }
+                }
+
+
+                chat.UserTwo = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+
                 _context.Add(chat);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId", chat.UserId);
             return View(chat);
         }
 
@@ -82,7 +100,6 @@ namespace UserSide.Controllers
             {
                 return NotFound();
             }
-            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId", chat.UserId);
             return View(chat);
         }
 
@@ -91,7 +108,7 @@ namespace UserSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ChatID,MsgCount,UserId")] Chat chat)
+        public async Task<IActionResult> Edit(int id, [Bind("ChatID,MsgCount,UserOne,UserTwo")] Chat chat)
         {
             if (id != chat.ChatID)
             {
@@ -118,7 +135,6 @@ namespace UserSide.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.UserChats, "UserId", "UserId", chat.UserId);
             return View(chat);
         }
 
@@ -131,7 +147,6 @@ namespace UserSide.Controllers
             }
 
             var chat = await _context.Chats
-                .Include(c => c.UserChat)
                 .FirstOrDefaultAsync(m => m.ChatID == id);
             if (chat == null)
             {

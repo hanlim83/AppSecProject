@@ -33,9 +33,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
         private readonly IAmazonCloudWatchLogs cwlClient;
         private readonly IAmazonRDS rdsClient;
         private const string IPv4VMCIDR = "172.30.0.0/16";
-        private static string IPv6VMCIDR;
-        private static string primaryVPCID;
+        private static string VMVPCID;
         private static Boolean Flag;
+        private const string IPv4PlatformCIDR = "172.29.0.0/16";
+        private static string PlatformVPCID;
 
         public ScopedSetupService(ILogger<ScopedSetupService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient, IAmazonRDS relationaldatabaseserviceClient)
         {
@@ -60,7 +61,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 {
                     GroupIds = new List<string>
                 {
-                    "sg-0c3eb90f56531f376"
+                    "sg-05613fe8f8f7a54c4"
                 }
                 });
                 if (responseDescribeSecurityGroups.SecurityGroups[0] != null)
@@ -166,9 +167,11 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 {
                     if (VPC.CidrBlock.Contains(IPv4VMCIDR))
                     {
-                        primaryVPCID = VPC.VpcId;
+                        VMVPCID = VPC.VpcId;
                         Flag = true;
                     }
+                    else if (VPC.CidrBlock.Contains(IPv4PlatformCIDR))
+                        PlatformVPCID = VPC.VpcId;
                     if (Flag == true)
                         break;
                 }
@@ -227,21 +230,28 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                         }
                     });
+                    _logger.LogInformation("Setup Background Service Sleeping while IPv6 Assignment");
+                    responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                    {
+                        VpcIds = new List<string>
+                        {
+                            responseCreateVPC.Vpc.VpcId
+                        }
+                    });
+                    await Task.Delay(TimeSpan.FromSeconds(10));
                     VPC newlyCreatedVPC = new VPC
                     {
                         AWSVPCReference = responseCreateVPC.Vpc.VpcId,
-                        AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId
+                        AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
+                        type = VPCType.DefaultVM,
+                        BaseIPv4CIDR = responseCreateVPC.Vpc.CidrBlock,
+                        BaseIPv6CIDR = responseDescribeVPC.Vpcs[0].Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock
                     };
                     context.VPCs.Add(newlyCreatedVPC);
-                    await context.SaveChangesAsync();
                     _logger.LogInformation("VPC created!");
-                }
-                else
-                {
-                    VPC Rvpc = await context.VPCs.FindAsync(1);
-                    if (Rvpc == null)
+                    if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + PlatformVPCID + "'").ToList().Count() == 0)
                     {
-                        _logger.LogInformation("VPC already created but not inside SQL Database!");
+                        _logger.LogInformation("Platform VPC not inside SQL Database!");
                         responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                         {
                             Filters = new List<Filter>
@@ -251,7 +261,52 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                     Name = "vpc-id",
                                     Values = new List<string>
                                     {
-                                        primaryVPCID
+                                        PlatformVPCID
+                                    }
+                                }
+                            }
+                        });
+                        responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
+                        {
+                            Filters = new List<Filter>
+                        {
+                            new Filter
+                            {
+                                Name ="vpc-id",
+                                Values = new List<string>
+                                {
+                                    PlatformVPCID
+                                }
+                            }
+                        }
+                        });
+                        VPC newlyCreatedVPC2 = new VPC
+                        {
+                            AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
+                            AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
+                            type = VPCType.Platform,
+                            BaseIPv4CIDR = responseDescribeVPC.Vpcs[0].CidrBlock,
+                            BaseIPv6CIDR = responseDescribeVPC.Vpcs[0].Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock
+                        };
+                        context.VPCs.Add(newlyCreatedVPC2);
+                    }
+                    await context.SaveChangesAsync();
+                }
+                else
+                {
+                    if (!context.VPCs.Any() || context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + VMVPCID + "'").ToList().Count() == 0)
+                    {
+                        _logger.LogInformation("VM VPC already created but not inside SQL Database!");
+                        responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                        {
+                            Filters = new List<Filter>
+                            {
+                                new Filter
+                                {
+                                    Name = "vpc-id",
+                                    Values = new List<string>
+                                    {
+                                        VMVPCID
                                     }
                                 }
                             }
@@ -265,7 +320,51 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 Name ="vpc-id",
                                 Values = new List<string>
                                 {
-                                    primaryVPCID
+                                    VMVPCID
+                                }
+                            }
+                        }
+                        });                      
+                        VPC newlyCreatedVPC = new VPC
+                        {
+                            AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
+                            AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
+                            type = VPCType.DefaultVM,
+                            BaseIPv4CIDR = responseDescribeVPC.Vpcs[0].CidrBlock,
+                            BaseIPv6CIDR = responseDescribeVPC.Vpcs[0].Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock
+                        };
+                        context.VPCs.Add(newlyCreatedVPC);
+                        context.SaveChanges();
+                    }
+                    else
+                        _logger.LogInformation("VPC already created!");
+                    if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + PlatformVPCID + "'").ToList().Count() == 0)
+                    {
+                        _logger.LogInformation("Platform VPC not inside SQL Database!");
+                        responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
+                        {
+                            Filters = new List<Filter>
+                            {
+                                new Filter
+                                {
+                                    Name = "vpc-id",
+                                    Values = new List<string>
+                                    {
+                                        PlatformVPCID
+                                    }
+                                }
+                            }
+                        });
+                        DescribeSecurityGroupsResponse responseSecurityGroups = await ec2Client.DescribeSecurityGroupsAsync(new DescribeSecurityGroupsRequest
+                        {
+                            Filters = new List<Filter>
+                        {
+                            new Filter
+                            {
+                                Name ="vpc-id",
+                                Values = new List<string>
+                                {
+                                    PlatformVPCID
                                 }
                             }
                         }
@@ -273,31 +372,16 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         VPC newlyCreatedVPC = new VPC
                         {
                             AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
-                            AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId
+                            AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
+                            type = VPCType.Platform,
+                            BaseIPv4CIDR = responseDescribeVPC.Vpcs[0].CidrBlock,
+                            BaseIPv6CIDR = responseDescribeVPC.Vpcs[0].Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock
                         };
                         context.VPCs.Add(newlyCreatedVPC);
-                        await context.SaveChangesAsync();
-                    } else
-                        _logger.LogInformation("VPC already created!");
+                        context.SaveChanges();
+                    }
                 }
                 VPC vpc = await context.VPCs.FindAsync(1);
-                responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
-                {
-                    Filters = new List<Filter>
-                        {
-                            new Filter
-                            {
-                                Name = "vpc-id",
-                                Values = new List<string>
-                                {
-                                    vpc.AWSVPCReference
-                                }
-                            }
-                        }
-                });
-                Vpc AWSvpc = responseDescribeVPC.Vpcs[0];
-                VpcIpv6CidrBlockAssociation set = AWSvpc.Ipv6CidrBlockAssociationSet[0];
-                IPv6VMCIDR = set.Ipv6CidrBlock;
                 DescribeSubnetsResponse responseDescribeSubnets = await ec2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                 {
                     Filters = new List<Filter>
@@ -315,12 +399,12 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 if (responseDescribeSubnets.Subnets.Count == 0)
                 {
                     _logger.LogInformation("Default Subnets not found! Creating...");
-                    string[] ipv6CIDRStr = IPv6VMCIDR.Split(":");
+                    string[] ipv6CIDRStr = vpc.BaseIPv6CIDR.Split(":");
                     for (int i = 0; i < 3; i++)
                     {
                         CreateSubnetResponse responseCreateSubnet = await ec2Client.CreateSubnetAsync(new CreateSubnetRequest
                         {
-                            CidrBlock = IPv4VMCIDR.Substring(0, 7) + i + ".0/24",
+                            CidrBlock = vpc.BaseIPv4CIDR.Substring(0, 7) + i + ".0/24",
                             Ipv6CidrBlock = ipv6CIDRStr[0] + ":" + ipv6CIDRStr[1] + ":" + ipv6CIDRStr[2] + ":" + ipv6CIDRStr[3].Substring(0, 3) + i + "::/64",
                             VpcId = vpc.AWSVPCReference
                         });
@@ -401,7 +485,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     {
                         _logger.LogInformation("Subnets already created but not inside SQL Database!");
                         Flag = true;
-                    } else
+                    }
+                    else
                         _logger.LogInformation("Subnets already created!");
                 }
                 DescribeRouteTablesResponse responseDescribeRouteTable = await ec2Client.DescribeRouteTablesAsync(new DescribeRouteTablesRequest
@@ -706,7 +791,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             };
                             context.RouteTables.Add(newRT);
                             context.SaveChanges();
-                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = '"+RT.RouteTableId+"'").ToList();
+                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = '" + RT.RouteTableId + "'").ToList();
                             if (queryResult.Count() == 1)
                                 newRT = queryResult[0];
                             foreach (Amazon.EC2.Model.Route R in RT.Routes)
@@ -715,11 +800,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 {
                                     isInternet = true;
                                     break;
-                                } else if (String.IsNullOrEmpty(R.GatewayId) && (!String.IsNullOrEmpty(R.NatGatewayId) || !String.IsNullOrEmpty(R.EgressOnlyInternetGatewayId)))
+                                }
+                                else if (String.IsNullOrEmpty(R.GatewayId) && (!String.IsNullOrEmpty(R.NatGatewayId) || !String.IsNullOrEmpty(R.EgressOnlyInternetGatewayId)))
                                 {
                                     isExtranet = true;
                                     break;
-                                } else if (!String.IsNullOrEmpty(R.GatewayId) && R.GatewayId.Contains("local"))
+                                }
+                                else if (!String.IsNullOrEmpty(R.GatewayId) && R.GatewayId.Contains("local"))
                                 {
                                     ++IntranetCounter;
                                 }
@@ -728,7 +815,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 isIntranet = true;
                             if (isInternet == true)
                             {
-                                foreach(Amazon.EC2.Model.Route r in RT.Routes)
+                                foreach (Amazon.EC2.Model.Route r in RT.Routes)
                                 {
                                     Route newRoute = new Route();
                                     if (!string.IsNullOrEmpty(r.DestinationCidrBlock) && !string.IsNullOrEmpty(r.GatewayId))
@@ -761,7 +848,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
                                             newRoute.applicability = Applicability.Internet;
                                             newRoute.RouteTableID = newRT.ID;
-                                        }                                      
+                                        }
                                     }
                                     if (newRoute.Description != null)
                                         context.Routes.Add(newRoute);
@@ -790,7 +877,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                                 })
                                             }));
                                         if (responseDescribeSubnets.HttpStatusCode == HttpStatusCode.OK && responseDescribeTag.HttpStatusCode == HttpStatusCode.OK)
-                                        {                                         
+                                        {
                                             Subnet newSubnet = new Subnet
                                             {
                                                 Name = responseDescribeTag.Tags[0].Value,
@@ -802,7 +889,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                                 RouteTableID = newRT.ID,
                                                 VPCID = vpc.ID
                                             };
-                                            switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3,3))
+                                            switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3, 3))
                                             {
                                                 case "/17":
                                                     newSubnet.SubnetSize = Convert.ToString(32766);
@@ -853,13 +940,15 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         }
                                     }
                                 }
-                            } else if (isExtranet == true)
+                            }
+                            else if (isExtranet == true)
                             {
                                 foreach (Amazon.EC2.Model.Route r in RT.Routes)
                                 {
                                     Route newRoute = new Route();
                                     if (!string.IsNullOrEmpty(r.DestinationCidrBlock) && !string.IsNullOrEmpty(r.NatGatewayId))
-                                    { if (r.NatGatewayId.Contains("nat"))
+                                    {
+                                        if (r.NatGatewayId.Contains("nat"))
                                         {
                                             newRoute.Description = "Route To Internet (IPv4)";
                                             newRoute.RouteType = RouteType.Mandatory;
@@ -887,7 +976,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
                                             newRoute.applicability = Applicability.Internet;
                                             newRoute.RouteTableID = newRT.ID;
-                                        }                                        
+                                        }
                                     }
                                     if (newRoute.Description != null)
                                         context.Routes.Add(newRoute);
@@ -979,7 +1068,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         }
                                     }
                                 }
-                            } else if (isIntranet == true)
+                            }
+                            else if (isIntranet == true)
                             {
                                 foreach (Amazon.EC2.Model.Route r in RT.Routes)
                                 {
@@ -1109,10 +1199,11 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                             context.SaveChanges();
                         }
-                    } else
+                    }
+                    else
                         _logger.LogInformation("Route Tables already created!");
                 }
-                if(!context.CloudWatchLogGroups.Any() && !context.CloudWatchLogStreams.Any())
+                if (!context.CloudWatchLogGroups.Any() && !context.CloudWatchLogStreams.Any())
                 {
                     _logger.LogInformation("Importing CloudWatch Data...");
                     DescribeLogGroupsResponse responseDescribeLogGroups = await cwlClient.DescribeLogGroupsAsync(new DescribeLogGroupsRequest());
@@ -1193,7 +1284,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
             catch (Exception e)
             {
                 _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message);
-            } 
+            }
         }
     }
 }

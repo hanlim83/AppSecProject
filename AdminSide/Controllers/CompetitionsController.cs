@@ -88,7 +88,7 @@ namespace AdminSide.Controllers
             //Tested and working^
             //Console.WriteLine(model.SelectedCategories.ElementAt(0));
             //Console.WriteLine(competitionCategory.Categories.ElementAt(0).CategoryName);
-            if (model.CompetitionCategory == null)
+            if (model.SelectedCategories == null)
             {
                 return RedirectToAction("Create");
             }
@@ -288,10 +288,10 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            //var competition = await _context.Competitions.FindAsync(id);
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .FirstOrDefaultAsync(m => m.ID == id);
+
             foreach (var category in competition.CompetitionCategories)
             {
                 await ClearBucket(competition.BucketName, category.CategoryName);

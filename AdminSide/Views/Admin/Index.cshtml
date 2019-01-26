@@ -1,0 +1,45 @@
+﻿@{
+    ViewData["Title"] = "Admin";
+}
+
+<title>@ViewData["Title"] - Admin</title>
+
+<br>
+<div class="container">
+    <div class="float-right">
+        <a asp-area="Identity" asp-page="/Account/Register"><input type="button" value="New Admin" class="btn btn btn-primary"></a>
+    </div>
+    <br>
+    <h2>All admins</h2>
+    <table class="table table-hover">
+        <thead>
+            <tr>
+                <th>
+                    Id
+                </th>
+                <th>
+                    Email
+                </th>
+                <th>
+                    Hash Password
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var admin in ViewBag.adminList)
+            {
+                <tr>
+                    <td>
+                        @admin.Id
+                    </td>
+                    <td>
+                        @admin.Email
+                    </td>
+                    <td>
+                        @admin.PasswordHash
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

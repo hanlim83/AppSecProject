@@ -43,8 +43,6 @@
 
     <hr>
     @{ var SolveChallengeList = new List<int>(); }
-    @*check here to populate green or black(means haven't solve)
-        return team id from controller*@
     @if ((bool)ViewData["Archived"] != true)
     {
         foreach (var team in Model.Teams)
@@ -55,7 +53,10 @@
                 {
                     if (teamchallenge.TeamId == team.TeamID)
                     {
-                        SolveChallengeList.Add(teamchallenge.ChallengeId);
+                        if (teamchallenge.Solved == true)
+                        {
+                            SolveChallengeList.Add(teamchallenge.ChallengeId);
+                        }
                     }
                 }
             }
@@ -134,7 +135,7 @@
         </div>
     }
     <br>
-    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-default"></a>
+    <a asp-controller="Competitions" asp-action="Index"><input type="button" value="Back" class="btn btn btn-primary"></a>
 </div>
 
 @*Modal

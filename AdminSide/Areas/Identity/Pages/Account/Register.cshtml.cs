@@ -12,7 +12,9 @@ using Microsoft.Extensions.Logging;
 
 namespace AdminSide.Areas.Identity.Pages.Account
 {
-    [AllowAnonymous]
+    [Authorize]
+    //the line above makes a page protected and will redirect user back to login
+    //[AllowAnonymous]
     public class RegisterModel : PageModel
     {
         private readonly SignInManager<IdentityUser> _signInManager;
@@ -83,7 +85,8 @@ namespace AdminSide.Areas.Identity.Pages.Account
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    return LocalRedirect(returnUrl);
+                    //return LocalRedirect(returnUrl);
+                    return RedirectToAction("Index", "Admin", new { area = "" });
                 }
                 foreach (var error in result.Errors)
                 {

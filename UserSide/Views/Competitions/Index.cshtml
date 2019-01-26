@@ -66,7 +66,7 @@
                         <td>
                             @if (competition.Teams.Count == 0)
                             {
-                                <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-outline-primary"></a>
                                 //break;
                             }
                             else
@@ -77,7 +77,7 @@
                                     {
                                         @if (team.TeamUsers.Count == 0)
                                         {
-                                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-outline-primary"></a>
                                             counter = 1;
                                             //break;
                                         }
@@ -87,7 +87,6 @@
                                             {
                                                 if (teamUsers.UserId.Equals(user.Id))
                                                 {
-                                                    @*<a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><input type="button" value="View" class="btn btn btn-default"></a>*@
                                                     <p>This competition has not started. Please check back again.</p>
                                                     counter = 1;
                                                     break;
@@ -96,7 +95,7 @@
                                                 {
                                                     if (counter2 == 0)
                                                     {
-                                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-outline-primary"></a>
                                                     }
                                                     counter2--;
                                                 }
@@ -156,7 +155,7 @@
                         <td>
                             @if (competition.Teams.Count == 0)
                             {
-                                <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-outline-primary"></a>
                                 //break;
                             }
                             else
@@ -167,7 +166,7 @@
                                     {
                                         @if (team.TeamUsers.Count == 0)
                                         {
-                                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                            <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-outline-primary"></a>
                                             counter = 1;
                                             //break;
                                         }
@@ -177,7 +176,7 @@
                                             {
                                                 if (teamUsers.UserId.Equals(user.Id))
                                                 {
-                                                    <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><input type="button" value="View" class="btn btn btn-default"></a>
+                                                    <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><input type="button" value="View" class="btn btn btn-outline-primary"></a>
                                                     counter = 1;
                                                     break;
                                                 }
@@ -185,7 +184,7 @@
                                                 {
                                                     if (counter2 == 0)
                                                     {
-                                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-default"></a>
+                                                        <a asp-controller="Competitions" asp-action="Join" asp-route-id="@competition.ID"><input type="button" value="Join" class="btn btn btn-outline-primary"></a>
                                                     }
                                                     counter2--;
                                                 }
@@ -230,7 +229,7 @@
                             @Html.DisplayFor(modelItem => competition.Status)
                         </td>
                         <td>
-                            <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><input type="button" value="View" class="btn btn btn-default"></a>
+                            <a asp-controller="Challenges" asp-action="Index" asp-route-id="@competition.ID"><input type="button" value="View" class="btn btn btn-outline-primary"></a>
                         </td>
                     </tr>
                 }
