@@ -105,16 +105,15 @@ namespace AdminSide.Controllers
             ////For username (can use it inside method also)
             var username = user;
 
-            //if (!user.UserName.Equals(post.UserName))
-            //{
-            //    ViewData["ShowWrongDirectory"] = "false";
-            //    return RedirectToAction("Index", "Forum", new { check = false });
-            //}
-            //else if (user.UserName.Equals(post.UserName))
-            //{
-            //    ViewData["ShowWrongDirectory"] = "true";
-            //    return RedirectToAction("Edit", "Forum", new { check = true });
-            //}
+            if (!user.UserName.Equals(post.UserName))
+            {
+                ViewData["ShowWrongDirectory"] = "true";
+                return RedirectToAction("Index", "Forum", new { check = true });
+            }
+            else if (user.UserName.Equals(post.UserName))
+            {
+                ViewData["ShowWrongDirectory"] = "false";
+            }
 
             PopulateCategoryDropDownList();
             return View(post);
@@ -156,18 +155,25 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> NewTopicF([Bind("Title,Content,UserName, DT, CategoryID")] Post post)
         {
-            if (ModelState.IsValid)
+            if (ValidateCheck(post.Content) == true)
             {
-                //Take in user object
-                var user = await _userManager.GetUserAsync(HttpContext.User);
-                //For username (can use it inside method also)
-                var username = user;
-                post.UserName = user.UserName;
-                post.DT = DateTime.Now;
+                ViewData["Alert"] = "Please Remove The Special Characters.";
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    //Take in user object
+                    var user = await _userManager.GetUserAsync(HttpContext.User);
+                    //For username (can use it inside method also)
+                    var username = user;
+                    post.UserName = user.UserName;
+                    post.DT = DateTime.Now;
 
-                context1.Add(post);
-                await context1.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    context1.Add(post);
+                    await context1.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
             }
 
             PopulateCategoryDropDownList();
@@ -183,30 +189,36 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            if (ValidateCheck(post.Content) == true)
             {
-                try
+                ViewData["Alert"] = "Please Remove The Special Characters.";
+            }
+            else
+            {
+                if (ModelState.IsValid)
                 {
-                    post.DT = DateTime.Now;
-                    // GET THE ID
-                    var userID = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                    post.UserName = userID;
-                    context1.Update(post);
-                    await context1.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!PostExists(post.PostID))
+                    try
                     {
-                        return NotFound();
+                        post.DT = DateTime.Now;
+                        // GET THE ID
+                        var userID = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                        post.UserName = userID;
+                        context1.Update(post);
+                        await context1.SaveChangesAsync();
                     }
-                    else
+                    catch (DbUpdateConcurrencyException)
                     {
-                        throw;
+                        if (!PostExists(post.PostID))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
                     }
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
             }
             return View(post);
         }
@@ -224,17 +236,24 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
+            if (ValidateCheck(comment.Content) == true)
+            {
+                ViewData["Alert"] = "Please Remove The Special Characters.";
+            }
+            else
+            {
+                Comment c = new Comment();
+                c.UserName = user.UserName;
+                c.Content = comment.Content;
+                c.DT = DateTime.Now;
+                c.CommentID = comment.CommentID;
+                c.PostID = int.Parse(PostID);
 
-            Comment c = new Comment();
-            c.UserName = user.UserName;
-            c.Content = comment.Content;
-            c.DT = DateTime.Now;
-            c.CommentID = comment.CommentID;
-            c.PostID = int.Parse(PostID);
-
-            context1.Add(c);
-            await context1.SaveChangesAsync();
+                context1.Add(c);
+                await context1.SaveChangesAsync();
+            }
             return RedirectToAction("Details", new { id = PostID });
+
         }
 
         // POST: Forum/Delete
@@ -272,11 +291,18 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> NewCategory([Bind("CategoryName")] ForumCategory category)
         {
-            if (ModelState.IsValid)
+            if (ValidateCheck(category.CategoryName) == true)
             {
-                context1.Add(category);
-                await context1.SaveChangesAsync();
-                return RedirectToAction("CategoryD");
+                ViewData["Alert"] = "Please Remove The Special Characters.";
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    context1.Add(category);
+                    await context1.SaveChangesAsync();
+                    return RedirectToAction("CategoryD");
+                }
             }
             return View(category);
         }
@@ -294,6 +320,17 @@ namespace AdminSide.Controllers
                                 orderby c.CategoryName
                                 select c;
             ViewBag.CategoryID = new SelectList(categoryQuery.AsNoTracking(), "CategoryID", "CategoryName", selectCategory);
+        }
+
+        // Validate Input for Special Characters
+        public Boolean ValidateCheck(String input)
+        {
+            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
+            {
+                return true;
+            }
+            else
+                return false;
         }
     }
 }
