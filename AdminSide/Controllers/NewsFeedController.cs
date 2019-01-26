@@ -15,6 +15,7 @@ namespace AdminSide.Controllers
 {
     public class NewsFeedController : Controller
     {
+    
 
         private readonly NewsFeedContext _context;
 
@@ -47,6 +48,7 @@ namespace AdminSide.Controllers
                     }
 
                 }
+
                 return View(AllFeeds);
             }
             else
@@ -65,6 +67,32 @@ namespace AdminSide.Controllers
         [HttpPost]
         public async Task<IActionResult> Index(string SearchQuery, string Filter, bool? check)
         {
+            if (ValidateCheck(SearchQuery)== true)
+            {
+                ViewData["Alert"] = "Invalid Input";
+                ViewData["ShowNoResult"] = false;
+                List<FeedSource> AllSources1 = await _context.FeedSources.ToListAsync();
+                List<RSSFeed> AllFeeds1 = new List<RSSFeed>();
+                foreach (FeedSource var in AllSources1)
+                {
+                    var feed = await FeedReader.ReadAsync(var.sourceURL);
+                    foreach (FeedItem item in feed.Items)
+                    {
+                        RSSFeed Feed2 = new RSSFeed
+                        {
+                            Title = item.Title,
+                            Link = item.Link,
+                            Description = item.Description,
+                            sourceCat = var.sourceName
+                        };
+                        AllFeeds1.Add(Feed2);
+                    }
+
+                }
+
+                return View(AllFeeds1);
+
+            }
             List<FeedSource> AllSources = await _context.FeedSources.ToListAsync();
             List<RSSFeed> AllFeeds = new List<RSSFeed>();
             foreach (FeedSource var in AllSources)
@@ -257,6 +285,16 @@ namespace AdminSide.Controllers
         private bool FeedSourceExists(int id)
         {
             return _context.FeedSources.Any(e => e.ID == id);
+        }
+
+        public Boolean ValidateCheck(String input)
+        {
+            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
+            {
+                return true;
+            }
+            else
+                return false;
         }
     }
 }
