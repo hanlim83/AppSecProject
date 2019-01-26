@@ -31,12 +31,6 @@
             <input asp-for="Content" class="form-control" id="con" placeholder="Enter Content Here" />
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
-
-        <!-- For Files, TBC -->
-        <div class="form-group">
-            <label for=""></label>
-            <input type="file" class="form-control-file" id="File1">
-        </div>
         <br />
         <div class="form-group"></div>
         <button class="btn btn-outline-secondary" asp-area="" asp-controller="Forum" asp-action="Index">Cancel</button> &nbsp;
@@ -44,7 +38,3 @@
     </form>
 </div>
 <br />
-
-<div class="container">
-    <a asp-action="Index">Back to Forum Page</a>
-</div>

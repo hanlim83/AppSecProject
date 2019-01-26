@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AntiXSS" Version="4.3.0" />
     <PackageReference Include="AWSSDK.CloudWatch" Version="3.3.10.13" />
     <PackageReference Include="AWSSDK.CloudWatchEvents" Version="3.3.8.13" />
     <PackageReference Include="AWSSDK.CloudWatchLogs" Version="3.3.7.13" />
@@ -32,9 +33,6 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Competitions\SignUp.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Views\Forum\Delete.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Forum\Details.cshtml">
