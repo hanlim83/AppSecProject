@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace AdminSide.Controllers
 {
+    [Authorize]
     public class ForumController : Controller
     {
 
@@ -26,7 +27,6 @@ namespace AdminSide.Controllers
             _userManager = userManager;
         }
 
-        [Authorize]
         // GET: Forum Post
         public async Task<IActionResult> Index()
         {
@@ -49,7 +49,6 @@ namespace AdminSide.Controllers
             return View(category);
         }
 
-        [Authorize]
         // GET: Forum/Details
         public async Task<IActionResult> Details(int? id)
         {
@@ -79,7 +78,6 @@ namespace AdminSide.Controllers
             return View(model);
         }
 
-        [Authorize]
         // GET: Topic/Create
         public IActionResult NewTopicF()
         {
@@ -87,7 +85,6 @@ namespace AdminSide.Controllers
             return View();
         }
 
-        [Authorize]
         // GET: Forum/Edit
         public async Task<IActionResult> Edit(int? id)
         {
@@ -123,7 +120,6 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
-        [Authorize]
         // GET: Forum/Delete
         public async Task<IActionResult> Delete(int? id)
         {
@@ -143,21 +139,18 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
-        [Authorize]
         // GET: Category/Details
         public async Task<IActionResult> CategoryD()
         {
             return View(await context1.ForumCategories.ToListAsync());
         }
 
-        [Authorize]
         // GET: Category/New
         public IActionResult NewCategory()
         {
             return View();
         }
 
-        [Authorize]
         // POST: Topic/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -181,7 +174,6 @@ namespace AdminSide.Controllers
             return View(post);
         }
 
-        [Authorize]
         // POST: Forum/Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -245,7 +237,6 @@ namespace AdminSide.Controllers
             return RedirectToAction("Details", new { id = PostID });
         }
 
-        [Authorize]
         // POST: Forum/Delete
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -257,7 +248,6 @@ namespace AdminSide.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-        [Authorize]
         // POST: Category/Details
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -277,7 +267,6 @@ namespace AdminSide.Controllers
             }
         }
 
-        [Authorize]
         // POST: Category/New
         [HttpPost]
         [ValidateAntiForgeryToken]
