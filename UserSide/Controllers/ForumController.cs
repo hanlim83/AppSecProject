@@ -160,6 +160,7 @@ namespace UserSide.Controllers
 
             if (ModelState.IsValid)
             {
+
                 //Take in user object
                 var user = await _userManager.GetUserAsync(HttpContext.User);
                 ////For username (can use it inside method also)
