@@ -121,7 +121,7 @@
 </div>
 <script>
     var previous = @Model.SelectedValue;
-    if (previous == null || previous == 0)
+    if (previous == null || previous == -1)
         document.getElementById("selection").selectedIndex = -1;
     else {
         for (i = 0; i < document.getElementById("selection").options.length; i++) {

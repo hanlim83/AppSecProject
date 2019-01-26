@@ -48,7 +48,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     Response = null,
                     Streams = _context.CloudWatchLogStreams.ToList(),
-                    SelectedValue = 0
+                    SelectedValue = -1
                 };
                 return View(model);
             } else if (OverrideMode.Equals("true"))
@@ -58,7 +58,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     Response = null,
                     Streams = _context.CloudWatchLogStreams.ToList(),
-                    SelectedValue = 0
+                    SelectedValue = -1
                 };
                 return View(model);
             }
@@ -69,7 +69,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     Response = null,
                     Streams = _context.CloudWatchLogStreams.ToList(),
-                    SelectedValue = 0
+                    SelectedValue = -1
 
                 };
                 return View(model);
