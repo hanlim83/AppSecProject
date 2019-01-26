@@ -13,12 +13,12 @@
     });
     $('#CWresults').DataTable();
 
-    var incerment = 1;
-    var table = $("#" + incerment);
+    var increment = 1;
+    var table = $("#" + increment);
     while (table[0] != null) {
-        $('#' + incerment).DataTable();
-        ++incerment;
-        var table = $("#" + incerment);
+        $('#' + increment).DataTable();
+        ++increment;
+        var table = $("#" + increment);
     }
 });
 function deleteSubnetInput(ID) {

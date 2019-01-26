@@ -108,16 +108,16 @@ namespace AdminSide.Controllers
             ////For username (can use it inside method also)
             var username = user;
 
-            if (!user.UserName.Equals(post.UserName))
-            {
-                ViewData["ShowWrongDirectory"] = "false";
-                return RedirectToAction("Index", "Forum", new { check = false });
-            }
-            else if (user.UserName.Equals(post.UserName))
-            {
-                ViewData["ShowWrongDirectory"] = "true";
-                return RedirectToAction("Edit", "Forum", new { check = true });
-            }
+            //if (!user.UserName.Equals(post.UserName))
+            //{
+            //    ViewData["ShowWrongDirectory"] = "false";
+            //    return RedirectToAction("Index", "Forum", new { check = false });
+            //}
+            //else if (user.UserName.Equals(post.UserName))
+            //{
+            //    ViewData["ShowWrongDirectory"] = "true";
+            //    return RedirectToAction("Edit", "Forum", new { check = true });
+            //}
 
             PopulateCategoryDropDownList();
             return View(post);

@@ -11,6 +11,8 @@ using UserSide.Models;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
+using System.Text;
+using System.Web;
 
 namespace UserSide.Controllers
 {
@@ -113,17 +115,17 @@ namespace UserSide.Controllers
             ////For username (can use it inside method also)
             var username = user;
 
-            if (!user.UserName.Equals(post.UserName))
-            {
-                //return RedirectToAction("Index");
-                ViewData["ShowWrongDirectory"] = "false";
-                return RedirectToAction("Index", "Forum", new { check = false });
-            }
-            else if(user.UserName.Equals(post.UserName))
-            {
-                ViewData["ShowWrongDirectory"] = "true";
-                return RedirectToAction("Edit", "Forum", new { check = true });
-            }
+            //if (user.UserName.Equals(post.UserName))
+            //{
+            //    ViewData["ShowWrongDirectory"] = "true";
+            //    return RedirectToAction("Edit", "Forum", new { check = true });
+            //}
+            //else if (!user.UserName.Equals(post.UserName))
+            //{
+            //    //return RedirectToAction("Index");
+            //    ViewData["ShowWrongDirectory"] = "false";
+            //    return RedirectToAction("Index", "Forum", new { check = false });
+            //}
 
             PopulateCategoryDropDownList();
             return View(post);
@@ -213,6 +215,7 @@ namespace UserSide.Controllers
         [Authorize]
         // POST: Forum/PostReply
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> PostReply(Comment comment, String PostID)
         {
             //Take in user object
@@ -232,10 +235,21 @@ namespace UserSide.Controllers
             c.CommentID = comment.CommentID;
             c.PostID = int.Parse(PostID);
 
+            StringBuilder sbComments = new StringBuilder();
+            sbComments.Append(HttpUtility.HtmlEncode(comment.Content));
+
+            sbComments.Replace("&lt;b&gt;", "<b>");
+            sbComments.Replace("&lt;/b&gt;", "</b>");
+            sbComments.Replace("&lt;u&gt;", "<u>");
+            sbComments.Replace("&lt;/u&gt;", "</u>");
+
+            comment.Content = sbComments.ToString();
+
             context1.Add(c);
             await context1.SaveChangesAsync();
-            return RedirectToAction("Details",new {id = PostID});
+            return RedirectToAction("Details", new { id = PostID });
         }
+
 
         //[Authorize]
         //// POST: Forum/Delete
