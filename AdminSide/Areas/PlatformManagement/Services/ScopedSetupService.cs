@@ -1222,7 +1222,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             lg.RetentionInDays = (int)lg.RetentionInDays;
                         context.CloudWatchLogGroups.Add(newG);
                         context.SaveChanges();
-                        List<CloudWatchLogGroup> gQuery = context.CloudWatchLogGroups.FromSql("SELECT * FROM dbo.CloudWatchLogGroups WHERE ARN = '" + lg.Arn + "'").ToList();
+                        List<CloudWatchLogGroup> gQuery = context.CloudWatchLogGroups.FromSql("SELECT * FROM dbo.CloudWatchLogGroups WHERE ARN = {0}",lg.Arn).ToList();
                         if (gQuery.Count() == 1)
                             newG = gQuery[0];
                         DescribeLogStreamsResponse responseDescribeLogStreams = await cwlClient.DescribeLogStreamsAsync(new DescribeLogStreamsRequest

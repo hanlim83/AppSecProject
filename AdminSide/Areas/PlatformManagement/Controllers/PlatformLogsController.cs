@@ -6,7 +6,10 @@ using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
@@ -19,35 +22,63 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
     {
         private readonly PlatformResourcesContext _context;
 
+        private readonly UserManager<IdentityUser> _userManager;
+
         IAmazonCloudWatch CloudwatchClient { get; set; }
 
         IAmazonCloudWatchEvents CloudwatchEventsClient { get; set; }
 
         IAmazonCloudWatchLogs CloudwatchLogsClient { get; set; }
 
-        public PlatformLogsController(PlatformResourcesContext context, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchLogsClient)
+        public PlatformLogsController(PlatformResourcesContext context, UserManager<IdentityUser> userManager, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchLogsClient)
         {
             this._context = context;
             this.CloudwatchClient = cloudwatchClient;
             this.CloudwatchEventsClient = cloudwatcheventsClient;
             this.CloudwatchLogsClient = cloudwatchLogsClient;
+            this._userManager = userManager;
         }
 
-        public IActionResult Index()
+        public IActionResult Index(string OverrideMode)
         {
-            PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+            if (string.IsNullOrEmpty(OverrideMode))
             {
-                Response = null,
-                Streams = _context.CloudWatchLogStreams.ToList(),
-                SelectedValue = 0
+                ViewData["Mode"] = "Automatic";
+                PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+                {
+                    Response = null,
+                    Streams = _context.CloudWatchLogStreams.ToList(),
+                    SelectedValue = 0
+                };
+                return View(model);
+            } else if (OverrideMode.Equals("true"))
+            {
+                ViewData["Mode"] = "Automatic";
+                PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+                {
+                    Response = null,
+                    Streams = _context.CloudWatchLogStreams.ToList(),
+                    SelectedValue = 0
+                };
+                return View(model);
+            }
+            else
+            {
+                ViewData["Mode"] = "Generic";
+                PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+                {
+                    Response = null,
+                    Streams = _context.CloudWatchLogStreams.ToList(),
+                    SelectedValue = 0
 
-            };
-            return View(model);
+                };
+                return View(model);
+            }
         }
 
         [HttpPost]
 
-        public async Task<IActionResult> Index(string StreamID)
+        public async Task<IActionResult> Index(string StreamID, string ViewMode)
         {
             if (StreamID == null)
             {
@@ -57,6 +88,23 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     Streams = _context.CloudWatchLogStreams.ToList(),
                     SelectedValue = 0
                 };
+                TempData["Exception"] = "Invaild Selection of Component!";
+                return View(model);
+            }
+            else if (StreamID.Equals("0"))
+            {
+                List<RDSSQLLog> Logs = _context.GetRDSLogs().Result.ToList();
+                PlatformLogsParentViewModel model = new PlatformLogsParentViewModel
+                {
+                    Response = null,
+                    Streams = _context.CloudWatchLogStreams.ToList(),
+                    SelectedValue = int.Parse(StreamID),
+                    SQLlogs = Logs
+                };
+                if(ViewMode.Equals("Automatic"))
+                    ViewData["Mode"] = "Automatic";
+                else if (ViewMode.Equals("Generic"))
+                    ViewData["Mode"] = "Automatic";
                 return View(model);
             }
             else
@@ -79,6 +127,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         Streams = _context.CloudWatchLogStreams.ToList(),
                         SelectedValue = int.Parse(StreamID)
                     };
+                    ViewData["Mode"] = "Generic";
                     return View(model);
                 }
                 else

@@ -11,7 +11,10 @@
             $(this).addClass('active');
         }
     });
-    $('#CWresults').DataTable();
+    $('#CWresults').DataTable({
+        colReorder: true,
+        responsive: true
+    });
 
     var incerment = 1;
     var table = $("#" + incerment);
