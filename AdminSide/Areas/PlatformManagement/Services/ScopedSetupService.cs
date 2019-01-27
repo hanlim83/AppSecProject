@@ -996,7 +996,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             }
 
                                             newRoute.IPCIDR = r.DestinationCidrBlock;
-                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.applicability = Applicability.Extranet;
                                             newRoute.RouteTableID = newRT.ID;
                                         }
                                     }
@@ -1017,7 +1017,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             }
 
                                             newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
-                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.applicability = Applicability.Extranet;
                                             newRoute.RouteTableID = newRT.ID;
                                         }
                                     }
