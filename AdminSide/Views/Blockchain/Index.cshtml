@@ -64,6 +64,7 @@
                         <p class="card-text">N.A.</p>
                         <h5 class="card-title">Current Hash</h5>
                         <p class="card-text">@result.Hash</p>
+                        <a asp-controller="Blockchain" asp-action="Edit" asp-route-id="@result.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary"></a>
                     </div>
                 </div>
             </div>
@@ -85,6 +86,7 @@
                         <p class="card-text">@result.PreviousHash</p>
                         <h5 class="card-title">Current Hash</h5>
                         <p class="card-text">@result.Hash</p>
+                        <a asp-controller="Blockchain" asp-action="Edit" asp-route-id="@result.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary"></a>
                     </div>
                 </div>
             </div>

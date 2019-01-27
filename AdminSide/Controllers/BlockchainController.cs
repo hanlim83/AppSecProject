@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,6 +32,11 @@ namespace AdminSide.Controllers
 
         public async Task<IActionResult> Index(int id)
         {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .ThenInclude(cc => cc.Challenges)
@@ -82,6 +86,51 @@ namespace AdminSide.Controllers
             ViewBag.ResultList = IncorrectTeams;
             ViewData["CompetitionID"] = id;
             return View(blockchain);
+        }
+
+        //Testing edit for "Attack"
+        // GET: Competitions/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            var block = await _context.Blockchain.FindAsync(id);
+
+            return View(block);
+        }
+
+
+        // POST: Competitions/Edit/5
+        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
+        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit([Bind("ID, TimeStamp, CompetitionID, TeamID, ChallengeID, TeamChallengeID, Score, PreviousHash, Hash")] Block block)
+        {
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(block);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!BlockExists(block.ID))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Index", "Blockchain", new { id = block.CompetitionID });
+            }
+            return RedirectToAction("Index", "Blockchain", new { id = block.CompetitionID });
+        }
+
+        private bool BlockExists(int id)
+        {
+            return _context.Blockchain.Any(e => e.ID == id);
         }
     }
 }
