@@ -4,27 +4,34 @@
     ViewData["Title"] = "Details";
 }
 
+<style>
+    .center {
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
 <br>
 <div class="container">
-    <h2>Details</h2>
-    <div>
-        <h4>Team</h4>
+    <h1 class="center">@Model.TeamName</h1>
+    <h2 class="center">@Model.Score Points</h2>
+    <hr>
+    <div class="row">
         <hr />
-        <dl class="dl-horizontal">
-            <dt>
-                @Html.DisplayNameFor(model => model.TeamName)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.TeamName)
-            </dd>
-            <dt>
-                @Html.DisplayNameFor(model => model.Password)
-            </dt>
-            <dd>
-                @Html.DisplayFor(model => model.Password)
-            </dd>
-        </dl>
+        <div class="col-md-6 d-inline-block" id="SolvePercChartContainer" style="height: 370px; width: 100%;"></div>
+        @*<div class="col-md-6 d-inline-block" id="CategoryChartContainer" style="height: 370px; width: 100%;"></div>*@
+        <script src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+        <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     </div>
+    <br>
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Password)
+        </dd>
+    </dl>
     <table class="table">
         <thead>
             <tr>

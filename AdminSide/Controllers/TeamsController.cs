@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using AdminSide.Data;
 using AdminSide.Models;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace AdminSide.Controllers
 {
@@ -53,11 +54,85 @@ namespace AdminSide.Controllers
 
             var team = await _context.Teams
                 .Include(t => t.TeamUsers)
+                .Include(t => t.TeamChallenges)
                 .FirstOrDefaultAsync(m => m.TeamID == id);
             if (team == null)
             {
                 return NotFound();
             }
+
+            int solve = 0;
+            int fail = 0;
+
+            foreach (var item in team.TeamChallenges)
+            {
+                if (item.Solved == true)
+                {
+                    solve++;
+                }
+                else
+                {
+                    fail++;
+                }
+            }
+
+            List<DataPoint> dataPoints = new List<DataPoint>();
+
+            dataPoints.Add(new DataPoint(solve, "Solve", "#00FF08"));
+            //dataPoints.Add(new DataPoint(363040, "Fails", "#546BC1"));
+            dataPoints.Add(new DataPoint(fail, "Fails", "#ff0000"));
+
+
+            ViewBag.SovlePercentage = JsonConvert.SerializeObject(dataPoints);
+
+            dataPoints = new List<DataPoint>();
+
+            ViewData["Total"] = team.TeamChallenges.Count();
+
+            //var competition = await _context.Competitions
+            //    .Include(c => c.CompetitionCategories)
+            //    .ThenInclude(cc => cc.Challenges)
+            //    .ThenInclude(ch => ch.TeamChallenges)
+            //    .AsNoTracking()
+            //    .FirstOrDefaultAsync(m => m.ID == team.CompetitionID);
+
+            //List<DataPoint> categoryDataPoints = new List<DataPoint>();
+
+            //int TotalSolved = 0;
+
+            //List<string> colorList = new List<string>()
+            //{
+            //    "#FF9E00",
+            //    "#009EFF",
+            //    "#783DF2",
+            //    "#3DE3F2",
+            //    "#52D406",
+            //    "#F2F03D"
+            //};
+
+            //int colorCounter = 0;
+            //foreach (var category in competition.CompetitionCategories)
+            //{
+            //    int categorySolvedCounter = 0;
+            //    foreach (var challenge in category.Challenges)
+            //    {
+            //        foreach (var teamChallenge in challenge.TeamChallenges)
+            //        {
+            //            if (teamChallenge.Solved == true && teamChallenge.TeamId == team.TeamID)
+            //            {
+            //                //categoryDataPoints.Add(new DataPoint(1, category.CategoryName, "#00FF08"));
+            //                categorySolvedCounter++;
+            //                TotalSolved++;
+            //            }
+            //        }
+            //    }
+            //    categoryDataPoints.Add(new DataPoint(categorySolvedCounter, category.CategoryName, colorList[colorCounter]));
+            //    colorCounter++;
+            //}
+
+            //ViewBag.CategoryBreakdown = JsonConvert.SerializeObject(categoryDataPoints);
+
+            //ViewData["TotalSolved"] = TotalSolved;
 
             return View(team);
         }
