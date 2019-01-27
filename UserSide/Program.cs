@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Data.SqlClient;
+using System.Linq;
 using UserSide.Data;
 
 namespace UserSide
@@ -16,7 +14,6 @@ namespace UserSide
     {
         public static void Main(string[] args)
         {
-            //CreateWebHostBuilder(args).Build().Run();
             SetEbConfig();
             var host = CreateWebHostBuilder(args).Build();
 
@@ -26,13 +23,45 @@ namespace UserSide
                 try
                 {
                     //var contextC = services.GetRequiredService<CompetitionContext>();
-                    //DbInitializer.InitializeCompetitions(contextC);
                     var contextF = services.GetRequiredService<ForumContext>();
                     var contextChat = services.GetRequiredService<ChatContext>();
                     var contextIdentity = services.GetRequiredService<ApplicationDbContext>();
-                    DbInitializer.InitializeForum(contextF);
-                    DbInitializer.InitializeChat(contextChat);
-                    DbInitializer.InitializeIdentity(contextIdentity);
+                    //try
+                    //{
+                    //    DbInitializer.InitializeCompetitions(contextC);
+                    //}
+                    //catch (SqlException ex)
+                    //{
+                    //    var logger = services.GetRequiredService<ILogger<Program>>();
+                    //    logger.LogError(ex, "An error occurred creating the DB for Competition");
+                    //}
+                    try
+                    {
+                        DbInitializer.InitializeForum(contextF);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for Forum");
+                    }
+                    try
+                    {
+                        DbInitializer.InitializeChat(contextChat);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for Chat");
+                    }
+                    try
+                    {
+                        DbInitializer.InitializeIdentity(contextIdentity);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for Identity");
+                    }
 
                 }
                 catch (Exception ex)
