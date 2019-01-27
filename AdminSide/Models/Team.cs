@@ -15,7 +15,6 @@ namespace AdminSide.Models
         
         [DisplayName("Team Name")]
         public string TeamName { get; set; }
-        [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; }
         public string Salt { get; set; }

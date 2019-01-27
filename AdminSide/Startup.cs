@@ -1,4 +1,5 @@
-﻿using AdminSide.Areas.PlatformManagement.Data;
+﻿using AdminSide.Areas.Identity.Services;
+using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Services;
 using AdminSide.Data;
 using Amazon.CloudWatch;
@@ -111,9 +112,9 @@ namespace AdminSide
             options.UseSqlServer(
             GetRdsConnectionStringIdentity()));
 
-            services.AddIdentity<IdentityUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
+            //services.AddIdentity<IdentityUser, IdentityRole>()
+            //    .AddEntityFrameworkStores<ApplicationDbContext>()
+            //    .AddDefaultTokenProviders();
 
             //Competition Db Context
             services.AddDbContext<CompetitionContext>(options =>
@@ -162,8 +163,12 @@ namespace AdminSide
                 options.AccessDeniedPath = $"/Identity/Account/AccessDenied";
             });
 
-            // using Microsoft.AspNetCore.Identity.UI.Services;
+            //// using Microsoft.AspNetCore.Identity.UI.Services;
+            //services.AddSingleton<IEmailSender, EmailSender>();
+
+            // requires
             services.AddSingleton<IEmailSender, EmailSender>();
+            services.Configure<AuthMessageSenderOptions>(Configuration);
 
             //Core AWS Initialization
             var awsOptions = Configuration.GetAWSOptions();
@@ -231,11 +236,11 @@ namespace AdminSide
         }
     }
 
-    public class EmailSender : IEmailSender
-    {
-        public Task SendEmailAsync(string email, string subject, string message)
-        {
-            return Task.CompletedTask;
-        }
-    }
+    //public class EmailSender : IEmailSender
+    //{
+    //    public Task SendEmailAsync(string email, string subject, string message)
+    //    {
+    //        return Task.CompletedTask;
+    //    }
+    //}
 }

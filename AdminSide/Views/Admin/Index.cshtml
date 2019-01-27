@@ -11,7 +11,7 @@
     </div>
     <br>
     <h2>All admins</h2>
-    <table class="table table-hover">
+    <table class="table table-hover" style="table-layout: fixed; width: 100%">
         <thead>
             <tr>
                 <th>
@@ -23,22 +23,28 @@
                 <th>
                     Hash Password
                 </th>
+                <th>
+                    Email Confirmed
+                </th>
             </tr>
         </thead>
         <tbody>
             @foreach (var admin in ViewBag.adminList)
             {
-                <tr>
-                    <td>
-                        @admin.Id
-                    </td>
-                    <td>
-                        @admin.Email
-                    </td>
-                    <td>
-                        @admin.PasswordHash
-                    </td>
-                </tr>
+            <tr>
+                <td style="word-wrap: break-word">
+                    @admin.Id
+                </td>
+                <td style="word-wrap: break-word">
+                    @admin.Email
+                </td>
+                <td style="word-wrap: break-word">
+                    @admin.PasswordHash
+                </td>
+                <td>
+                    @admin.EmailConfirmed
+                </td>
+            </tr>
             }
         </tbody>
     </table>

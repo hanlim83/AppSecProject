@@ -253,7 +253,6 @@ namespace AdminSide.Controllers
                 await context1.SaveChangesAsync();
             }
             return RedirectToAction("Details", new { id = PostID });
-
         }
 
         // POST: Forum/Delete
@@ -325,7 +324,7 @@ namespace AdminSide.Controllers
         // Validate Input for Special Characters
         public Boolean ValidateCheck(String input)
         {
-            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
+            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
             {
                 return true;
             }
