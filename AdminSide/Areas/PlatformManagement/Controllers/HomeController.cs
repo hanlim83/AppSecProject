@@ -347,6 +347,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
         }
 
+        public IActionResult IntentionalError()
+        {
+            return StatusCode(503);
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

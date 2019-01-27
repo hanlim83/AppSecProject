@@ -536,16 +536,16 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             Server selected = await _context.Servers.FindAsync(Int32.Parse(serverID));
             if (selected != null)
             {
-                //    StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
-                //    {
-                //        InstanceIds = new List<string> {
-                //        selected.AWSEC2Reference
-                //}
-                //    });
-                //    if (response.HttpStatusCode == HttpStatusCode.OK)
-                return View(selected);
-                //else
-                //    return StatusCode(500);
+                StopInstancesResponse response = await EC2Client.StopInstancesAsync(new StopInstancesRequest
+                {
+                    InstanceIds = new List<string> {
+                        selected.AWSEC2Reference
+                }
+                });
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                    return View(selected);
+                else
+                    return StatusCode(500);
             }
             else
             {

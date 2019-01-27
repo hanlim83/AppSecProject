@@ -33,7 +33,7 @@
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
                 <input type="text" class="form-control" id="ServerName" name="ServerName" value="@Model.Name" pattern="^[A-Za-z0-9 _-]*[A-Za-z0-9][A-Za-z0-9 _ -]*$" required>
-                <div class="invalid-feedback">A server needs a name</div>
+                <div class="invalid-feedback">A server needs a alphanumeric name</div>
             </div>
             <input type="hidden" id="ServerIDSrc" name="ID" value="@Model.ID" />
             <div class="form-group">
