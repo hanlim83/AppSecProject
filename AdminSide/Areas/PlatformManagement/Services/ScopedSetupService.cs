@@ -248,7 +248,25 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                         }
                     });
-                    _logger.LogInformation("Setup Background Service Sleeping while IPv6 Assignment");
+                    if (responseDescribeSecurityGroups.SecurityGroups[0].IpPermissions.Count != 0)
+                    {
+                        RevokeSecurityGroupIngressRequest requestRevokeIngress = new RevokeSecurityGroupIngressRequest
+                        {
+                            GroupId = responseDescribeSecurityGroups.SecurityGroups[0].GroupId
+                        };
+                        requestRevokeIngress.IpPermissions = responseDescribeSecurityGroups.SecurityGroups[0].IpPermissions;
+                        await ec2Client.RevokeSecurityGroupIngressAsync(requestRevokeIngress);
+                    }
+                    if (responseDescribeSecurityGroups.SecurityGroups[0].IpPermissionsEgress.Count != 0)
+                    {
+                        RevokeSecurityGroupEgressRequest requestRevokeEgress = new RevokeSecurityGroupEgressRequest
+                        {
+                            GroupId = responseDescribeSecurityGroups.SecurityGroups[0].GroupId
+                        };
+                        requestRevokeEgress.IpPermissions = responseDescribeSecurityGroups.SecurityGroups[0].IpPermissionsEgress;
+                        await ec2Client.RevokeSecurityGroupEgressAsync(requestRevokeEgress);
+                    }
+                        _logger.LogInformation("Setup Background Service Sleeping while IPv6 Assignment");
                     responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                     {
                         VpcIds = new List<string>
