@@ -10,6 +10,15 @@
 
     <h4>Feed Source</h4>
     <hr />
+    @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["ShowAlert"])))
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Invalid Input</h4>
+            <p>Please do not use special characters.</p>
+            <hr>
+
+        </div>
+    }
     <div class="row">
         <div class="col-md-4">
             <form asp-action="Create">
@@ -40,8 +49,3 @@
     }
 </div>
 
-<script>
-function myFunction() {
-  alert("New Link Source has been added!");
-}
-</script>

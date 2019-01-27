@@ -95,11 +95,7 @@ namespace UserSide.Controllers
                 return NotFound();
             }
 
-            var post = await context1.Posts
-                //.Include(p => p.UserName)
-                //    .ThenInclude(e => e.Course)
-                //.AsNoTracking()
-                .SingleOrDefaultAsync(m => m.PostID == id);
+            var post = await context1.Posts.SingleOrDefaultAsync(m => m.PostID == id);
 
             if (post == null)
             {
@@ -125,25 +121,6 @@ namespace UserSide.Controllers
             PopulateCategoryDropDownList();
             return View(post);
         }
-
-        //// GET: Forum/Delete
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    var post = await context1.Posts
-        //        .AsNoTracking()
-        //        .SingleOrDefaultAsync(m => m.PostID == id);
-        //    if (post == null)
-        //    {
-        //        return NotFound();
-        //    }
-
-        //    return View(post);
-        //}
 
         // POST: Topic/Create
         [HttpPost]
@@ -179,125 +156,121 @@ namespace UserSide.Controllers
         // POST: Forum/Edit
         [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Title,Content,UserName, DT, CategoryID")] Post post)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id != post.PostID)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            if (ValidateCheck(post.Content) == true)
+            var postToUpdate = await context1.Posts.SingleOrDefaultAsync(p => p.PostID == id);
+            if (await TryUpdateModelAsync<Post>(
+                postToUpdate,
+                "",
+                p => p.Title, p => p.Content, p => p.CategoryID))
             {
-                ViewData["Alert"] = "Please Remove The Special Characters.";
-            }
-            else
-            {
-
-                if (ModelState.IsValid)
+                try
                 {
-                    try
-                    {
-                        context1.Update(post);
-                        await context1.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!PostExists(post.PostID))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
+                    await context1.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
-                return RedirectToAction(nameof(Index));
+                catch (DbUpdateException)
+                {
+                    // Log the errors  
+                    ModelState.AddModelError("", "Unable to save changes. ");
+                }
             }
-            PopulateCategoryDropDownList(post.CategoryID);
-
-            return View(post);
+            return View(postToUpdate);
         }
+
+        //if (ValidateCheck(post.Content) == true)
+        //{
+        //    ViewData["Alert"] = "Please Remove The Special Characters.";
+        //}
+        //else
+        //{
+        //    if (ModelState.IsValid)
+        //    {
+        //        try
+        //        {
+        //            context1.Update(post);
+        //            await context1.SaveChangesAsync();
+        //        }
+        //        catch (DbUpdateConcurrencyException)
+        //        {
+        //            if (!PostExists(post.PostID))
+        //            {
+        //                return NotFound();
+        //            }
+        //            else
+        //            {
+        //                throw;
+        //            }
+        //        }
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //}
+        //return View(post);
+        //}
 
         // POST: Forum/PostReply
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> PostReply(Comment comment, String PostID)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> PostReply(Comment comment, String PostID)
+    {
+        //Take in user object
+        var user = await _userManager.GetUserAsync(HttpContext.User);
+        //For username (can use it inside method also)
+        var username = user;
+
+        if (user == null)
         {
-            //Take in user object
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            //For username (can use it inside method also)
-            var username = user;
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            if (ValidateCheck(comment.Content) == true)
-            {
-                ViewData["Alert"] = "Please Remove The Special Characters.";
-            }
-            else
-            {
-                Comment c = new Comment();
-                c.UserName = user.UserName;
-                c.Content = comment.Content;
-                c.DT = DateTime.Now;
-                c.CommentID = comment.CommentID;
-                c.PostID = int.Parse(PostID);
-
-                //StringBuilder sbComments = new StringBuilder();
-                //sbComments.Append(HttpUtility.HtmlEncode(comment.Content));
-
-                //sbComments.Replace("&lt;b&gt;", "<b>");
-                //sbComments.Replace("&lt;/b&gt;", "</b>");
-                //sbComments.Replace("&lt;u&gt;", "<u>");
-                //sbComments.Replace("&lt;/u&gt;", "</u>");
-
-                //comment.Content = sbComments.ToString();
-
-                context1.Add(c);
-                await context1.SaveChangesAsync();
-            }
-            return RedirectToAction("Details", new { id = PostID });
+            return NotFound();
         }
 
-        //// POST: Forum/Delete
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var post = await context1.Posts.FindAsync(id);
-        //    context1.Posts.Remove(post);
-        //    await context1.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
-
-        // Checking if Post Exists
-        private bool PostExists(int id)
+        if (ValidateCheck(comment.Content) == true)
         {
-            return context1.Posts.Any(e => e.PostID == id);
+            ViewData["Alert"] = "Please Remove The Special Characters.";
         }
-
-        // Drop down List for Category
-        private void PopulateCategoryDropDownList(object selectCategory = null)
+        else
         {
-            var categoryQuery = from c in context1.ForumCategories
-                                orderby c.CategoryName
-                                select c;
-            ViewBag.CategoryID = new SelectList(categoryQuery.AsNoTracking(), "CategoryID", "CategoryName", selectCategory);
-        }
+            Comment c = new Comment();
+            c.UserName = user.UserName;
+            c.Content = comment.Content;
+            c.DT = DateTime.Now;
+            c.CommentID = comment.CommentID;
+            c.PostID = int.Parse(PostID);
 
-        // Validate Input for Special Characters
-        public Boolean ValidateCheck(String input)
-        {
-            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
-            {
-                return true;
-            }
-            else
-                return false;
+            context1.Add(c);
+            await context1.SaveChangesAsync();
         }
+        return RedirectToAction("Details", new { id = PostID });
     }
+
+    // Checking if Post Exists
+    private bool PostExists(int id)
+    {
+        return context1.Posts.Any(e => e.PostID == id);
+    }
+
+    // Drop down List for Category
+    private void PopulateCategoryDropDownList(object selectCategory = null)
+    {
+        var categoryQuery = from c in context1.ForumCategories
+                            orderby c.CategoryName
+                            select c;
+        ViewBag.CategoryID = new SelectList(categoryQuery.AsNoTracking(), "CategoryID", "CategoryName", selectCategory);
+    }
+
+    // Validate Input for Special Characters
+    public Boolean ValidateCheck(String input)
+    {
+        if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
+        {
+            return true;
+        }
+        else
+            return false;
+    }
+}
 }
