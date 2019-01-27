@@ -32,7 +32,7 @@
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
-                <input type="text" class="form-control" id="ServerName" name="ServerName" value="@Model.Name" required>
+                <input type="text" class="form-control" id="ServerName" name="ServerName" value="@Model.Name"  pattern="^[A-Za-z0-9 _-]*[A-Za-z0-9][A-Za-z0-9 _ -]*$" required>
                 <div class="invalid-feedback">A server needs a name</div>
             </div>
             <input type="hidden" id="ServerIDSrc" name="ID" value="@Model.ID" />
@@ -63,8 +63,8 @@
             </div>
             <div class="form-group">
                 <label for="ServerStorage">Server Assigned Storage:</label>
-                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" value="@Model.StorageAssigned" min="8" max="1000" placeholder="Size in Gigabytes" required>
-                <div class="invalid-feedback">A minimum Storage space of 8 Gigabytes must be assigned to the server</div>
+                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" value="@Model.StorageAssigned" min="@Model.StorageAssigned" max="1000" placeholder="Size in Gigabytes" required>
+                <div class="invalid-feedback">You cannot assign a lower storage space to your server!</div>
             </div>
             <div class="form-group">
                 <label>Server Tenancy:</label>

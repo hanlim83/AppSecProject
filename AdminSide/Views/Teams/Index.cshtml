@@ -43,13 +43,13 @@
                         @Html.DisplayFor(modelItem => item.Score)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.TeamID">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.TeamID">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.TeamID">Delete</a>
+                        <a asp-action="Details" asp-route-id="@item.TeamID"><input type="button" value="View Details" class="btn btn btn-outline-info"></a>
+                        <a asp-action="Edit" asp-route-id="@item.TeamID"><input type="button" value="Edit" class="btn btn btn-outline-primary"></a>
+                        <a asp-action="Delete" asp-route-id="@item.TeamID"><input type="button" value="Delete" class="btn btn btn-outline-danger"></a>
                     </td>
                 </tr>
             }
         </tbody>
     </table>
-    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><input type="button" value="Back to Competition Details" class="btn btn btn-default"></a>
+    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@Model.ID"><input type="button" value="Back to Competition Details" class="btn btn btn-primary"></a>
 </div>

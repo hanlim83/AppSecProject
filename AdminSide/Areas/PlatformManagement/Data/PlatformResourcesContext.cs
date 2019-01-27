@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using AdminSide.Areas.PlatformManagement.Models;
+using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace AdminSide.Areas.PlatformManagement.Data
 {
@@ -30,6 +32,13 @@ namespace AdminSide.Areas.PlatformManagement.Data
             modelBuilder.Entity<VPC>().ToTable("VPCs");
             modelBuilder.Entity<CloudWatchLogGroup>().ToTable("CloudWatchLogGroups");
             modelBuilder.Entity<CloudWatchLogStream>().ToTable("CloudWatchLogStreams");
+            modelBuilder.Query<RDSSQLLog>();
+        }
+
+        public async Task<List<RDSSQLLog>> GetRDSLogs()
+        {
+            List<RDSSQLLog> getLogs = await this.Query<RDSSQLLog>().FromSql("EXEC rdsadmin.dbo.rds_read_error_log @index = 0, @type = 1;").ToListAsync();
+            return getLogs;
         }
     }
 }

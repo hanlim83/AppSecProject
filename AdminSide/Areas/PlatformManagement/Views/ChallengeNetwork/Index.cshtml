@@ -62,3 +62,11 @@
         </div>
     </div>
 </div>
+@section Scripts{ 
+    <script>
+        function deleteSubnetInput(ID) {
+            $('#subnetDeletionInput').val(ID);
+            $('#deleteSubnet').modal()
+        }
+    </script>
+}

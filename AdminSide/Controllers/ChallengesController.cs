@@ -12,6 +12,7 @@ using Amazon.S3.Transfer;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.AspNetCore.Authorization;
+using System;
 
 namespace AdminSide.Controllers
 {
@@ -93,12 +94,38 @@ namespace AdminSide.Controllers
         //Update Details code
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Details(int id, [Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge)
+        public async Task<IActionResult> Details(int id, [Bind("ID,Name,Description,Value,Flag,CompetitionID,CompetitionCategoryID")] Challenge challenge, List<IFormFile> files)
         {
             if (id != challenge.ID)
             {
                 return NotFound();
             }
+
+            if (files.Count != 0)
+            {
+                var competition = await _context.Competitions
+                    .Include(c => c.CompetitionCategories)
+                    .ThenInclude(cc => cc.Challenges)
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
+
+                var competitionCategory = await _context.CompetitionCategories
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionCategoryID);
+
+                var temp_Challenge = await _context.Challenges
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(m => m.ID == challenge.ID);
+
+                await DeleteFile(competition.BucketName, competitionCategory.CategoryName, temp_Challenge.FileName);
+
+                foreach (var file in files)
+                {
+                    challenge.FileName = file.FileName;
+                    await UploadFileToS3(file, competition.BucketName, competitionCategory.CategoryName);
+                }
+            }
+
 
             if (ModelState.IsValid)
             {
@@ -123,6 +150,39 @@ namespace AdminSide.Controllers
             return View(challenge);
         }
 
+        private async Task DeleteFile(string bucketName, string folderName, string filename)
+        {
+            try
+            {
+                DeleteObjectsRequest request2 = new DeleteObjectsRequest();
+                ListObjectsRequest request = new ListObjectsRequest
+                {
+                    BucketName = bucketName,
+                    Prefix = folderName + "/" + filename
+
+                };
+
+                ListObjectsResponse response = await S3Client.ListObjectsAsync(request);
+                // Process response.
+                foreach (S3Object entry in response.S3Objects)
+                {
+
+                    request2.AddKey(entry.Key);
+                }
+                request2.BucketName = bucketName;
+                DeleteObjectsResponse response2 = await S3Client.DeleteObjectsAsync(request2);
+
+            }
+            catch (AmazonS3Exception e)
+            {
+                //Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+            catch (Exception e)
+            {
+                //Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+            }
+        }
+
         // GET: Challenges/Create
         public async Task<IActionResult> Create(int? id)
         {
@@ -131,19 +191,18 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
-            
+
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .ThenInclude(cc => cc.Challenges)
-                //.Include(c1 => c1.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == id);
             if (competition == null)
             {
                 return NotFound();
             }
-            
-            ViewData["CompetitionID"]=competition.ID;
+
+            ViewData["CompetitionID"] = competition.ID;
             var dictionary = new Dictionary<int, string>
             {
 
@@ -167,24 +226,28 @@ namespace AdminSide.Controllers
             var competition = await _context.Competitions
                 .Include(c => c.CompetitionCategories)
                 .ThenInclude(cc => cc.Challenges)
-                //.Include(c1 => c1.Challenges)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionID);
 
+            var competitionCategory = await _context.CompetitionCategories
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == challenge.CompetitionCategoryID);
+
             if (ModelState.IsValid)
             {
-                foreach (var category in competition.CompetitionCategories)
-                {
-                    if (category.ID == challenge.CompetitionCategoryID)
-                    {
+                //Check this
+                //foreach (var category in competition.CompetitionCategories)
+                //{
+                //    if (category.ID == challenge.CompetitionCategoryID)
+                //    {
                         foreach (var file in files)
                         {
                             challenge.FileName = file.FileName;
-                            await UploadFileToS3(file, competition.BucketName, category.CategoryName);
+                            await UploadFileToS3(file, competition.BucketName, competitionCategory.CategoryName);
                         }
-                    }
-                }
-                
+                //    }
+                //}
+
                 _context.Challenges.Add(challenge);
                 await _context.SaveChangesAsync();
                 //return RedirectToAction(nameof(Index));

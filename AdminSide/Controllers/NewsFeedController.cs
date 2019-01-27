@@ -193,14 +193,27 @@ namespace AdminSide.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,sourceName,sourceURL")] FeedSource feedSource)
         {
-            if (ModelState.IsValid)
+            if (ValidateCheck(feedSource.sourceName) == true)
             {
-                _context.Add(feedSource);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(ListSource));
                 
+                ViewData["ShowAlert"] = "Invalid Input";
             }
-            return View(feedSource);
+            else if (ValidateURL(feedSource.sourceURL) == true)
+            {
+                ViewData["ShowAlert"] = "Invalid Input";
+            }
+            else
+            {
+                if (ModelState.IsValid)
+                {
+                    _context.Add(feedSource);
+                    
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(ListSource));
+
+                }
+            }
+                return View(feedSource);
         }
 
         // GET: FeedSources/Edit/5
@@ -230,27 +243,41 @@ namespace AdminSide.Controllers
             {
                 return NotFound();
             }
-
-            if (ModelState.IsValid)
+            else
             {
-                try
+                if (ValidateCheck(feedSource.sourceName) == true)
                 {
-                    _context.Update(feedSource);
-                    await _context.SaveChangesAsync();
-                    
+
+                    ViewData["Show"] = "Invalid Input";
                 }
-                catch (DbUpdateConcurrencyException)
+                else if (ValidateURL(feedSource.sourceURL) == true)
                 {
-                    if (!FeedSourceExists(feedSource.ID))
+                    ViewData["Show"] = "Invalid Input";
+                }
+                else
+                {
+                    if (ModelState.IsValid)
                     {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
+                        try
+                        {
+                            _context.Update(feedSource);
+                            await _context.SaveChangesAsync();
+
+                        }
+                        catch (DbUpdateConcurrencyException)
+                        {
+                            if (!FeedSourceExists(feedSource.ID))
+                            {
+                                return NotFound();
+                            }
+                            else
+                            {
+                                throw;
+                            }
+                        }
+                        return RedirectToAction(nameof(ListSource));
                     }
                 }
-                return RedirectToAction(nameof(ListSource));
             }
             return View(feedSource);
         }
@@ -291,7 +318,16 @@ namespace AdminSide.Controllers
 
         public Boolean ValidateCheck(String input)
         {
-            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
+            if (input.Contains("||") || input.Contains("-") || input.Contains("/") || input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("=") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
+            {
+                return true;
+            }
+            else
+                return false;
+        }
+        public Boolean ValidateURL(String input)
+        {
+            if (input.Contains("||") ||  input.Contains("<") || input.Contains(">") || input.Contains(",") || input.Contains("<=") || input.Contains(">=") || input.Contains("~=") || input.Contains("!=") || input.Contains("^=") || input.Contains("(") || input.Contains(")"))
             {
                 return true;
             }

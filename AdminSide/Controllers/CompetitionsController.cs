@@ -39,8 +39,6 @@ namespace AdminSide.Controllers
         // GET: Competitions/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            ViewData["NavigationShowAll"] = true;
-            //Testing for dynamic navbar
             ViewData["routeID"] = id;
             if (id == null)
             {
@@ -338,11 +336,11 @@ namespace AdminSide.Controllers
             }
             catch (AmazonS3Exception e)
             {
-                Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
+                //Console.WriteLine("Error encountered on server. Message:'{0}' when writing an object", e.Message);
             }
             catch (Exception e)
             {
-                Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
+                //Console.WriteLine("Unknown encountered on server. Message:'{0}' when writing an object", e.Message);
             }
         }
 

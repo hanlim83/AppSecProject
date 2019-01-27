@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using AdminSide.Areas.PlatformManagement.Data;
+﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Data;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Data.SqlClient;
+using System.Linq;
 
 namespace AdminSide
 {
@@ -17,7 +17,7 @@ namespace AdminSide
         {
             SetEbConfig();
             var host = CreateWebHostBuilder(args).Build();
-            
+
             using (var scope = host.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -28,11 +28,51 @@ namespace AdminSide
                     var contextF = services.GetRequiredService<ForumContext>();
                     var contextNF = services.GetRequiredService<NewsFeedContext>();
                     var contextIdentity = services.GetRequiredService<ApplicationDbContext>();
-                    DbInitializer.InitializePlatformResources(contextPR);
-                    DbInitializer.InitializeCompetitions(contextC);
-                    DbInitializer.InitializeForum(contextF);
-                    DbInitializer.InitializeNewsFeed(contextNF);
-                    DbInitializer.InitializeIdentity(contextIdentity);
+                    try
+                    {
+                        DbInitializer.InitializePlatformResources(contextPR);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for Platform Manangement");
+                    }
+                    try
+                    {
+                        DbInitializer.InitializeCompetitions(contextC);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for Competition");
+                    }
+                    try
+                    {
+                        DbInitializer.InitializeForum(contextF);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for Forum");
+                    }
+                    try
+                    {
+                        DbInitializer.InitializeNewsFeed(contextNF);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for NewsFeed");
+                    }
+                    try
+                    {
+                        DbInitializer.InitializeIdentity(contextIdentity);
+                    }
+                    catch (SqlException ex)
+                    {
+                        var logger = services.GetRequiredService<ILogger<Program>>();
+                        logger.LogError(ex, "An error occurred creating the DB for Identity");
+                    }
                 }
                 catch (Exception ex)
                 {
