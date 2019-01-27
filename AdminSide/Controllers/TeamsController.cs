@@ -89,50 +89,66 @@ namespace AdminSide.Controllers
 
             ViewData["Total"] = team.TeamChallenges.Count();
 
-            //var competition = await _context.Competitions
-            //    .Include(c => c.CompetitionCategories)
-            //    .ThenInclude(cc => cc.Challenges)
-            //    .ThenInclude(ch => ch.TeamChallenges)
-            //    .AsNoTracking()
-            //    .FirstOrDefaultAsync(m => m.ID == team.CompetitionID);
+            var competition = await _context.Competitions
+                .Include(c => c.CompetitionCategories)
+                .ThenInclude(cc => cc.Challenges)
+                //.ThenInclude(ch => ch.TeamChallenges)
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == team.CompetitionID);
 
-            //List<DataPoint> categoryDataPoints = new List<DataPoint>();
+            var teamChallenges = await _context.TeamChallenges
+                .AsNoTracking()
+                .ToListAsync();
 
-            //int TotalSolved = 0;
+            List<DataPoint> categoryDataPoints = new List<DataPoint>();
 
-            //List<string> colorList = new List<string>()
-            //{
-            //    "#FF9E00",
-            //    "#009EFF",
-            //    "#783DF2",
-            //    "#3DE3F2",
-            //    "#52D406",
-            //    "#F2F03D"
-            //};
+            int TotalSolved = 0;
 
-            //int colorCounter = 0;
-            //foreach (var category in competition.CompetitionCategories)
-            //{
-            //    int categorySolvedCounter = 0;
-            //    foreach (var challenge in category.Challenges)
-            //    {
-            //        foreach (var teamChallenge in challenge.TeamChallenges)
-            //        {
-            //            if (teamChallenge.Solved == true && teamChallenge.TeamId == team.TeamID)
-            //            {
-            //                //categoryDataPoints.Add(new DataPoint(1, category.CategoryName, "#00FF08"));
-            //                categorySolvedCounter++;
-            //                TotalSolved++;
-            //            }
-            //        }
-            //    }
-            //    categoryDataPoints.Add(new DataPoint(categorySolvedCounter, category.CategoryName, colorList[colorCounter]));
-            //    colorCounter++;
-            //}
+            List<string> colorList = new List<string>()
+            {
+                "#FF9E00",
+                "#009EFF",
+                "#783DF2",
+                "#3DE3F2",
+                "#52D406",
+                "#F2F03D"
+            };
 
-            //ViewBag.CategoryBreakdown = JsonConvert.SerializeObject(categoryDataPoints);
+            int colorCounter = 0;
+            foreach (var category in competition.CompetitionCategories)
+            {
+                int categorySolvedCounter = 0;
+                foreach (var challenge in category.Challenges)
+                {
+                    //foreach (var teamChallenge in challenge.TeamChallenges)
+                    //{
+                    //    if (teamChallenge.Solved == true && teamChallenge.TeamId == team.TeamID)
+                    //    {
+                    //        //categoryDataPoints.Add(new DataPoint(1, category.CategoryName, "#00FF08"));
+                    //        categorySolvedCounter++;
+                    //        TotalSolved++;
+                    //    }
+                    //}
+                    foreach (var teamChallenge in teamChallenges)
+                    {
+                        if (teamChallenge.ChallengeId == challenge.ID)
+                        {
+                            if (teamChallenge.Solved == true && teamChallenge.TeamId == team.TeamID)
+                            {
+                                //categoryDataPoints.Add(new DataPoint(1, category.CategoryName, "#00FF08"));
+                                categorySolvedCounter++;
+                                TotalSolved++;
+                            }
+                        }
+                    }
+                }
+                categoryDataPoints.Add(new DataPoint(categorySolvedCounter, category.CategoryName, colorList[colorCounter]));
+                colorCounter++;
+            }
 
-            //ViewData["TotalSolved"] = TotalSolved;
+            ViewBag.CategoryBreakdown = JsonConvert.SerializeObject(categoryDataPoints);
+
+            ViewData["TotalSolved"] = TotalSolved;
 
             return View(team);
         }
@@ -156,6 +172,7 @@ namespace AdminSide.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("TeamID,TeamName,Password,CompetitionID")] Team team)
+        //public async Task<IActionResult> Create([Bind("TeamID, TeamName, Score")] Team team)
         {
             if (ModelState.IsValid)
             {
@@ -189,18 +206,22 @@ namespace AdminSide.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("TeamID,TeamName,Password,CompetitionID")] Team team)
+        //public async Task<IActionResult> Edit(int id, [Bind("TeamID,TeamName,Password,CompetitionID")] Team team)
+        public async Task<IActionResult> Edit(int id, [Bind("TeamID, TeamName, Score")] Team team)
         {
             if (id != team.TeamID)
             {
                 return NotFound();
             }
 
+            var saveTeam = await _context.Teams.FindAsync(id);
+            saveTeam.Score = team.Score;
+
             if (ModelState.IsValid)
             {
                 try
                 {
-                    _context.Update(team);
+                    _context.Update(saveTeam);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
@@ -214,9 +235,10 @@ namespace AdminSide.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Edit", "Teams", new { id = saveTeam.CompetitionID });
             }
-            return View(team);
+            return RedirectToAction("Edit", "Teams", new { id = saveTeam.CompetitionID });
+            //return View(returnTeam);
         }
 
         // GET: Teams/Delete/5

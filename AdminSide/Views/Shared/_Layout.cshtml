@@ -119,7 +119,7 @@
 	        data: []
         };
 
-        @*var totalSolved = @ViewData["TotalSolved"];
+        var totalSolved = @ViewData["TotalSolved"];
         var categoryBreakdownOptions = {
             animationEnabled: true,
             theme: "light2",
@@ -141,7 +141,7 @@
                 }
             },
             data: []
-        };*@
+        };
 
     //var visitorsDrilldownedChartOptions = {
     //	animationEnabled: true,
@@ -166,9 +166,9 @@
         chart.options.data = visitorsData["New vs Returning Visitors"];
         chart.render();
 
-        //var chart = new CanvasJS.Chart("CategoryChartContainer", categoryBreakdownOptions);
-        //chart.options.data = categoryBreakdownData["New vs Returning Visitors"];
-        //chart.render();
+        var chart = new CanvasJS.Chart("CategoryChartContainer", categoryBreakdownOptions);
+        chart.options.data = categoryBreakdownData["New vs Returning Visitors"];
+        chart.render();
 
         function visitorsChartDrilldownHandler(e) {
 	        chart = new CanvasJS.Chart("chartContainer", visitorsDrilldownedChartOptions);
