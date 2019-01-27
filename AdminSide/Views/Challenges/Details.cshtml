@@ -7,7 +7,7 @@
 <br>
 <div class="container">
     <div>
-        <h4>Challenge</h4>
+        <h4>Edit Challenge</h4>
         <hr />
         @*May replace this to form to allow Editing and Viewing of Details on 1 page*@
         <form method="post" enctype="multipart/form-data" asp-action="Details">
@@ -50,16 +50,21 @@
                 <input type="hidden" asp-for="CompetitionID" value="@Model.CompetitionID">
                 <span asp-validation-for="CompetitionID" class="text-danger"></span>
             </div>
-
-            <!--Temporary uncomment file changing-->
-            @*<div class="form-group">
-                    <p>Upload one or more files using this form:</p>
-                    <div class="custom-file">
-                        <input type="file" class="custom-file-input" id="customFile" name="files" multiple />
-                        <label class="custom-file-label" for="customFile">Choose file</label>
-                    </div>
-                </div>*@
-            <br>
+            <div class="form-group">
+                @if (Model.FileName == null)
+                {
+                    <h4>File Name: No file</h4>
+                }
+                else
+                {
+                    <h4>File Name: @Model.FileName</h4>
+                }
+                <p>Upload file using this form:</p>
+                <div class="custom-file">
+                    <input type="file" class="custom-file-input" id="customFile" name="files" multiple />
+                    <label class="custom-file-label" id="filename" for="customFile">Choose file</label>
+                </div>
+            </div>
             <br>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-success" />

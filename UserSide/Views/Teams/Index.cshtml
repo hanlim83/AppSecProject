@@ -21,7 +21,9 @@
                     @*@Html.DisplayNameFor(model => model.Score)*@
                     Score
                 </th>
-                <th></th>
+                <th>
+                    Actions
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -36,7 +38,7 @@
                         @Html.DisplayFor(modelItem => item.Score)
                     </td>
                     <td>
-                        <a asp-controller="Teams" asp-action="Details" asp-route-id="@item.TeamID" data-turbolinks="false">Details</a>
+                        <a asp-controller="Teams" asp-action="Details" asp-route-id="@item.TeamID" data-turbolinks="false"><input type="button" value="Details" class="btn btn btn-outline-info"></a>
                     </td>
                 </tr>
             }
