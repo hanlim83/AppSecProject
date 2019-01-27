@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace AdminSide.Areas.PlatformManagement.Controllers
@@ -309,6 +310,41 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         public async Task<IActionResult> ManageNotification()
         {
             return View(await SNSClient.ListSubscriptionsByTopicAsync(new ListSubscriptionsByTopicRequest("arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications")));
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManageNotification(string action, string input)
+        {
+            if (action.Equals("Add"))
+            {
+                SubscribeResponse response = await SNSClient.SubscribeAsync(new SubscribeRequest("arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications", "sms", input));
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    ViewData["Result"] = "Added Sucessfully!";
+                    return View(await SNSClient.ListSubscriptionsByTopicAsync(new ListSubscriptionsByTopicRequest("arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications")));
+                }
+                else
+                {
+                    ViewData["Exception"] = "Adding Failed!";
+                    return View(await SNSClient.ListSubscriptionsByTopicAsync(new ListSubscriptionsByTopicRequest("arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications")));
+                }
+            }
+            else if (action.Equals("Remove"))
+            {
+                UnsubscribeResponse response = await SNSClient.UnsubscribeAsync(new UnsubscribeRequest(input));
+                if (response.HttpStatusCode == HttpStatusCode.OK)
+                {
+                    ViewData["Result"] = "Removed Sucessfully!";
+                    return View(await SNSClient.ListSubscriptionsByTopicAsync(new ListSubscriptionsByTopicRequest("arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications")));
+                }
+                else
+                {
+                    ViewData["Exception"] = "Removal Failed!";
+                    return View(await SNSClient.ListSubscriptionsByTopicAsync(new ListSubscriptionsByTopicRequest("arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications")));
+                }
+            }
+            else
+                return NotFound();
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

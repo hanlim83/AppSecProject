@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-danger" role="alert">
-                @TempData["Result"]
+                @ViewData["Result"]
             </div>
         </div>
     </div>
@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-lg-12">
             <div class="alert alert-danger" role="alert">
-                @TempData["Exception"]
+                @ViewData["Exception"]
             </div>
         </div>
     </div>
@@ -34,18 +34,18 @@
                 Add Phone Number
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <form class="px-8 py-4 needs-validation" asp-action="ManageNotification" method="post" novalidate>
+                <form class="px-4 py-3 needs-validation" asp-action="ManageNotification" method="post" novalidate>
                     <input type="hidden" name="action" value="Add" />
                     <div class="form-group">
                         <label for="DropdownFormPhoneNumber">Phone Number</label>
-                        <input type="number" class="form-control" id="DropdownFormPhoneNumber" name="input" pattern="^[+]65\d{8}$" required>
+                        <input type="number" class="form-control" id="DropdownFormPhoneNumber" name="input" pattern="^[+]65[0-9]{8}$" required>
                         <div class="invalid-feedback">
                             Please enter a vaild phone number
                         </div>
                     </div>
                     <div class="form-group">
                     </div>
-                    <button type="submit" class="btn btn-primary">Add Phone Number</button>
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </form>
             </div>
         </div>
