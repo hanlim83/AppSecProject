@@ -154,7 +154,7 @@ namespace UserSide.Controllers
                 string folderName = category.CategoryName;
                 if (temp_challenge1.FileName != null)
                 {
-                    string fileName = challenge.FileName;
+                    string fileName = temp_challenge1.FileName;
                     Regex pattern = new Regex("[+]");
                     string tempFileName = pattern.Replace(fileName, "%2B");
                     tempFileName.Replace(' ', '+');
