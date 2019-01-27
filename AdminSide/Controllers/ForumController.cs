@@ -181,46 +181,33 @@ namespace AdminSide.Controllers
         }
 
         // POST: Forum/Edit
-        [HttpPost]
+        [HttpPost, ActionName("Edit")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Title,Content,UserName, DT, CategoryID")] Post post)
+        public async Task<IActionResult> Edit(int id)
         {
-            if (id != post.PostID)
+            if (id == null)
             {
                 return NotFound();
             }
-            if (ValidateCheck(post.Content) == true)
+
+            var postToUpdate = await context1.Posts.SingleOrDefaultAsync(p => p.PostID == id);
+            if (await TryUpdateModelAsync<Post>(
+                postToUpdate,
+                "",
+                p => p.Title, p => p.Content, p => p.CategoryID))
             {
-                ViewData["Alert"] = "Please Remove The Special Characters.";
-            }
-            else
-            {
-                if (ModelState.IsValid)
+                try
                 {
-                    try
-                    {
-                        post.DT = DateTime.Now;
-                        // GET THE ID
-                        var userID = this.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-                        post.UserName = userID;
-                        context1.Update(post);
-                        await context1.SaveChangesAsync();
-                    }
-                    catch (DbUpdateConcurrencyException)
-                    {
-                        if (!PostExists(post.PostID))
-                        {
-                            return NotFound();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                    }
+                    await context1.SaveChangesAsync();
                     return RedirectToAction(nameof(Index));
                 }
+                catch (DbUpdateException)
+                {
+                    // Log the errors  
+                    ModelState.AddModelError("", "Unable to save changes. ");
+                }
             }
-            return View(post);
+            return View(postToUpdate);
         }
 
         // POST: Forum/PostReply
