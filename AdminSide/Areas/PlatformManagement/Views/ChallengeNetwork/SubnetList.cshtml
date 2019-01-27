@@ -55,7 +55,7 @@
                                     @Html.DisplayFor(modelItem => subnet.IPv6CIDR)
                                 </td>
                                 <td>
-                                    @if (!subnet.ID.Equals(1) && !subnet.ID.Equals(2) && !subnet.ID.Equals(3))
+                                    @if (subnet.editable == true)
                                     {
                                         <form method="post">
                                             <input type="hidden" name="action" value="Modify" />

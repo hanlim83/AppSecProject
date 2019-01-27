@@ -51,12 +51,22 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 if (Deletesubnet == null)
                 {
                     TempData["Result"] = "Invaild Subnet!";
-                    return View(await _context.Subnets.ToListAsync());
+                    ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
+                    {
+                        RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                        RetrievedRoutes = await _context.Routes.ToListAsync()
+                    };
+                    return View(model);
                 }
                 else if (Deletesubnet.editable == false)
                 {
                     TempData["Result"] = "You cannot delete a default subnet!";
-                    return View(await _context.Subnets.ToListAsync());
+                    ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
+                    {
+                        RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                        RetrievedRoutes = await _context.Routes.ToListAsync()
+                    };
+                    return View(model);
                 }
                 else
                 {
