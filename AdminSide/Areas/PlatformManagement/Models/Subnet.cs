@@ -14,6 +14,7 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public int ID { get; set; }
         [Required]
         [StringLength(50, ErrorMessage = "A Subnet must have a name")]
+        [RegularExpression(@"^[A-Za-z0-9 _-]*[A-Za-z0-9][A-Za-z0-9 _ -]*$",ErrorMessage = "Please use only alphanumeric characters, dashes and underscores only")]
         [Display(Name = "Subnet Name")]
         public string Name { get; set; }
         [Required]

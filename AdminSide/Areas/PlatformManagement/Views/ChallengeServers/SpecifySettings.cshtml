@@ -43,7 +43,7 @@
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
-                <input type="text" class="form-control" id="ServerName" name="ServerName" required>
+                <input type="text" class="form-control" id="ServerName" name="ServerName" pattern="^[A-Za-z0-9 _-]*[A-Za-z0-9][A-Za-z0-9 _ -]*$" required>
                 <div class="invalid-feedback">A server needs a name</div>
             </div>
             <div class="form-group">

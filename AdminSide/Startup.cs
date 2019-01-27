@@ -5,8 +5,7 @@ using Amazon.CloudWatch;
 using Amazon.CloudWatchEvents;
 using Amazon.CloudWatchLogs;
 using Amazon.EC2;
-using Amazon.RDS;
-using Amazon.Route53Domains;
+using Amazon.GuardDuty;
 using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.SimpleNotificationService;
@@ -180,10 +179,8 @@ namespace AdminSide
             services.AddAWSService<IAmazonCloudWatchEvents>();
             //SNS Initialization
             services.AddAWSService<IAmazonSimpleNotificationService>();
-            //RDS Initialization
-            services.AddAWSService<IAmazonRDS>();
-            //Route53 Initialization
-            services.AddAWSService<IAmazonRoute53Domains>();
+            //GuardDuty Initialization
+            services.AddAWSService<IAmazonGuardDuty>();
 
             //Background Processing
             services.AddHostedService<ConsumeScopedServicesHostedService>();
