@@ -403,7 +403,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     {
                         newlyCreated.Tenancy = Tenancy.DedicatedHardware;
                     }
-
+                    _context.Servers.Add(newlyCreated);
+                    _context.SaveChanges();
                     await CWClient.PutMetricAlarmAsync(new PutMetricAlarmRequest
                     {
                         Threshold = 1,
@@ -425,13 +426,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         AlarmActions = new List<string>
                         {
                             "arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications",
-                            "arn:aws:automate:ap-southeast-1:ec2:recover"
+                            "arn:aws:automate:ap-southeast-1:ec2:reboot"
                         },
                         Statistic = Statistic.Maximum,
                         AlarmDescription = "Created Via Platform for " + newlyCreated.Name
                     });
-                    _context.Servers.Add(newlyCreated);
-                    _context.SaveChanges();
                     ViewData["ServerName"] = newlyCreated.Name;
                     return View(response.Reservation.Instances[0]);
                 }
