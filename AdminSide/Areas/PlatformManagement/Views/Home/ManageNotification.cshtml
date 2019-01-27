@@ -22,11 +22,9 @@
         </div>
     </div>
 }
-<div class="row">
-    <div class="col-lg-12">
-        <h2>Manage Alarm Notifications</h2>
-    </div>
-</div>
+<h2>Manage</h2>
+<h4>Alarm Notifications</h4>
+<hr />
 <div class="row">
     <div class="col-lg-12">
         <div class="dropdown float-right">
@@ -34,7 +32,7 @@
                 Add Phone Number
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <form class="px-4 py-3 needs-validation" asp-action="ManageNotification" method="post" novalidate>
+                <form class="px-1 py-2 needs-validation" asp-action="ManageNotification" method="post" novalidate>
                     <input type="hidden" name="action" value="Add" />
                     <div class="form-group">
                         <label for="DropdownFormPhoneNumber">Phone Number</label>
@@ -51,40 +49,41 @@
         </div>
     </div>
 </div>
-<br />
-<br />
-<div class="row">
-    <div class="col-lg-10">
-        <div class="table-responsive">
-            <table id="SNSDisplay" class="table">
-                <thead>
-                    <tr>
-                        <th scope="col">Phone Number</th>
-                        <th scope="col">Action</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var s in Model.Subscriptions)
-                    {
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10">
+            <div class="table-responsive">
+                <table id="SNSDisplay" class="table">
+                    <thead>
                         <tr>
-                            <th scope="row">@s.Endpoint</th>
-                            <td>
-                                <form asp-action="ManageNotification" method="post">
-                                    <input type="hidden" name="action" value="Remove" />
-                                    <input type="hidden" name="input" value="@s.SubscriptionArn" />
-                                    <button type="submit" class="btn btn-danger">Remove Phone Number</button>
-                                </form>
-                            </td>
+                            <th scope="col">Phone Number</th>
+                            <th scope="col">Action</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach (var s in Model.Subscriptions)
+                        {
+                            <tr>
+                                <th scope="row">@s.Endpoint</th>
+                                <td>
+                                    <form asp-action="ManageNotification" method="post">
+                                        <input type="hidden" name="action" value="Remove" />
+                                        <input type="hidden" name="input" value="@s.SubscriptionArn" />
+                                        <button type="submit" class="btn btn-danger">Remove Phone Number</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
+<br />
 <div class="row">
     <div class="col-lg-12">
-        <button asp-action="" type="button" class="btn btn-primary">Return to Dashboard</button>
+        <a asp-action="" asp-area="PlatformManagement" type="button" class="btn btn-primary">Return to Dashboard</a>
     </div>
 </div>
 @section Scripts{
