@@ -23,6 +23,6 @@ namespace AdminSide.Models
         [Display(Name = "Competition Category")]
         public int CompetitionCategoryID { get; set; }
 
-        public ICollection<TeamChallenge> TeamChallenges { get; set; }
+        //public ICollection<TeamChallenge> TeamChallenges { get; set; }
     }
 }
