@@ -228,6 +228,8 @@
         @*<script src="~/js/site.js" asp-append-version="true" data-turbolinks-track="reload"></script>*@
         <script src="~/js/site.js" asp-append-version="true"></script>
         <script src="~/lib/DataTables/datatables.js"></script>
+        <script src="~/lib/DataTables/pdfmake-0.1.36/pdfmake.js"></script>
+        <script src="~/lib/DataTables/pdfmake-0.1.36/vfs_fonts.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -247,7 +249,11 @@
                 integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
                 crossorigin="anonymous">
         </script>
-        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.js"
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"
+                asp-fallback-src="~/lib/DataTables/pdfmake-0.1.36/pdfmake.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"
+                asp-fallback-src="~/lib/DataTables/pdfmake-0.1.36/vfs_fonts.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/b-print-1.5.4/r-2.2.2/sc-1.5.0/datatables.min.js"
                 asp-fallback-src="~/lib/DataTables/datatables.min.js"></script>
         @*<script src="~/js/site.min.js" data-turbolinks-track="reload" asp-append-version="true"></script>*@
         <script src="~/js/site.min.js" asp-append-version="true"></script>

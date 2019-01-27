@@ -6,7 +6,6 @@ using Amazon.CloudWatchLogs;
 using Amazon.CloudWatchLogs.Model;
 using Amazon.EC2;
 using Amazon.EC2.Model;
-using Amazon.RDS;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -31,14 +30,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
         private readonly IAmazonCloudWatch cwClient;
         private readonly IAmazonCloudWatchEvents cweClient;
         private readonly IAmazonCloudWatchLogs cwlClient;
-        private readonly IAmazonRDS rdsClient;
         private const string IPv4VMCIDR = "172.30.0.0/16";
         private static string VMVPCID;
         private static Boolean Flag;
         private const string IPv4PlatformCIDR = "172.29.0.0/16";
         private static string PlatformVPCID;
 
-        public ScopedSetupService(ILogger<ScopedSetupService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient, IAmazonRDS relationaldatabaseserviceClient)
+        public ScopedSetupService(ILogger<ScopedSetupService> logger, PlatformResourcesContext Context, IAmazonEC2 EC2Client, IAmazonCloudWatch cloudwatchClient, IAmazonCloudWatchEvents cloudwatcheventsClient, IAmazonCloudWatchLogs cloudwatchlogsClient)
         {
             _logger = logger;
             context = Context;
@@ -46,7 +44,6 @@ namespace AdminSide.Areas.PlatformManagement.Services
             cwClient = cloudwatchClient;
             cweClient = cloudwatcheventsClient;
             cwlClient = cloudwatchlogsClient;
-            rdsClient = relationaldatabaseserviceClient;
         }
 
         public async Task DoWorkAsync()
@@ -89,7 +86,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                         }
                         if (Flag == true)
+                        {
                             break;
+                        }
                     }
                     if (Flag == false && legacy == false)
                     {
@@ -114,7 +113,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             GroupId = securityGroup.GroupId
                         });
                         if (responseAuthorizeSecurityGroupIngress.HttpStatusCode == HttpStatusCode.OK)
+                        {
                             _logger.LogInformation("Setup Background Service has completed RDS authroization");
+                        }
                     }
                     else if (Flag == true && legacy == true)
                     {
@@ -156,9 +157,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             GroupId = securityGroup.GroupId
                         });
                         if (responseRevokeSecurityGroupIngress.HttpStatusCode == HttpStatusCode.OK && responseAuthorizeSecurityGroupIngress.HttpStatusCode == HttpStatusCode.OK)
+                        {
                             _logger.LogInformation("Setup Background Service has completed RDS authroization");
+                        }
                         else
+                        {
                             _logger.LogInformation("Setup Background Service has failed RDS authroization");
+                        }
                     }
                 }
                 DescribeVpcsResponse responseDescribeVPC = await ec2Client.DescribeVpcsAsync();
@@ -171,9 +176,14 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         Flag = true;
                     }
                     else if (VPC.CidrBlock.Contains(IPv4PlatformCIDR))
+                    {
                         PlatformVPCID = VPC.VpcId;
+                    }
+
                     if (Flag == true)
+                    {
                         break;
+                    }
                 }
                 if (Flag == false)
                 {
@@ -324,7 +334,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 }
                             }
                         }
-                        });                      
+                        });
                         VPC newlyCreatedVPC = new VPC
                         {
                             AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
@@ -337,7 +347,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         context.SaveChanges();
                     }
                     else
+                    {
                         _logger.LogInformation("VPC already created!");
+                    }
+
                     if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + PlatformVPCID + "'").ToList().Count() == 0)
                     {
                         _logger.LogInformation("Platform VPC not inside SQL Database!");
@@ -487,7 +500,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         Flag = true;
                     }
                     else
+                    {
                         _logger.LogInformation("Subnets already created!");
+                    }
                 }
                 DescribeRouteTablesResponse responseDescribeRouteTable = await ec2Client.DescribeRouteTablesAsync(new DescribeRouteTablesRequest
                 {
@@ -793,7 +808,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             context.SaveChanges();
                             List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = '" + RT.RouteTableId + "'").ToList();
                             if (queryResult.Count() == 1)
+                            {
                                 newRT = queryResult[0];
+                            }
+
                             foreach (Amazon.EC2.Model.Route R in RT.Routes)
                             {
                                 if (!String.IsNullOrEmpty(R.GatewayId) && R.GatewayId.Contains("igw"))
@@ -812,7 +830,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 }
                             }
                             if (IntranetCounter == 2 && (isInternet == false || isExtranet == false))
+                            {
                                 isIntranet = true;
+                            }
+
                             if (isInternet == true)
                             {
                                 foreach (Amazon.EC2.Model.Route r in RT.Routes)
@@ -826,9 +847,14 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "Internet Gateway";
                                             if (r.State == Amazon.EC2.RouteState.Active)
+                                            {
                                                 newRoute.Status = Status.OK;
+                                            }
                                             else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            {
                                                 newRoute.Status = Status.Blackhole;
+                                            }
+
                                             newRoute.IPCIDR = r.DestinationCidrBlock;
                                             newRoute.applicability = Applicability.Internet;
                                             newRoute.RouteTableID = newRT.ID;
@@ -842,16 +868,23 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "Internet Gateway";
                                             if (r.State == Amazon.EC2.RouteState.Active)
+                                            {
                                                 newRoute.Status = Status.OK;
+                                            }
                                             else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            {
                                                 newRoute.Status = Status.Blackhole;
+                                            }
+
                                             newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
                                             newRoute.applicability = Applicability.Internet;
                                             newRoute.RouteTableID = newRT.ID;
                                         }
                                     }
                                     if (newRoute.Description != null)
+                                    {
                                         context.Routes.Add(newRoute);
+                                    }
                                 }
                                 foreach (RouteTableAssociation a in RT.Associations)
                                 {
@@ -954,11 +987,16 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "NAT Gateway";
                                             if (r.State == Amazon.EC2.RouteState.Active)
+                                            {
                                                 newRoute.Status = Status.OK;
+                                            }
                                             else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            {
                                                 newRoute.Status = Status.Blackhole;
+                                            }
+
                                             newRoute.IPCIDR = r.DestinationCidrBlock;
-                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.applicability = Applicability.Extranet;
                                             newRoute.RouteTableID = newRT.ID;
                                         }
                                     }
@@ -970,16 +1008,23 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "Internet-Only Gateway";
                                             if (r.State == Amazon.EC2.RouteState.Active)
+                                            {
                                                 newRoute.Status = Status.OK;
+                                            }
                                             else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            {
                                                 newRoute.Status = Status.Blackhole;
+                                            }
+
                                             newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
-                                            newRoute.applicability = Applicability.Internet;
+                                            newRoute.applicability = Applicability.Extranet;
                                             newRoute.RouteTableID = newRT.ID;
                                         }
                                     }
                                     if (newRoute.Description != null)
+                                    {
                                         context.Routes.Add(newRoute);
+                                    }
                                 }
                                 foreach (RouteTableAssociation a in RT.Associations)
                                 {
@@ -1082,9 +1127,14 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "Challenge Network";
                                             if (r.State == Amazon.EC2.RouteState.Active)
+                                            {
                                                 newRoute.Status = Status.OK;
+                                            }
                                             else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            {
                                                 newRoute.Status = Status.Blackhole;
+                                            }
+
                                             newRoute.IPCIDR = r.DestinationCidrBlock;
                                             newRoute.applicability = Applicability.All;
                                             newRoute.RouteTableID = newRT.ID;
@@ -1098,16 +1148,23 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "Challenge Network";
                                             if (r.State == Amazon.EC2.RouteState.Active)
+                                            {
                                                 newRoute.Status = Status.OK;
+                                            }
                                             else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            {
                                                 newRoute.Status = Status.Blackhole;
+                                            }
+
                                             newRoute.IPCIDR = r.DestinationIpv6CidrBlock;
                                             newRoute.applicability = Applicability.All;
                                             newRoute.RouteTableID = newRT.ID;
                                         }
                                     }
                                     if (newRoute.Description != null)
+                                    {
                                         context.Routes.Add(newRoute);
+                                    }
                                 }
                                 foreach (RouteTableAssociation a in RT.Associations)
                                 {
@@ -1201,7 +1258,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         }
                     }
                     else
+                    {
                         _logger.LogInformation("Route Tables already created!");
+                    }
                 }
                 if (!context.CloudWatchLogGroups.Any() && !context.CloudWatchLogStreams.Any())
                 {
@@ -1215,16 +1274,27 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             CreationTime = lg.CreationTime
                         };
                         if (lg.LogGroupName.Contains("/"))
+                        {
                             newG.Name = lg.LogGroupName.Replace("/", "@");
+                        }
                         else
+                        {
                             newG.Name = lg.LogGroupName;
+                        }
+
                         if (lg.RetentionInDays != null)
+                        {
                             lg.RetentionInDays = (int)lg.RetentionInDays;
+                        }
+
                         context.CloudWatchLogGroups.Add(newG);
                         context.SaveChanges();
-                        List<CloudWatchLogGroup> gQuery = context.CloudWatchLogGroups.FromSql("SELECT * FROM dbo.CloudWatchLogGroups WHERE ARN = '" + lg.Arn + "'").ToList();
+                        List<CloudWatchLogGroup> gQuery = context.CloudWatchLogGroups.FromSql("SELECT * FROM dbo.CloudWatchLogGroups WHERE ARN = {0}", lg.Arn).ToList();
                         if (gQuery.Count() == 1)
+                        {
                             newG = gQuery[0];
+                        }
+
                         DescribeLogStreamsResponse responseDescribeLogStreams = await cwlClient.DescribeLogStreamsAsync(new DescribeLogStreamsRequest
                         {
                             LogGroupName = lg.LogGroupName
@@ -1241,30 +1311,53 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 LinkedGroupID = newG.ID
                             };
                             if (newG.Name.Equals("VMVPCLogs"))
+                            {
                                 newS.DisplayName = "Network Flow Log For Challenge Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                            }
                             else if (newG.Name.Equals("PlatformVPCLogs"))
+                            {
                                 newS.DisplayName = "Network Flow Log For Platform Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                            }
                             else if (newG.Name.Equals("RDSOSMetrics"))
                             {
                                 if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                {
                                     newS.DisplayName = "SQL Database CPU Usage";
+                                }
                             }
                             else if (newG.Name.Equals("@aws@elasticbeanstalk@User-Side@IIS-Log"))
+                            {
                                 newS.DisplayName = "IIS Logs for User Side Web Server";
+                            }
                             else if (newG.Name.Equals("@aws@elasticbeanstalk@Admin-Side@IIS-Log"))
+                            {
                                 newS.DisplayName = "IIS Logs for Admin Side Web Server";
+                            }
                             else if (newG.Name.Equals("@aws@elasticbeanstalk@User-Side@EBDeploy-Log"))
+                            {
                                 newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for User Side";
+                            }
                             else if (newG.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBDeploy-Log"))
+                            {
                                 newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for Admin Side";
+                            }
                             else if (newG.Name.Equals("@aws@elasticbeanstalk@User-Side@EBHooks-Log"))
+                            {
                                 newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for User Side";
+                            }
                             else if (newG.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBHooks-Log"))
+                            {
                                 newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for Admin Side";
+                            }
                             else
+                            {
                                 newS.DisplayName = newS.Name;
+                            }
+
                             if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                            {
                                 context.CloudWatchLogStreams.Add(newS);
+                            }
                         }
                         await context.SaveChangesAsync();
                     }
