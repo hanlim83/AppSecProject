@@ -10,29 +10,49 @@
         <br />
         <div class="row">
             <div class="col-lg-12">
+                @if (!String.IsNullOrEmpty(Convert.ToString(TempData["Exception"])))
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger" role="alert">
+                                @TempData["Exception"]
+                            </div>
+                        </div>
+                    </div>
+                }
+                @if (ViewData["Mode"].Equals("Generic"))
+                {
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-info" role="alert">
+                                All Log Entries except for SQL Server Error Logs, will now be shown as raw entries without any filtering
+                            </div>
+                        </div>
+                    </div>
+                }
                 <form asp-action="" method="post" class="form-inline">
                     <label class="my-1 mr-2" for="logGroup">Select which component of the platform to view logs for:</label>
-                    <select id="selection" class="custom-select my-1 mr-sm-2" id="Component" name="StreamID" required>
-                        @foreach(var stream in Model.Streams)
+                    <select id="selection" class="custom-select my-1 mr-sm-2" name="StreamID" required>
+                        @foreach (var stream in Model.Streams)
                         {
                             <option value="@stream.ID">@stream.DisplayName</option>
                         }
+                        <option value="0">SQL Server Error Logs</option>
                     </select>
+                    <input type="hidden" name="ViewMode" value="@ViewData["Mode"]" />
                     <button type="submit" class="btn btn-primary my-1">Retrieve Events</button>
                 </form>
             </div>
         </div>
-        <br />
-        <br />
-        <div class="row">
+        <div id="CWEventsDisplay" class="row" style="display:none;">
             <div class="col-lg-12">
                 @if (Model.Response != null)
                 {
-                    <table id="CWresults" class="table">
+                    <table id="CWresults" class="table" style="width : 100%;">
                         <thead>
                             <tr>
                                 <th>
-                                    TimeStamp
+                                    Time-Stamp
                                 </th>
                                 <th>
                                     Log
@@ -55,15 +75,220 @@
                             }
                         </tbody>
                     </table>
+                }
+                @if (Model.Response == null && Model.SQLlogs != null)
+                {
+                    <table id="CWresults" class="table" style="width : 100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Time-Stamp
+                                </th>
+                                <th>
+                                    Process Information
+                                </th>
+                                <th>
+                                    Log Text
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loggedEvent in Model.SQLlogs)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.LogDate)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.ProcessInfo)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Text)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                @if (Model.IISLogs != null)
+                {
+                    <table id="CWresults" class="table" style="width : 100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Time-Stamp
+                                </th>
+                                <th>
+                                    HTTP Method
+                                </th>
+                                <th>
+                                    Path
+                                </th>
+                                <th>
+                                    Query
+                                </th>
+                                <th>
+                                    User Identity
+                                </th>
+                                <th>
+                                    Source IP
+                                </th>
+                                <th>
+                                    Source User Agent
+                                </th>
+                                <th>
+                                    Referer
+                                </th>
+                                <th>
+                                    HTTP Status Code
+                                </th>
+                                <th>
+                                    Sub-Status Code
+                                </th>
+                                <th>
+                                    Win32 Status Code
+                                </th>
+                                <th>
+                                    Time Taken (In miliseconds)
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loggedEvent in Model.IISLogs)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.TimeStamp)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.HTTPMethod)
+                                    </td>
 
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Path)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Query)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.AuthenticatedUser)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SourceIP)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SourceUserAgent)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Referer)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.HTTPStatusCode)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SubstatusCode)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Win32StatusCode)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Duration)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                @if (Model.ENILogs != null)
+                {
+                    <table id="CWresults" class="table" style="width : 100%;">
+                        <thead>
+                            <tr>
+                                <th>
+                                    Time-Stamp
+                                </th>
+                                <th>
+                                    Source IP Address
+                                </th>
+                                <th>
+                                    Source Port
+                                </th>
+                                <th>
+                                    Destination IP Address
+                                </th>
+                                <th>
+                                    Destination Port
+                                </th>
+                                <th>
+                                    Protocol
+                                </th>
+                                <th>
+                                    Packet Count
+                                </th>
+                                <th>
+                                    Total Bytes
+                                </th>
+                                <th>
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var loggedEvent in Model.ENILogs)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.TimeStamp)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SourceAddress)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.SourcePort)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.DestinationAddress)
+                                    </td>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.DestinationPort)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Protocol)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Packets)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Bytes)
+                                    </td>
+
+                                    <td>
+                                        @Html.DisplayFor(modelItem => loggedEvent.Action)
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 }
             </div>
         </div>
     </div>
 </div>
-<script>
-    var previous = @Model.SelectedValue;
-    if (previous == null || previous == 0)
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var previous = @Model.SelectedValue;
+    if (previous == null || previous == -1)
         document.getElementById("selection").selectedIndex = -1;
     else {
         for (i = 0; i < document.getElementById("selection").options.length; i++) {
@@ -74,4 +299,22 @@
             }
         }
     }
-</script>
+        var table = $('#CWresults').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                'pdfHtml5',
+                'print'
+            ],
+            responsive: true,
+            deferRender: true,
+            "pagingType": "full_numbers"
+        });
+        $('#CWresults').removeAttr("style");
+        $('#CWresults *').removeAttr("style");
+            $('#CWEventsDisplay').removeAttr("style");
+        });
+    </script>
+}
