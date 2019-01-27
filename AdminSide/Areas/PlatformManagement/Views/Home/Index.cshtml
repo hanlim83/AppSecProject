@@ -17,8 +17,107 @@
                         <hr>
                         <form asp-action="" method="post">
                             <p class="mb-0">To resolve this, please click the button below or restart the Platform to automatically fix the issue</p>
-                            <button type="submit" class="btn btn-primary">Resolve Error</button>
+                            <input type="hidden" name="Placeholder" value="meh" />
+                            <br />
+                            <button type="submit" class="btn btn-primary">Resolve</button>
                         </form>
+                    </div>
+                </div>
+            </div>
+            <div class-row>
+                <div class="col-lg-12">
+                    <div class="card-deck" style="padding-bottom: 5%;">
+                        <div class="card">
+                            <h5 class="card-header">Platform Metric Alarms</h5>
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
+                            {
+                                <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
+                            }
+                            @if (ViewData["CWPlatformState"].Equals("ALARM") || ViewData["CWELBState"].Equals("ALARM") && ViewData["CWCSState"].Equals("ALARM"))
+                            {
+                                <h5 class="card-title text-warning">One or more Alarms has been triggered</h5>
+                            }
+                            <div class="card-body">
+                                @if (ViewData["CWPlatformState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
+                                }
+                                @if (ViewData["CWPlatformState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
+                                }
+                                @if (ViewData["CWCSState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
+                                }
+                                @if (ViewData["CWCSState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                }
+                                <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h5 class="card-header">Platform Health</h5>
+                            <div class="card-body">
+                                @if (ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK"))
+                                {
+                                    <h5 class="card-title text-success">All AWS Services required by the Platform are operating normally</h5>
+                                }
+                                @if (ViewData["CWStatus"].Equals("WARNING") || ViewData["EC2Status"].Equals("WARNING") || ViewData["EBSStatus"].Equals("WARNING") || ViewData["ELBStatus"].Equals("WARNING") || ViewData["NATStatus"].Equals("WARNING") || ViewData["RDSStatus"].Equals("WARNING") || ViewData["R53Status"].Equals("WARNING") || ViewData["SGStatus"].Equals("WARNING") || ViewData["S3Status"].Equals("WARNING") || ViewData["VPCStatus"].Equals("WARNING"))
+                                {
+                                    <h5 class="card-title text-warning">One or more AWS Services required by the Platform are facing intermittent issues</h5>
+                                }
+                                @if (ViewData["CWStatus"].Equals("CRITICAL") || ViewData["EC2Status"].Equals("CRITICAL") || ViewData["EBSStatus"].Equals("CRITICAL") || ViewData["ELBStatus"].Equals("CRITICAL") || ViewData["NATStatus"].Equals("CRITICAL") || ViewData["RDSStatus"].Equals("CRITICAL") || ViewData["R53Status"].Equals("CRITICAL") || ViewData["SGStatus"].Equals("CRITICAL") || ViewData["S3Status"].Equals("CRITICAL") || ViewData["VPCStatus"].Equals("CRITICAL"))
+                                {
+                                    <h5 class="card-title text-danger">One or more AWS Services required by the Platform are facing downtime</h5>
+                                }
+                                @if (ViewData["RDSStatus"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK"))
+                                {
+                                    <p class="card-text">Data Access: All Systems Go!</p>
+                                }
+                                @if (ViewData["RDSStatus"].Equals("WARNING") || ViewData["SGStatus"].Equals("WARNING") && ViewData["S3Status"].Equals("WARNING"))
+                                {
+                                    <p class="card-text">Data Access: May Face Performance Issues</p>
+                                }
+                                @if (ViewData["RDSStatus"].Equals("CRITICAL") || ViewData["SGStatus"].Equals("CRITICAL") && ViewData["S3Status"].Equals("CRITICAL"))
+                                {
+                                    <p class="card-text">Data Access: May Face Issues In Accessing Data</p>
+                                }
+                                @if (ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["NATStatus"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform and Challenge Servers: All Systems Go!</p>
+                                }
+                                @if (ViewData["EBSStatus"].Equals("WARNING") || ViewData["ELBStatus"].Equals("WARNING") || ViewData["R53Status"].Equals("WARNING") || ViewData["EC2Status"].Equals("WARNING") || ViewData["NATStatus"].Equals("WARNING"))
+                                {
+                                    <p class="card-text">Platform and Challenge Servers: May Face Performance Issues</p>
+                                }
+                                @if (ViewData["EBSStatus"].Equals("CRITICAL") || ViewData["ELBStatus"].Equals("CRITICAL") || ViewData["R53Status"].Equals("CRITICAL") || ViewData["EC2Status"].Equals("CRITICAL") || ViewData["NATStatus"].Equals("CRITICAL"))
+                                {
+                                    <p class="card-text">Platform and Challenge Servers: May Face Issues in Accessing The Platform</p>
+                                }
+                                @if (ViewData["CWStatus"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Logging: All Systems Go!</p>
+                                }
+                                @if (ViewData["CWStatus"].Equals("WARNING"))
+                                {
+                                    <p class="card-text">Platform Logging: Increased Latency in retrieving events</p>
+                                }
+                                @if (ViewData["CWStatus"].Equals("CRITICAL"))
+                                {
+                                    <p class="card-text">Platform Logging: Logging may not accurate</p>
+                                }
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -32,25 +131,122 @@
                     </div>
                 </div>
             </div>
-        }
-        <div class="row">
-            <div class="col-lg-12" style="text-align: center; margin-top: 3%; margin-bottom: 5%;">
-                @if (ViewData["ServerHealth"].Equals("OK") && ViewData["RouteHealth"].Equals("OK") && ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK") && ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
-                {
-                    <h3 class="page-header text-success">
-                        <i class="far fa-thumbs-up" style="font-size: 62px"></i>&nbsp;&nbsp;&nbsp;All Looks Good!
-                    </h3>
-                }
-                @if (!ViewData["ServerHealth"].Equals("OK") || !ViewData["RouteHealth"].Equals("OK") || !ViewData["CWStatus"].Equals("OK") || !ViewData["EC2Status"].Equals("OK") || !ViewData["EBSStatus"].Equals("OK") || !ViewData["ELBStatus"].Equals("OK") || !ViewData["NATStatus"].Equals("OK") || !ViewData["RDSStatus"].Equals("OK") || !ViewData["R53Status"].Equals("OK") || !ViewData["SGStatus"].Equals("OK") || !ViewData["S3Status"].Equals("OK") || !ViewData["VPCStatus"].Equals("OK") || !ViewData["CWPlatformState"].Equals("OK") || !ViewData["CWELBState"].Equals("OK") || !ViewData["CWCSState"].Equals("OK"))
-                {
-                    <h3 class="page-header text-warning">
-                        <i class="fas fa-exclamation-triangle" style="font-size: 62px"></i>&nbsp;&nbsp;&nbsp;Uh Oh! Something is not right...
-                    </h3>
-                }
+            <div class-row>
+                <div class="col-lg-12">
+                    <div class="card-deck" style="padding-bottom: 5%;">
+                        <div class="card">
+                            <h5 class="card-header">Platform Metric Alarms</h5>
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
+                            {
+                                <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
+                            }
+                            @if (ViewData["CWPlatformState"].Equals("ALARM") || ViewData["CWELBState"].Equals("ALARM") && ViewData["CWCSState"].Equals("ALARM"))
+                            {
+                                <h5 class="card-title text-warning">One or more Alarms has been triggered</h5>
+                            }
+                            <div class="card-body">
+                                @if (ViewData["CWPlatformState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
+                                }
+                                @if (ViewData["CWPlatformState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
+                                }
+                                @if (ViewData["CWCSState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
+                                }
+                                @if (ViewData["CWCSState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                }
+                                <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <h5 class="card-header">Platform Health</h5>
+                            <div class="card-body">
+                                @if (ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK"))
+                                {
+                                    <h5 class="card-title text-success">All AWS Services required by the Platform are operating normally</h5>
+                                }
+                                @if (ViewData["CWStatus"].Equals("WARNING") || ViewData["EC2Status"].Equals("WARNING") || ViewData["EBSStatus"].Equals("WARNING") || ViewData["ELBStatus"].Equals("WARNING") || ViewData["NATStatus"].Equals("WARNING") || ViewData["RDSStatus"].Equals("WARNING") || ViewData["R53Status"].Equals("WARNING") || ViewData["SGStatus"].Equals("WARNING") || ViewData["S3Status"].Equals("WARNING") || ViewData["VPCStatus"].Equals("WARNING"))
+                                {
+                                    <h5 class="card-title text-warning">One or more AWS Services required by the Platform are facing intermittent issues</h5>
+                                }
+                                @if (ViewData["CWStatus"].Equals("CRITICAL") || ViewData["EC2Status"].Equals("CRITICAL") || ViewData["EBSStatus"].Equals("CRITICAL") || ViewData["ELBStatus"].Equals("CRITICAL") || ViewData["NATStatus"].Equals("CRITICAL") || ViewData["RDSStatus"].Equals("CRITICAL") || ViewData["R53Status"].Equals("CRITICAL") || ViewData["SGStatus"].Equals("CRITICAL") || ViewData["S3Status"].Equals("CRITICAL") || ViewData["VPCStatus"].Equals("CRITICAL"))
+                                {
+                                    <h5 class="card-title text-danger">One or more AWS Services required by the Platform are facing downtime</h5>
+                                }
+                                @if (ViewData["RDSStatus"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK"))
+                                {
+                                    <p class="card-text">Data Access: All Systems Go!</p>
+                                }
+                                @if (ViewData["RDSStatus"].Equals("WARNING") || ViewData["SGStatus"].Equals("WARNING") && ViewData["S3Status"].Equals("WARNING"))
+                                {
+                                    <p class="card-text">Data Access: May Face Performance Issues</p>
+                                }
+                                @if (ViewData["RDSStatus"].Equals("CRITICAL") || ViewData["SGStatus"].Equals("CRITICAL") && ViewData["S3Status"].Equals("CRITICAL"))
+                                {
+                                    <p class="card-text">Data Access: May Face Issues In Accessing Data</p>
+                                }
+                                @if (ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["NATStatus"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform and Challenge Servers: All Systems Go!</p>
+                                }
+                                @if (ViewData["EBSStatus"].Equals("WARNING") || ViewData["ELBStatus"].Equals("WARNING") || ViewData["R53Status"].Equals("WARNING") || ViewData["EC2Status"].Equals("WARNING") || ViewData["NATStatus"].Equals("WARNING"))
+                                {
+                                    <p class="card-text">Platform and Challenge Servers: May Face Performance Issues</p>
+                                }
+                                @if (ViewData["EBSStatus"].Equals("CRITICAL") || ViewData["ELBStatus"].Equals("CRITICAL") || ViewData["R53Status"].Equals("CRITICAL") || ViewData["EC2Status"].Equals("CRITICAL") || ViewData["NATStatus"].Equals("CRITICAL"))
+                                {
+                                    <p class="card-text">Platform and Challenge Servers: May Face Issues in Accessing The Platform</p>
+                                }
+                                @if (ViewData["CWStatus"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Logging: All Systems Go!</p>
+                                }
+                                @if (ViewData["CWStatus"].Equals("WARNING"))
+                                {
+                                    <p class="card-text">Platform Logging: Increased Latency in retrieving events</p>
+                                }
+                                @if (ViewData["CWStatus"].Equals("CRITICAL"))
+                                {
+                                    <p class="card-text">Platform Logging: Logging may not accurate</p>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+        }
         @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["MissingVPC"])) && ViewData["MissingVPC"].Equals("NO"))
         {
+            <div class="row">
+                <div class="col-lg-12" style="text-align: center; margin-top: 3%; margin-bottom: 5%;">
+                    @if (ViewData["ServerHealth"].Equals("OK") && ViewData["RouteHealth"].Equals("OK") && ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK") && ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
+                    {
+                        <h3 class="page-header text-success">
+                            <i class="far fa-thumbs-up" style="font-size: 62px"></i>&nbsp;&nbsp;&nbsp;All Looks Good!
+                        </h3>
+                    }
+                    @if (!ViewData["ServerHealth"].Equals("OK") || !ViewData["RouteHealth"].Equals("OK") || !ViewData["CWStatus"].Equals("OK") || !ViewData["EC2Status"].Equals("OK") || !ViewData["EBSStatus"].Equals("OK") || !ViewData["ELBStatus"].Equals("OK") || !ViewData["NATStatus"].Equals("OK") || !ViewData["RDSStatus"].Equals("OK") || !ViewData["R53Status"].Equals("OK") || !ViewData["SGStatus"].Equals("OK") || !ViewData["S3Status"].Equals("OK") || !ViewData["VPCStatus"].Equals("OK") || !ViewData["CWPlatformState"].Equals("OK") || !ViewData["CWELBState"].Equals("OK") || !ViewData["CWCSState"].Equals("OK"))
+                    {
+                        <h3 class="page-header text-warning">
+                            <i class="fas fa-exclamation-triangle" style="font-size: 62px"></i>&nbsp;&nbsp;&nbsp;Uh Oh! Something is not right...
+                        </h3>
+                    }
+                </div>
+            </div>
             <div class-row>
                 <div class="col-lg-12">
                     <div class="card-deck" style="padding-bottom: 5%;">
@@ -80,33 +276,33 @@
                             {
                                 <h5 class="card-title text-warning">One or more Alarms has been triggered</h5>
                             }
-                                <div class="card-body">
-                                    @if (ViewData["CWPlatformState"].Equals("OK"))
-                                    {
-                                        <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
-                                    }
-                                    @if (ViewData["CWPlatformState"].Equals("ALARM"))
-                                    {
-                                        <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
-                                    }
-                                    @if (ViewData["CWELBState"].Equals("OK"))
-                                    {
-                                        <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
-                                    }
-                                    @if (ViewData["CWELBState"].Equals("ALARM"))
-                                    {
-                                        <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
-                                    }
-                                    @if (ViewData["CWCSState"].Equals("OK"))
-                                    {
-                                        <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
-                                    }
-                                    @if (ViewData["CWCSState"].Equals("ALARM"))
-                                    {
-                                        <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
-                                    }
-                                    <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
-                                </div>
+                            <div class="card-body">
+                                @if (ViewData["CWPlatformState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
+                                }
+                                @if (ViewData["CWPlatformState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
+                                }
+                                @if (ViewData["CWCSState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
+                                }
+                                @if (ViewData["CWCSState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                }
+                                <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -190,3 +386,11 @@
         }
     </div>
 </div>
+@section Scripts{ 
+    <script>
+        var result = "@Convert.ToString(ViewData["MissingVPC"]).ToLower()";
+        if (result == "yes" || result == "fixing") {
+            $(".vpcUnAvail").addClass("disabled");
+        }
+    </script>
+}

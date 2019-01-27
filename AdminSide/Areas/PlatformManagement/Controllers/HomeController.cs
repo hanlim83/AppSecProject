@@ -1,5 +1,6 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
+using AdminSide.Areas.PlatformManagement.Services;
 using Amazon.CloudWatch;
 using Amazon.CloudWatch.Model;
 using Amazon.SimpleNotificationService;
@@ -7,8 +8,11 @@ using Amazon.SimpleNotificationService.Model;
 using ASPJ_MVC.Models;
 using CodeHollow.FeedReader;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -29,11 +33,22 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         private readonly IAmazonSimpleNotificationService SNSClient;
 
-        public HomeController(PlatformResourcesContext context, IAmazonCloudWatch CWClient, IAmazonSimpleNotificationService SNSClient)
+        public IServiceProvider Services { get; }
+
+        public IBackgroundTaskQueue Backgroundqueue { get; }
+
+        private readonly IApplicationLifetime _appLifetime;
+        private readonly ILogger _logger;
+
+        public HomeController(PlatformResourcesContext context, IAmazonCloudWatch CWClient, IAmazonSimpleNotificationService SNSClient, IServiceProvider services, IBackgroundTaskQueue Queue, IApplicationLifetime appLifetime, ILogger<HomeController> logger)
         {
             _context = context;
             this.CWClient = CWClient;
             this.SNSClient = SNSClient;
+            Services = services;
+            Backgroundqueue = Queue;
+            _appLifetime = appLifetime;
+            _logger = logger;
         }
 
         public async Task<IActionResult> Index()
@@ -259,14 +274,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
             if (_context.VPCs.ToList().Count == 0)
             {
-                if (ViewData["MissingVPC"].Equals("FIXING"))
-                {
-                    ViewData["MissingVPC"] = "FIXING";
-                }
-                else
-                {
-                    ViewData["MissingVPC"] = "YES";
-                }
+                ViewData["MissingVPC"] = "YES";
             }
             else
             {
@@ -344,7 +352,34 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             else
+            {
                 return NotFound();
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Index(string Placeholder)
+        {
+            using (var scope = Services.CreateScope())
+            {
+                var ScopedSetupService =
+                    scope.ServiceProvider
+                        .GetRequiredService<IScopedSetupService>();
+                try
+                {
+                    Backgroundqueue.QueueBackgroundWorkItem(async token =>
+                    {
+                        await ScopedSetupService.DoWorkAsync();
+                    });
+                    ViewData["MissingVPC"] = "FIXING";
+                    return await Index();
+                }
+                catch (Exception)
+                {
+                    _logger.LogInformation("Calling of Setup Background Task Failed!");
+                    return await Index();
+                }
+            }
         }
 
         public IActionResult IntentionalError()

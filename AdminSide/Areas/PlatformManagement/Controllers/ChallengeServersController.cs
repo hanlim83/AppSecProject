@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -65,21 +66,37 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             return View(await _context.Servers.ToListAsync());
         }
 
         public async Task<IActionResult> SelectTemplate()
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             return View(await _context.Templates.ToListAsync());
         }
 
         public IActionResult SpecifySettings()
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             return RedirectToAction("SelectTemplate");
         }
 
         public IActionResult VerifySettings()
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             if (creationReference == null)
             {
                 return RedirectToAction("SelectTemplate");
@@ -92,6 +109,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> RedirectServerCreation(String selectedTemplate)
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             if (selectedTemplate != null)
             {
                 Template selected = await _context.Templates.FindAsync(int.Parse(selectedTemplate));
@@ -533,6 +554,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> ModifyServer(String serverID)
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             Server selected = await _context.Servers.FindAsync(Int32.Parse(serverID));
             if (selected != null)
             {
@@ -543,9 +568,13 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
                 });
                 if (response.HttpStatusCode == HttpStatusCode.OK)
+                {
                     return View(selected);
+                }
                 else
+                {
                     return StatusCode(500);
+                }
             }
             else
             {
@@ -780,6 +809,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> CreateFirewallRule(String ServerID)
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             Server modified = await _context.Servers.FindAsync(int.Parse(ServerID));
             if (modified != null)
             {
