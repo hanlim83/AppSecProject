@@ -1,11 +1,14 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
+using AdminSide.Areas.PlatformManagement.Services;
 using Amazon.EC2;
 using Amazon.EC2.Model;
 using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,10 +25,18 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         IAmazonEC2 EC2Client { get; set; }
 
-        public ServerTemplatesController(PlatformResourcesContext context, IAmazonEC2 ec2Client)
+        private readonly IApplicationLifetime _appLifetime;
+        private readonly ILogger _logger;
+
+        public IBackgroundTaskQueue Backgroundqueue { get; }
+
+        public ServerTemplatesController(PlatformResourcesContext context, IAmazonEC2 ec2Client, IBackgroundTaskQueue Queue, IApplicationLifetime appLifetime, ILogger<ChallengeServersController> logger)
         {
             this._context = context;
             this.EC2Client = ec2Client;
+            Backgroundqueue = Queue;
+            _appLifetime = appLifetime;
+            _logger = logger;
         }
 
         [HttpPost]
@@ -72,10 +83,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     return RedirectToAction("");
                 }
                 else
+                {
                     return StatusCode(500);
+                }
             }
             else
+            {
                 return StatusCode(500);
+            }
         }
 
         public async Task<IActionResult> Index()
@@ -88,9 +103,13 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         {
             Template found = await _context.Templates.FindAsync(int.Parse(TemplateID));
             if (found != null)
+            {
                 return View(found);
+            }
             else
+            {
                 return NotFound();
+            }
         }
 
         [HttpPost]
@@ -124,7 +143,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             else
+            {
                 return NotFound();
+            }
         }
 
         public async Task<IActionResult> Delete(String TemplateID)
@@ -138,6 +159,16 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 });
                 if (response.HttpStatusCode == HttpStatusCode.OK)
                 {
+                    if (!String.IsNullOrEmpty(deleted.AWSSnapshotReference))
+                    {
+                        Backgroundqueue.QueueBackgroundWorkItem(async token =>
+                        {
+                            _logger.LogInformation("Deletion of snapshot scheduled");
+                            await Task.Delay(TimeSpan.FromMinutes(3), token);
+                            await EC2Client.DeleteSnapshotAsync(new DeleteSnapshotRequest(deleted.AWSSnapshotReference));
+                            _logger.LogInformation("Deletion of snapshot done!");
+                        });
+                    }
                     _context.Templates.Remove(deleted);
                     await _context.SaveChangesAsync();
                     TempData["Result"] = "Deleted Sucessfully!";

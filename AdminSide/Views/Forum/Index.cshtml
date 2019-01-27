@@ -59,7 +59,7 @@
                 <div id="collapse1" class=".collapse in">
                     <div class="card-body table-responsive-md" style="padding: 10px;">
 
-                        <table id="@category.CategoryID" class="table table-hover" style="table-layout:fixed">
+                        <table class="table table-hover" style="table-layout:fixed">
                             <thead>
                                 <tr>
                                     <th> Title </th>
@@ -100,22 +100,26 @@
         </div>
     </div>
 }
+@section Scripts{
+    <!-- Script for Back To Top Button -->
+    <script>
+        // When the user scrolls down 20px from the top of the document, show the button
+        window.onscroll = function () { scrollFunction() };
 
-<!-- Script for Back To Top Button -->
-<script>
-    // When the user scrolls down 20px from the top of the document, show the button
-    window.onscroll = function () { scrollFunction() };
-
-    function scrollFunction() {
-        if (document.body.scrollTop > 10 || document.documentElement.scrollTop > 10) {
-            document.getElementById("myBtn").style.display = "block";
-        } else {
-            document.getElementById("myBtn").style.display = "none";
+        function scrollFunction() {
+            if (document.body.scrollTop > 10 || document.documentElement.scrollTop > 10) {
+                document.getElementById("myBtn").style.display = "block";
+            } else {
+                document.getElementById("myBtn").style.display = "none";
+            }
         }
-    }
 
-    // When the user clicks on the button, scroll to the top of the document
-    function topFunction() {
-        document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
-    }
-</script>
+        // When the user clicks on the button, scroll to the top of the document
+        function topFunction() {
+            document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
+        }
+        $(document).ready(function () {
+            $('table.table').DataTable();
+        });
+    </script>
+}

@@ -9,43 +9,32 @@
     <div class="btn-group d-flex" role="group">
         <a asp-controller="Challenges" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Challenges" class="btn btn btn-outline-info w-100"></a>
         <a asp-controller="Teams" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Teams" class="btn btn btn-outline-info w-100"></a>
+        <a asp-controller="Blockchain" asp-action="Index" asp-route-id="@Model.ID" class="w-100"><input type="button" value="Blockchain" class="btn btn btn-outline-info w-100"></a>
     </div>
     <br>
-    <h1>
+    <h2>
         @Html.DisplayNameFor(model => model.CompetitionName)
-    </h1>
+    </h2>
     <p>
         @Html.DisplayFor(model => model.CompetitionName)
     </p>
-    <h1>
+    <h2>
         @Html.DisplayNameFor(model => model.Status)
-    </h1>
+    </h2>
     <p>
         @Html.DisplayFor(model => model.Status)
     </p>
-    <h1>
+    <h2>
         @Html.DisplayNameFor(model => model.BucketName)
-    </h1>
+    </h2>
     <p>
         @Html.DisplayFor(model => model.BucketName)
     </p>
-    <table class="table">
-        <tr>
-            <th>Testing</th>
-        </tr>
-        @foreach (var item in Model.CompetitionCategories)
-        {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CategoryName)
-                </td>
-            </tr>
-        }
-    </table>
-    @*<dl class="dl-horizontal">
-
-        <dd>
-
-        </dd>
-    </dl>*@
+    <h2>
+        Categories
+    </h2>
+    @foreach (var item in Model.CompetitionCategories)
+    {
+        <p>@Html.DisplayFor(modelItem => item.CategoryName)</p>
+    }
 </div>

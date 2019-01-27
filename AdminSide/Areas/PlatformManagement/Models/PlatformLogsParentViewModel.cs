@@ -11,5 +11,8 @@ namespace AdminSide.Areas.PlatformManagement.Models
         public List<CloudWatchLogStream>Streams { get; set; }
         public GetLogEventsResponse Response { get; set; }
         public int SelectedValue { get; set; }
+        public List<RDSSQLLog> SQLlogs { get; set; }
+        public List<IISLog>IISLogs { get; set; }
+        public List<ENILog>ENILogs { get; set; }
     }
 }

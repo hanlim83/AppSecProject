@@ -315,7 +315,7 @@ namespace AdminSide.Data
         {
             context.Database.EnsureCreated();
 
-            if (context.Posts.Any())
+            if (context.ForumCategories.Any())
             {
                 return;   // DB has been seeded
             }
@@ -351,6 +351,7 @@ namespace AdminSide.Data
             {
                 UserName = "hugochiaxyz@gmail.com",
                 Email = "hugochiaxyz@gmail.com",
+                EmailConfirmed = true,
                 NormalizedEmail = "hugochiaxyz@gmail.com".ToUpper(),
                 NormalizedUserName = "hugochiaxyz@gmail.com".ToUpper(),
                 SecurityStamp = "FTZ25GYXE5FFX6SEXY7CMFLZM2AMWAFE"

@@ -24,17 +24,17 @@
                 asp-fallback-src="~/lib/turbolinks/turbolinks.js"
                 integrity="sha256-iM4Yzi/zLj/IshPWMC1IluRxTtRjMqjPGd97TZ9yYpU="
                 crossorigin="anonymous"></script>
-        <link rel="stylesheet" href="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.css"
+        <link rel="stylesheet" href="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/b-print-1.5.4/r-2.2.2/sc-1.5.0/datatables.min.css"
               asp-fallback-href="~/lib/DataTables/datatables.min.css"
               asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
     </environment>
     <link rel="stylesheet" href="~/lib/progress-tracker/progress-tracker.css" />
 
     <script>
-window.onload = function () {
+        window.onload = function () {
 
-var total = @ViewData["Total"];
-var visitorsData = {
+        var total = @ViewData["Total"];
+        var visitorsData = {
 	"New vs Returning Visitors": [{
 		click: visitorsChartDrilldownHandler,
 		cursor: "pointer",
@@ -64,68 +64,126 @@ var visitorsData = {
 	}]*@
 };
 
-var newVSReturningVisitorsOptions = {
-	animationEnabled: true,
-	theme: "light2",
-	title: {
-		text: "Solve Percentage"
-	},
-	//subtitles: [{
-	//	text: "Click on Any Segment to Drilldown",
-	//	backgroundColor: "#2eacd1",
-	//	fontSize: 16,
-	//	fontColor: "white",
-	//	padding: 5
-	//}],
-	legend: {
-		fontFamily: "calibri",
-		fontSize: 14,
-		itemTextFormatter: function (e) {
-			return e.dataPoint.name + ": " + Math.round(e.dataPoint.y / total * 100) + "%";
-		}
-	},
-	data: []
-};
+            var categoryBreakdownData = {
+	            "New vs Returning Visitors": [{
+		        click: visitorsChartDrilldownHandler,
+		        cursor: "pointer",
+		        explodeOnClick: false,
+	    	    innerRadius: "75%",
+		        legendMarkerType: "square",
+		        name: "New vs Returning Visitors",
+	    	    radius: "100%",
+		        showInLegend: true,
+		        startAngle: 90,
+		        type: "doughnut",
+		        dataPoints: @Html.Raw(ViewBag.CategoryBreakdown)
+	        }],@* "New Visitors": [{
+                color: "#E7823A",
+                name: "New Visitors",
+                type: "column",
+                xValueType: "dateTime",
+                dataPoints:  @Html.Raw(ViewBag.NewVisitors)
+            }],
+            "Returning Visitors": [{
+            color: "#546BC1",
+            name: "Returning Visitors",
+            type: "column",
+            xValueType: "dateTime",
+            dataPoints:  @Html.Raw(ViewBag.ReturningVisitors)
+	        }]*@
 
-//var visitorsDrilldownedChartOptions = {
-//	animationEnabled: true,
-//	theme: "light2",
-//	axisX: {
-//		labelFontColor: "#717171",
-//		lineColor: "#a2a2a2",
-//		tickColor: "#a2a2a2"
-//	},
-//	axisY: {
-//		gridThickness: 0,
-//		includeZero: false,
-//		labelFontColor: "#717171",
-//		lineColor: "#a2a2a2",
-//		tickColor: "#a2a2a2",
-//		lineThickness: 1
-//	},
-//	data: []
-//};
+            };
 
-var chart = new CanvasJS.Chart("chartContainer", newVSReturningVisitorsOptions);
-chart.options.data = visitorsData["New vs Returning Visitors"];
-chart.render();
+        var newVSReturningVisitorsOptions = {
+	        animationEnabled: true,
+    	    theme: "light2",
+	        title: {
+		        text: "Solve Percentage"
+	        },
+	        //subtitles: [{
+	        //	text: "Click on Any Segment to Drilldown",
+	        //	backgroundColor: "#2eacd1",
+    	    //	fontSize: 16,
+	        //	fontColor: "white",
+    	    //	padding: 5
+	        //}],
+	        legend: {
+		        fontFamily: "calibri",
+	    	    fontSize: 14,
+    		    itemTextFormatter: function (e) {
+			        return e.dataPoint.name + ": " + Math.round(e.dataPoint.y / total * 100) + "%";
+		        }
+	        },
+	        data: []
+        };
 
-function visitorsChartDrilldownHandler(e) {
-	chart = new CanvasJS.Chart("chartContainer", visitorsDrilldownedChartOptions);
-	chart.options.data = visitorsData[e.dataPoint.name];
-	chart.options.title = { text: e.dataPoint.name }
-	chart.render();
-	$("#backButton").toggleClass("invisible");
-}
+        var totalSolved = @ViewData["TotalSolved"];
+        var categoryBreakdownOptions = {
+            animationEnabled: true,
+            theme: "light2",
+            title: {
+                text: "Category Breakdown"
+            },
+            //subtitles: [{
+            //	text: "Click on Any Segment to Drilldown",
+            //	backgroundColor: "#2eacd1",
+            //	fontSize: 16,
+            //	fontColor: "white",
+            //	padding: 5
+            //}],
+            legend: {
+                fontFamily: "calibri",
+                fontSize: 14,
+                itemTextFormatter: function (e) {
+                    return e.dataPoint.name + ": " + Math.round(e.dataPoint.y / totalSolved * 100) + "%";
+                }
+            },
+            data: []
+        };
 
-//$("#backButton").click(function () {
-//	$(this).toggleClass("invisible");
-//	chart = new CanvasJS.Chart("chartContainer", newVSReturningVisitorsOptions);
-//	chart.options.data = visitorsData["New vs Returning Visitors"];
-//	chart.render();
-//});
+    //var visitorsDrilldownedChartOptions = {
+    //	animationEnabled: true,
+    //	theme: "light2",
+    //	axisX: {
+    //		labelFontColor: "#717171",
+    //		lineColor: "#a2a2a2",
+    //		tickColor: "#a2a2a2"
+    //	},
+    //	axisY: {
+    //		gridThickness: 0,
+    //		includeZero: false,
+    //		labelFontColor: "#717171",
+    //		lineColor: "#a2a2a2",
+    //		tickColor: "#a2a2a2",
+    //		lineThickness: 1
+    //	},
+    //	data: []
+    //};
 
-}
+        var chart = new CanvasJS.Chart("SolvePercChartContainer", newVSReturningVisitorsOptions);
+        chart.options.data = visitorsData["New vs Returning Visitors"];
+        chart.render();
+
+        var chart = new CanvasJS.Chart("CategoryChartContainer", categoryBreakdownOptions);
+        chart.options.data = categoryBreakdownData["New vs Returning Visitors"];
+        chart.render();
+
+        function visitorsChartDrilldownHandler(e) {
+	        chart = new CanvasJS.Chart("chartContainer", visitorsDrilldownedChartOptions);
+	        chart.options.data = visitorsData[e.dataPoint.name];
+	        chart.options.title = { text: e.dataPoint.name }
+	        chart.render();
+	        $("#backButton").toggleClass("invisible");
+        }
+
+        //$("#backButton").click(function () {
+        //	$(this).toggleClass("invisible");
+        //	chart = new CanvasJS.Chart("chartContainer", newVSReturningVisitorsOptions);
+        //	chart.options.data = visitorsData["New vs Returning Visitors"];
+        //	chart.render();
+        //});
+
+        }
     </script>
     <style>
         #backButton {
@@ -165,13 +223,15 @@ function visitorsChartDrilldownHandler(e) {
     <div class="container-fluid body-content">
         @RenderBody()
     </div>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
     <environment include="Development">
         <script src="~/lib/jquery/jquery.js"></script>
         <script src="~/lib/popper/popper.js"></script>
         <script src="~/lib/bootstrap/js/bootstrap.js"></script>
         <script src="~/js/site.js" asp-append-version="true" data-turbolinks-track="reload"></script>
         <script src="~/lib/DataTables/datatables.js"></script>
+        <script src="~/lib/DataTables/pdfmake-0.1.36/pdfmake.js"></script>
+        <script src="~/lib/DataTables/pdfmake-0.1.36/vfs_fonts.js"></script>
     </environment>
     <environment exclude="Development">
         <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -191,7 +251,11 @@ function visitorsChartDrilldownHandler(e) {
                 integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k"
                 crossorigin="anonymous">
         </script>
-        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/dt-1.10.18/cr-1.5.0/r-2.2.2/datatables.min.js"
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"
+                asp-fallback-src="~/lib/DataTables/pdfmake-0.1.36/pdfmake.js"></script>
+        <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"
+                asp-fallback-src="~/lib/DataTables/pdfmake-0.1.36/vfs_fonts.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/v/bs4/jszip-2.5.0/dt-1.10.18/b-1.5.4/b-html5-1.5.4/b-print-1.5.4/r-2.2.2/sc-1.5.0/datatables.min.js"
                 asp-fallback-src="~/lib/DataTables/datatables.min.js"></script>
         <script src="~/js/site.min.js" data-turbolinks-track="reload" asp-append-version="true"></script>
     </environment>

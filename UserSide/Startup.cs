@@ -1,25 +1,24 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using UserSide.Data;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Identity.UI.Services;
+﻿using Amazon.CloudWatch;
+using Amazon.CloudWatchEvents;
+using Amazon.CloudWatchLogs;
+using Amazon.EC2;
+using Amazon.GuardDuty;
 using Amazon.Runtime;
 using Amazon.S3;
-using Amazon.EC2;
-using Amazon.CloudWatch;
-using Amazon.CloudWatchLogs;
 using Amazon.SimpleNotificationService;
-using Amazon.CloudWatchEvents;
-using Amazon.RDS;
-using UserSide.Areas.Identity.Services;
-using UserSide.Hubs;
-using Amazon.Route53Domains;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using UserSide.Areas.Identity.Services;
+using UserSide.Data;
+using UserSide.Hubs;
 
 namespace UserSide
 {
@@ -148,21 +147,14 @@ namespace UserSide
             services.AddAWSService<IAmazonCloudWatchEvents>();
             //SNS Initialization
             services.AddAWSService<IAmazonSimpleNotificationService>();
-            //RDS Initialization
-            services.AddAWSService<IAmazonRDS>();
-            //Route53 Initialization
-            services.AddAWSService<IAmazonRoute53Domains>();
-
-
+            //GuardDuty Initialization
+            services.AddAWSService<IAmazonGuardDuty>();
 
             //Chat Signalr
             services.AddSignalR();
-
-
             //User 
             services.AddSingleton<IUserIdProvider, CustomUserIdProvider>();
         }
-
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -197,7 +189,7 @@ namespace UserSide
                 routes.MapHub<ChatHub>("/chatHub");
             });
 
-            
+
 
             app.UseMvc(routes =>
             {
