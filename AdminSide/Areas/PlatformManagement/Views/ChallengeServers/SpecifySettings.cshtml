@@ -55,11 +55,11 @@
                 </select>
                 <div class="invalid-feedback">Server's Workload must be selected</div>
             </div>
-            <input type="hidden" name="selectedTemplate" value="@TempData["selectedTemplate"]" />
+            <input type="hidden" name="selectedTemplate" value="@ViewData["selectedTemplate"]" />
             <div class="form-group">
                 <label for="ServerStorage">Server Assigned Storage:</label>
-                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" min="8" max="1000" placeholder="Size in Gigabytes" required>
-                <div class="invalid-feedback">A minimum Storage space of 8 Gigabytes must be assigned to the server</div>
+                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" min="@ViewData["minimumSize"]" max="1000" placeholder="Size in Gigabytes" required>
+                <div class="invalid-feedback">A minimum Storage space of @ViewData["minimumSize"] Gigabytes must be assigned to the server</div>
             </div>
             <div class="form-group">
                 <label>Server Tenancy:</label>

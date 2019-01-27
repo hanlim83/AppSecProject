@@ -315,7 +315,7 @@ namespace AdminSide.Data
         {
             context.Database.EnsureCreated();
 
-            if (context.Posts.Any())
+            if (context.ForumCategories.Any())
             {
                 return;   // DB has been seeded
             }

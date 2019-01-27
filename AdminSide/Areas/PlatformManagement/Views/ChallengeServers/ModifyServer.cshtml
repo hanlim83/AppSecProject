@@ -63,8 +63,8 @@
             </div>
             <div class="form-group">
                 <label for="ServerStorage">Server Assigned Storage:</label>
-                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" value="@Model.StorageAssigned" min="8" max="1000" placeholder="Size in Gigabytes" required>
-                <div class="invalid-feedback">A minimum Storage space of 8 Gigabytes must be assigned to the server</div>
+                <input type="number" class="form-control" id="ServerStorage" name="ServerStorage" value="@Model.StorageAssigned" min="@Model.StorageAssigned" max="1000" placeholder="Size in Gigabytes" required>
+                <div class="invalid-feedback">You cannot assign a lower storage space to your server!</div>
             </div>
             <div class="form-group">
                 <label>Server Tenancy:</label>

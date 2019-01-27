@@ -25,7 +25,6 @@ namespace AdminSide.Controllers
         // GET: Teams
         public async Task<IActionResult> Index(int? id)
         {
-            ViewData["NavigationShowAll"] = true;
             if (id == null)
             {
                 return NotFound();
