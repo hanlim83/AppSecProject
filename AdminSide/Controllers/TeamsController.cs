@@ -214,7 +214,7 @@ namespace AdminSide.Controllers
                 return NotFound();
             }
 
-            var saveTeam = await _context.Teams.FindAsync(id);
+            var saveTeam = await _context.Teams.FindAsync(team.TeamID);
             saveTeam.Score = team.Score;
 
             if (ModelState.IsValid)
@@ -235,9 +235,9 @@ namespace AdminSide.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Edit", "Teams", new { id = saveTeam.CompetitionID });
+                return RedirectToAction("Index", "Teams", new { id = saveTeam.CompetitionID });
             }
-            return RedirectToAction("Edit", "Teams", new { id = saveTeam.CompetitionID });
+            return RedirectToAction("Index", "Teams", new { id = saveTeam.CompetitionID });
             //return View(returnTeam);
         }
 
