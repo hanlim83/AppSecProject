@@ -32,7 +32,7 @@
             <h3>Server Settings</h3>
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
-                <input type="text" class="form-control" id="ServerName" name="ServerName" value="@Model.Name"  pattern="^[A-Za-z0-9 _-]*[A-Za-z0-9][A-Za-z0-9 _ -]*$" required>
+                <input type="text" class="form-control" id="ServerName" name="ServerName" value="@Model.Name" pattern="^[A-Za-z0-9 _-]*[A-Za-z0-9][A-Za-z0-9 _ -]*$" required>
                 <div class="invalid-feedback">A server needs a name</div>
             </div>
             <input type="hidden" id="ServerIDSrc" name="ID" value="@Model.ID" />
@@ -199,22 +199,24 @@
         </div>
     </div>
 </div>
-<script>
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            var forms = document.getElementsByClassName('needs-validation');
-            var validation = Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-    var serverID = document.getElementById('ServerIDSrc').value;
-    document.getElementById('ServerIDDest').value = serverID;
-</script>
+@section Scripts {
+    <script>
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+        var serverID = document.getElementById('ServerIDSrc').value;
+        document.getElementById('ServerIDDest').value = serverID;
+    </script>
+}

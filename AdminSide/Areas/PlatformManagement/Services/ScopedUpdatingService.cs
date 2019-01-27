@@ -145,30 +145,53 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                     LinkedGroupID = g.ID
                                 };
                                 if (g.Name.Equals("VMVPCLogs"))
+                                {
                                     newS.DisplayName = "Network Flow Log For Challenge Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                                }
                                 else if (g.Name.Equals("PlatformVPCLogs"))
+                                {
                                     newS.DisplayName = "Network Flow Log For Platform Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
+                                }
                                 else if (g.Name.Equals("RDSOSMetrics"))
                                 {
                                     if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                    {
                                         newS.DisplayName = "SQL Database CPU Usage";
+                                    }
                                 }
                                 else if (g.Name.Equals("@aws@elasticbeanstalk@User-Side@IIS-Log"))
+                                {
                                     newS.DisplayName = "IIS Logs for User Side Web Server";
+                                }
                                 else if (g.Name.Equals("@aws@elasticbeanstalk@Admin-Side@IIS-Log"))
+                                {
                                     newS.DisplayName = "IIS Logs for Admin Side Web Server";
+                                }
                                 else if (g.Name.Equals("@aws@elasticbeanstalk@User-Side@EBDeploy-Log"))
+                                {
                                     newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for User Side";
+                                }
                                 else if (g.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBDeploy-Log"))
+                                {
                                     newS.DisplayName = "Elastic Beanstalk Deployment Tool Logs for Admin Side";
+                                }
                                 else if (g.Name.Equals("@aws@elasticbeanstalk@User-Side@EBHooks-Log"))
+                                {
                                     newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for User Side";
+                                }
                                 else if (g.Name.Equals("@aws@elasticbeanstalk@Admin-Side@EBHooks-Log"))
+                                {
                                     newS.DisplayName = "Elastic Beanstalk Deployment Hook Logs for Admin Side";
+                                }
                                 else
+                                {
                                     newS.DisplayName = newS.Name;
+                                }
+
                                 if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                {
                                     context.CloudWatchLogStreams.Add(newS);
+                                }
                             }
                         }
                         foreach (CloudWatchLogStream CWLS in g.LogStreams)
@@ -194,9 +217,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 {
                     DescribeSnapshotsResponse response = await ec2Client.DescribeSnapshotsAsync(new DescribeSnapshotsRequest());
                     List<Template> templates = await context.Templates.FromSql("SELECT * FROM dbo.Templates WHERE AWSSnapshotReference = NULL").ToListAsync();
-                    foreach(Template t in templates)
+                    foreach (Template t in templates)
                     {
-                        foreach(Snapshot s in response.Snapshots)
+                        foreach (Snapshot s in response.Snapshots)
                         {
                             if (s.Description.Contains(t.AWSAMIReference))
                             {

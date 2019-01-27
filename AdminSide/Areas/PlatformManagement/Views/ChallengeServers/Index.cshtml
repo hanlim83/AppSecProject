@@ -145,72 +145,74 @@
         </div>
     </div>
 </div>
-<script>
-    var refresh_rate = 90;
-    var last_user_action = 0;
-    var lost_focus = true;
-    var focus_margin = 10; 
-    var allow_refresh = true;
+@section Scripts{
+    <script>
+        var refresh_rate = 90;
+        var last_user_action = 0;
+        var lost_focus = true;
+        var focus_margin = 10;
+        var allow_refresh = true;
 
-    function keydown(evt) {
-        if (!evt) evt = event;
-        if (evt.keyCode == 192) {
-            toggle_on_off();
-        }
-    } 
-
-    function toggle_on_off() {
-        if (can_i_refresh) {
-            allow_refresh = false;
-            console.log("Auto Refresh Off");
-        } else {
-            allow_refresh = true;
-            console.log("Auto Refresh On");
-        }
-    }
-
-    function reset() {
-        last_user_action = 0;
-        console.log("Reset");
-    }
-
-    function windowHasFocus() {
-        lost_focus = false;
-        console.log(" <~ Has Focus");
-    }
-
-    function windowLostFocus() {
-        lost_focus = true;
-        console.log(" <~ Lost Focus");
-    }
-
-    setInterval(function () {
-        last_user_action++;
-        refreshCheck();
-    }, 1000);
-
-    function can_i_refresh() {
-        if (last_user_action >= refresh_rate && lost_focus && allow_refresh) {
-            return true;
-        }
-        return false;
-    }
-
-    function refreshCheck() {
-        var focus = window.onfocus;
-
-        if (can_i_refresh()) {
-            window.location.reload();
-            reset();
-        } else {
-            console.log("Timer");
+        function keydown(evt) {
+            if (!evt) evt = event;
+            if (evt.keyCode == 192) {
+                toggle_on_off();
+            }
         }
 
-    }
-    window.addEventListener("focus", windowHasFocus, false);
-    window.addEventListener("blur", windowLostFocus, false);
-    window.addEventListener("click", reset, false);
-    window.addEventListener("mousemove", reset, false);
-    window.addEventListener("keypress", reset, false);
-    window.onkeyup = keydown;
-</script>
+        function toggle_on_off() {
+            if (can_i_refresh) {
+                allow_refresh = false;
+                console.log("Auto Refresh Off");
+            } else {
+                allow_refresh = true;
+                console.log("Auto Refresh On");
+            }
+        }
+
+        function reset() {
+            last_user_action = 0;
+            console.log("Reset");
+        }
+
+        function windowHasFocus() {
+            lost_focus = false;
+            console.log(" <~ Has Focus");
+        }
+
+        function windowLostFocus() {
+            lost_focus = true;
+            console.log(" <~ Lost Focus");
+        }
+
+        setInterval(function () {
+            last_user_action++;
+            refreshCheck();
+        }, 1000);
+
+        function can_i_refresh() {
+            if (last_user_action >= refresh_rate && lost_focus && allow_refresh) {
+                return true;
+            }
+            return false;
+        }
+
+        function refreshCheck() {
+            var focus = window.onfocus;
+
+            if (can_i_refresh()) {
+                window.location.reload();
+                reset();
+            } else {
+                console.log("Timer");
+            }
+
+        }
+        window.addEventListener("focus", windowHasFocus, false);
+        window.addEventListener("blur", windowLostFocus, false);
+        window.addEventListener("click", reset, false);
+        window.addEventListener("mousemove", reset, false);
+        window.addEventListener("keypress", reset, false);
+        window.onkeyup = keydown;
+    </script>
+}

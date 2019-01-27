@@ -1,9 +1,10 @@
 ﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
 using AdminSide.Areas.PlatformManagement.Services;
+using Amazon.CloudWatch;
+using Amazon.CloudWatch.Model;
 using Amazon.EC2;
 using Amazon.EC2.Model;
-using Amazon.Extensions.NETCore.Setup;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
@@ -11,9 +12,6 @@ using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
-using Microsoft.AspNetCore.Mvc.ActionConstraints;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
@@ -41,6 +39,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         private IAmazonS3 S3Client { get; set; }
 
+        private IAmazonCloudWatch CWClient { get; set; }
+
         private ChallengeServersCreationFormModel creationReference;
 
         private readonly IApplicationLifetime _appLifetime;
@@ -48,7 +48,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public IBackgroundTaskQueue Backgroundqueue { get; }
 
-        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client, IBackgroundTaskQueue Queue, IApplicationLifetime appLifetime, ILogger<ChallengeServersController> logger)
+        public ChallengeServersController(PlatformResourcesContext context, IAmazonEC2 ec2Client, IBackgroundTaskQueue Queue, IApplicationLifetime appLifetime, ILogger<ChallengeServersController> logger, IAmazonCloudWatch CWClient)
         {
             this._context = context;
             this.EC2Client = ec2Client;
@@ -60,6 +60,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             Backgroundqueue = Queue;
             _appLifetime = appLifetime;
             _logger = logger;
+            this.CWClient = CWClient;
         }
 
         public async Task<IActionResult> Index()
@@ -80,9 +81,13 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
         public IActionResult VerifySettings()
         {
             if (creationReference == null)
+            {
                 return RedirectToAction("SelectTemplate");
+            }
             else
+            {
                 return View(creationReference);
+            }
         }
 
         public async Task<IActionResult> RedirectServerCreation(String selectedTemplate)
@@ -91,12 +96,18 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 Template selected = await _context.Templates.FindAsync(int.Parse(selectedTemplate));
                 if (selected != null)
+                {
                     return await SpecifySettings(Convert.ToString(selected.ID));
+                }
                 else
+                {
                     return RedirectToAction("", "ServerTemplates", "");
+                }
             }
             else
+            {
                 return RedirectToAction("", "ServerTemplates", "");
+            }
         }
 
         [HttpPost]
@@ -128,7 +139,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         InstanceId = selected.AWSEC2Reference
                     });
                     if (String.IsNullOrEmpty(response.PasswordData))
+                    {
                         model.Available = false;
+                    }
                     else
                     {
                         model.retrievedPassword = response.GetDecryptedPassword(keyPairString);
@@ -152,7 +165,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return View(model);
             }
             else
+            {
                 return NotFound();
+            }
         }
 
         [HttpPost]
@@ -166,16 +181,25 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 {
                     ViewData["selectedTemplate"] = selected.ID;
                     if (selected.SpecificMinimumSize == true)
+                    {
                         ViewData["minimumSize"] = selected.MinimumStorage;
+                    }
                     else
+                    {
                         ViewData["minimumSize"] = 8;
+                    }
+
                     return View(await _context.Subnets.ToListAsync());
                 }
                 else
+                {
                     return NotFound();
+                }
             }
             else
+            {
                 return RedirectToAction("SelectTemplate");
+            }
         }
 
         [HttpPost]
@@ -227,7 +251,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     FilePath = @"C:\Tempt\" + responseCreateKeyPair.KeyPair.KeyName + ".pem"
                 });
                 if (responsePutObject.HttpStatusCode == HttpStatusCode.OK)
+                {
                     System.IO.File.Delete(@"C:\Tempt\" + responseCreateKeyPair.KeyPair.KeyName + ".pem");
+                }
             }
             RunInstancesRequest request = new RunInstancesRequest
             {
@@ -241,7 +267,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 KeyName = responseCreateKeyPair.KeyPair.KeyName,
                 MaxCount = 1,
                 MinCount = 1,
-                SubnetId = selectedS.AWSVPCSubnetReference
+                SubnetId = selectedS.AWSVPCSubnetReference,
+                Monitoring = true
             };
             if (Model2.ServerWorkload.Equals("Low"))
             {
@@ -328,30 +355,81 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         KeyPairName = responseCreateKeyPair.KeyPair.KeyName
                     };
                     if (Model2.ServerWorkload.Equals("Low"))
+                    {
                         newlyCreated.Workload = Workload.Low;
+                    }
                     else if (Model2.ServerWorkload.Equals("Medium"))
+                    {
                         newlyCreated.Workload = Workload.Medium;
+                    }
                     else if (Model2.ServerWorkload.Equals("Large"))
+                    {
                         newlyCreated.Workload = Workload.Large;
+                    }
+
                     if (selectedS.Type == SubnetType.Internet)
+                    {
                         newlyCreated.Visibility = Visibility.Internet;
+                    }
                     else
                     {
                         if (selectedS.Type == SubnetType.Extranet)
+                        {
                             newlyCreated.Visibility = Visibility.Extranet;
+                        }
                         else
+                        {
                             newlyCreated.Visibility = Visibility.Intranet;
+                        }
                     }
                     if (response.Reservation.Instances[0].State.Code == 0)
+                    {
                         newlyCreated.State = State.Starting;
+                    }
                     else if (response.Reservation.Instances[0].State.Code == 16)
+                    {
                         newlyCreated.State = State.Running;
+                    }
+
                     if (Model2.ServerTenancy.Equals("Shared"))
+                    {
                         newlyCreated.Tenancy = Tenancy.Shared;
+                    }
                     else if (Model2.ServerTenancy.Equals("Dedicated Instance"))
+                    {
                         newlyCreated.Tenancy = Tenancy.DedicatedInstance;
+                    }
                     else if (Model2.ServerTenancy.Equals("Dedicated Hardware"))
+                    {
                         newlyCreated.Tenancy = Tenancy.DedicatedHardware;
+                    }
+
+                    await CWClient.PutMetricAlarmAsync(new PutMetricAlarmRequest
+                    {
+                        Threshold = 1,
+                        Period = 60,
+                        MetricName = "StatusCheckFailed_System",
+                        Dimensions = new List<Dimension>
+                        {
+                            new Dimension
+                            {
+                                Name = "InstanceId",
+                                Value = response.Reservation.Instances[0].InstanceId
+                            }
+                        },
+                        EvaluationPeriods = 2,
+                        ActionsEnabled = true,
+                        ComparisonOperator = ComparisonOperator.GreaterThanOrEqualToThreshold,
+                        Namespace = "AWS/EC2",
+                        AlarmName = newlyCreated.Name + "-eCTFVM-High-Status-Check-Failed-System-",
+                        AlarmActions = new List<string>
+                        {
+                            "arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications",
+                            "arn:aws:automate:ap-southeast-1:ec2:recover"
+                        },
+                        Statistic = Statistic.Maximum,
+                        AlarmDescription = "Created Via Platform for " + newlyCreated.Name
+                    });
                     _context.Servers.Add(newlyCreated);
                     _context.SaveChanges();
                     ViewData["ServerName"] = newlyCreated.Name;
@@ -367,6 +445,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 ViewData["Exception"] = e.Message;
                 return View(new Instance());
+            }
+            catch (AmazonCloudWatchException e)
+            {
+                return RedirectToAction("");
             }
         }
 
@@ -386,9 +468,26 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 };
                 try
                 {
-                    TerminateInstancesResponse response = await EC2Client.TerminateInstancesAsync(request);
-                    if (response.HttpStatusCode == HttpStatusCode.OK)
+                    TerminateInstancesResponse responseEC2 = await EC2Client.TerminateInstancesAsync(request);
+                    if (responseEC2.HttpStatusCode == HttpStatusCode.OK)
                     {
+                        DescribeAlarmsResponse responseCW = await CWClient.DescribeAlarmsAsync(new DescribeAlarmsRequest
+                        {
+                            AlarmNames = new List<string>
+                            {
+                                deleted.Name + "-eCTFVM-High-Status-Check-Failed-System-"
+                            }
+                        });
+                        if (responseCW.HttpStatusCode == HttpStatusCode.OK && responseCW.MetricAlarms.Count == 1)
+                        {
+                            await CWClient.DeleteAlarmsAsync(new DeleteAlarmsRequest
+                            {
+                                AlarmNames = new List<string>
+                                {
+                                    deleted.Name + "-eCTFVM-High-Status-Check-Failed-System-"
+                                }
+                            });
+                        }
                         Backgroundqueue.QueueBackgroundWorkItem(async token =>
                         {
                             _logger.LogInformation("Deletion of server's resources scheduled");
@@ -428,7 +527,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             else
+            {
                 return NotFound();
+            }
         }
 
         public async Task<IActionResult> ModifyServer(String serverID)
@@ -448,7 +549,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 //    return StatusCode(500);
             }
             else
+            {
                 return NotFound();
+            }
         }
 
         [HttpPost]
@@ -644,7 +747,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     return RedirectToAction("");
                 }
                 else
+                {
                     return StatusCode(500);
+                }
             }
             else if (retrieved != null && action.Equals("Stop"))
             {
@@ -664,7 +769,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     return RedirectToAction("");
                 }
                 else
+                {
                     return StatusCode(500);
+                }
             }
             else
             {
@@ -681,8 +788,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return View();
             }
             else
+            {
                 return NotFound();
-
+            }
         }
 
         [HttpPost]
@@ -1301,7 +1409,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             else
+            {
                 return NotFound();
+            }
         }
 
         [HttpPost]
@@ -1676,7 +1786,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             else
+            {
                 return NotFound();
+            }
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
