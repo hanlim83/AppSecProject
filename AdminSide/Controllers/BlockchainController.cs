@@ -80,7 +80,8 @@ namespace AdminSide.Controllers
                 }
             }
             ViewBag.ResultList = IncorrectTeams;
-            return View();
+            ViewData["CompetitionID"] = id;
+            return View(blockchain);
         }
     }
 }
