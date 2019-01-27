@@ -2,6 +2,8 @@
 using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.CloudWatch;
 using Amazon.CloudWatch.Model;
+using Amazon.SimpleNotificationService;
+using Amazon.SimpleNotificationService.Model;
 using ASPJ_MVC.Models;
 using CodeHollow.FeedReader;
 using Microsoft.AspNetCore.Authorization;
@@ -24,10 +26,13 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         private readonly IAmazonCloudWatch CWClient;
 
-        public HomeController(PlatformResourcesContext context, IAmazonCloudWatch CWClient)
+        private readonly IAmazonSimpleNotificationService SNSClient;
+
+        public HomeController(PlatformResourcesContext context, IAmazonCloudWatch CWClient, IAmazonSimpleNotificationService SNSClient)
         {
             _context = context;
             this.CWClient = CWClient;
+            this.SNSClient = SNSClient;
         }
 
         public async Task<IActionResult> Index()
@@ -207,9 +212,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             if (Flag == true)
+            {
                 ViewData["CWPlatformState"] = "ALARM";
+            }
             else
+            {
                 ViewData["CWPlatformState"] = "OK";
+            }
+
             Flag = false;
             foreach (MetricAlarm a in response.MetricAlarms)
             {
@@ -220,9 +230,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             if (Flag == true)
+            {
                 ViewData["CWELBState"] = "ALARM";
+            }
             else
+            {
                 ViewData["CWELBState"] = "OK";
+            }
+
             Flag = false;
             foreach (MetricAlarm a in response.MetricAlarms)
             {
@@ -233,9 +248,14 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             if (Flag == true)
+            {
                 ViewData["CWCSState"] = "ALARM";
+            }
             else
+            {
                 ViewData["CWCSState"] = "OK";
+            }
+
             if (_context.VPCs.ToList().Count == 0)
             {
                 if (ViewData["MissingVPC"].Equals("FIXING"))
@@ -284,6 +304,11 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 }
             }
             return View();
+        }
+
+        public async Task<IActionResult> ManageNotification()
+        {
+            return View(await SNSClient.ListSubscriptionsByTopicAsync(new ListSubscriptionsByTopicRequest("arn:aws:sns:ap-southeast-1:188363912800:eCTF_Notifications")));
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

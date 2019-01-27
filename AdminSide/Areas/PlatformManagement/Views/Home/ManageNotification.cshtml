@@ -1,0 +1,109 @@
+﻿@model Amazon.SimpleNotificationService.Model.ListSubscriptionsByTopicResponse
+@{
+    ViewData["Title"] = "Manage Alarm Notification";
+}
+@if (!String.IsNullOrEmpty(Convert.ToString(TempData["Result"])))
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-danger" role="alert">
+                @TempData["Result"]
+            </div>
+        </div>
+    </div>
+}
+@if (!String.IsNullOrEmpty(Convert.ToString(TempData["Exception"])))
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="alert alert-danger" role="alert">
+                @TempData["Exception"]
+            </div>
+        </div>
+    </div>
+}
+<div class="row">
+    <div class="col-lg-12">
+        <h2>Manage Alarm Notifications</h2>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="dropdown float-right">
+            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Add Phone Number
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                <form class="px-8 py-4 needs-validation" asp-action="ManageNotification" method="post" novalidate>
+                    <input type="hidden" name="action" value="Add" />
+                    <div class="form-group">
+                        <label for="DropdownFormPhoneNumber">Phone Number</label>
+                        <input type="number" class="form-control" id="DropdownFormPhoneNumber" name="input" pattern="^[+]65\d{8}$" required>
+                        <div class="invalid-feedback">
+                            Please enter a vaild phone number
+                        </div>
+                    </div>
+                    <div class="form-group">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Phone Number</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<br />
+<div class="row">
+    <div class="col-lg-10">
+        <div class="table-responsive">
+            <table id="SNSDisplay" class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">Phone Number</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var s in Model.Subscriptions)
+                    {
+                        <tr>
+                            <th scope="row">@s.Endpoint</th>
+                            <td>
+                                <form asp-action="ManageNotification" method="post">
+                                    <input type="hidden" name="action" value="Remove" />
+                                    <input type="hidden" name="input" value="@s.SubscriptionArn" />
+                                    <button type="submit" class="btn btn-danger">Remove Phone Number</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-12">
+        <button asp-action="" type="button" class="btn btn-primary">Return to Dashboard</button>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+        $('#SNSDisplay').DataTable();
+    </script>
+}
