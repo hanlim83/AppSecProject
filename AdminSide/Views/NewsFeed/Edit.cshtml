@@ -9,6 +9,15 @@
     <h2>Edit</h2>
     <h4>Feed Source</h4>
     <hr />
+    @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["Show"])))
+    {
+        <div class="alert alert-danger" role="alert">
+            <h4 class="alert-heading">Invalid Input</h4>
+            <p>Please do not use special characters.</p>
+            <hr>
+
+        </div>
+    }
     <div class="row">
         <div class="col-md-4">
             <form asp-action="Edit">
@@ -39,11 +48,3 @@
         @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     }
 </div>
-
-<script>
-function myFunction() {
-  alert("Changes have been saved!");
-    }
-
-
-</script>
