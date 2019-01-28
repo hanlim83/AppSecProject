@@ -103,12 +103,13 @@
                     <div class="title" id="">chat</div>
                 </div>
                 <div class="messages">
-                    @foreach (var x in Model)
+                    @*@foreach (var x in Model)
                     {
                          <ul class="list-group">
                              @Html.DisplayFor(modelItem => x.Messsage)
                          </ul>
-                    }
+                    }*@
+                    @ViewBag.Mess
                     <ul class="list-group" id="messageList"></ul>
                 </div>
 
