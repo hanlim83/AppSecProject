@@ -1,12 +1,18 @@
 ﻿@model AdminSide.Models.Blockchain
 
-@{
-    //var Blockchain = new Bloc
-}
+<style>
+    .center-align-all {
+        display: flex;
+        justify-content: center;
+    }
+</style>
+
+<br />
 <div class="container">
-    <h1>@ViewData["LastHash"]</h1>
+    @*<h1>@ViewData["LastHash"]</h1>*@
     <h1>Chain Validity: @ViewData["ChainValid"]</h1>
     <div>
+        <p>The list below contains Team results that don't match the blockchain</p>
         <table class="table">
             <thead>
                 <tr>
@@ -39,4 +45,56 @@
             </tbody>
         </table>
     </div>
+    <hr>
+
+    @{ int counter = 0;}
+    @foreach (var result in Model.Chain)
+    {
+        if (counter == 0)
+        {
+            <div class="center-align-all">
+                <div class="card border-primary mb-3" style="max-width: 18rem;">
+                    <div class="card-header">Genesis Block</div>
+                    <div class="card-body text-primary">
+                        <h5 class="card-title">Data</h5>
+                        <p class="card-text">
+                            @result.TimeStamp;@result.CompetitionID;@result.TeamID;@result.ChallengeID;@result.TeamChallengeID;@result.Score;@result.PreviousHash;
+                        </p>
+                        <h5 class="card-title">Previous Hash</h5>
+                        <p class="card-text">N.A.</p>
+                        <h5 class="card-title">Current Hash</h5>
+                        <p class="card-text">@result.Hash</p>
+                        <a asp-controller="Blockchain" asp-action="Edit" asp-route-id="@result.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="center-align-all">
+                <i class="fa fa-angle-down fa-4x" aria-hidden="true"></i>
+            </div>
+        }
+        else
+        {
+            <div class="center-align-all">
+                <div class="card border-primary mb-3" style="max-width: 18rem;">
+                    <div class="card-header">Block @counter</div>
+                    <div class="card-body text-primary">
+                        <h5 class="card-title">Data</h5>
+                        <p class="card-text">
+                            @result.TimeStamp;@result.CompetitionID;@result.TeamID;@result.ChallengeID;@result.TeamChallengeID;@result.Score;@result.PreviousHash;
+                        </p>
+                        <h5 class="card-title">Previous Hash</h5>
+                        <p class="card-text">@result.PreviousHash</p>
+                        <h5 class="card-title">Current Hash</h5>
+                        <p class="card-text">@result.Hash</p>
+                        <a asp-controller="Blockchain" asp-action="Edit" asp-route-id="@result.ID"><input type="button" value="Edit" class="btn btn btn-outline-primary"></a>
+                    </div>
+                </div>
+            </div>
+            <div class="center-align-all">
+                <i class="fa fa-angle-down fa-4x" aria-hidden="true"></i>
+            </div>
+        }
+        counter++;
+    }
+    <a asp-controller="Competitions" asp-action="Details" asp-route-id="@ViewData["CompetitionID"]"><input type="button" value="Back to Competition Details" class="btn btn btn-primary"></a>
 </div>
