@@ -25,7 +25,6 @@
 
     <!--Individual-->
 
-    @UserManager.GetUserId(User);
 
     <div class="container">
        
@@ -41,43 +40,54 @@
                     <th></th>
                 </tr>
             </thead>
+
             <tbody>
                 @foreach (var item in Model)
                 {
                 <tr>
-
-                    @if (UserManager.GetUserName(User).Equals(item.UserOne))
+                    @if (UserManager.GetUserId(User).Equals(item.UserOne))
                     {
                         <td>
                             @Html.DisplayFor(modelItem => item.MsgCount)
                         </td>
-                        <td>
-                            @Html.DisplayFor(modelItem => item.UserTwo)
-                        </td>
+                        foreach (var u in ViewBag.UserList)
+                        {
+                            @if (u.Id.Equals(item.UserTwo))
+                            {
+                                <td>
+                                    @u.UserName
+                                </td>
+                            }
+                        }
                         <td>
                             <form>
-                                <button type="submit" class="btn btn-default" asp-action="TalkView">Chat</button>
+                                <button type="submit" class="btn btn-primary" asp-action="TalkView" asp-route-id="Model.ID">Chat</button>
                             </form>
                         </td>
                     }
-                    @if (UserManager.GetUserName(User).Equals(item.UserTwo))
+                    @if (UserManager.GetUserId(User).Equals(item.UserTwo))
                     {
                         <td>
                             @Html.DisplayFor(modelItem => item.MsgCount)
                         </td>
+                        foreach (var u in ViewBag.UserList)
+                        {
+                            @if (u.Id.Equals(item.UserOne))
+                            {
+                                <td>
+                                    @u.UserName
+                                </td>
+                            }
+                        }
                         <td>
-                            @Html.DisplayFor(modelItem => item.UserOne)
-                        </td>
-                        <td>
-                            <form>
-                                <button type="submit" class="btn btn-default" asp-action="TalkView">Chat</button>
+                            <form asp-action="TalkView">
+                                <button type="submit" class="btn btn-primary" asp-action="TalkView" asp-route-id="Model.ID">Chat</button>
                             </form>
                         </td>
                     }
 
                 </tr>
                 }
-                <
                    
             </tbody>
         </table>

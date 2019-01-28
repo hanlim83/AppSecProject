@@ -12,9 +12,11 @@ using UserSide.Models;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace UserSide.Controllers
 {
+    [Authorize]
     public class ChatController : Controller
     {
         //HUB
@@ -48,8 +50,8 @@ namespace UserSide.Controllers
         //}
 
 
-        [Authorize]
-        public async Task<IActionResult> Index()
+        
+        public async Task<IActionResult> Index(Chat chat)
         {
             // await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
             var user = await _userManager.GetUserAsync(HttpContext.User);
@@ -57,7 +59,7 @@ namespace UserSide.Controllers
             //string CurrUser = HttpContext.User.FindFirstValue(ClaimTypes.Name);
             //Chat c = new Chat();
             ////sort or fliter here
-            
+
 
             //var item = _context.Chats.Where(x => x.UserOne == CurrUser)
             //    .Select(x => new Chat
@@ -66,17 +68,25 @@ namespace UserSide.Controllers
             //    });
 
             //ViewBag.related = item;
+            ViewBag.UserList = _userManager.Users.ToList();
 
 
-            //await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
+
+            await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
             return View(await _context.Chats.ToListAsync());
 
         }
 
-        [Authorize]
-        public IActionResult TalkView()
+        
+        public async Task<IActionResult> TalkView(int? id)
         {
-            return View();
+            ViewData["routeID"] = id;
+            //ViewBag.Dude = chat.ChatID;
+            var mess = await _context.Chats
+                .Include(m => m.Messages)
+                .FirstOrDefaultAsync(c => c.ChatID == id);
+            ViewBag.Mess = mess;
+            return View(await _context.Messages.ToListAsync());
         }
 
         public async Task<IActionResult> CreateGroup()
@@ -90,14 +100,9 @@ namespace UserSide.Controllers
             return View(username);
         }
 
+        
         public IActionResult CreateChat()
         {
-            //take in user object
-
-
-
-            //var user = 
-
             //var contact = new UserChat<string>();
 
             //foreach (var username in user)
@@ -107,7 +112,26 @@ namespace UserSide.Controllers
             //    contact.add(username);
             //}
             //need to remove showing current user
-            ViewBag.Users = _userManager.Users.Select(u => u.UserName).ToList();
+            var uList = _userManager.Users.ToListAsync();
+            var currUser = _userManager.GetUserId(HttpContext.User);
+
+            var dictionary = new Dictionary<string, string>
+            {
+
+            };
+            foreach (var user in uList.Result)
+            {
+                if (!user.Id.Equals(currUser))
+                {
+                    dictionary.Add(user.Id, user.UserName);
+                }
+                
+            }
+            
+
+            ViewBag.SelectList = new SelectList(dictionary, "Key", "Value");
+
+            
             return View();
         }
 
@@ -120,16 +144,16 @@ namespace UserSide.Controllers
                 var User = await _userManager.GetUserAsync(HttpContext.User);
                 var selectUser = await _userManager.Users.ToListAsync();
 
-                foreach (var u in selectUser)
-                {
-                    if (u.Id == chat.UserOne)
-                    {
-                        chat.UserOne = u.UserName;
-                    }
-                }
+                //foreach (var u in selectUser)
+                //{
+                //    if (u.Id == chat.UserOne)
+                //    {
+                //        chat.UserOne = u.UserName;
+                //    }
+                //}
 
 
-                chat.UserTwo = HttpContext.User.FindFirstValue(ClaimTypes.Name);
+                chat.UserTwo = User.Id;
 
                 _context.Add(chat);
                 await _context.SaveChangesAsync();
@@ -137,6 +161,8 @@ namespace UserSide.Controllers
             }
             return View(chat);
         }
+
+       
     }
 
 

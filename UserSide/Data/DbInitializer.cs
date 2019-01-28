@@ -90,7 +90,7 @@ namespace UserSide.Data
             var text = new Chat[]
            {
                 new Chat{UserOne="Stephen",UserTwo="James",MsgCount=12},
-                new Chat{UserOne="Id 1",UserTwo="ID 2",MsgCount=2}
+                new Chat{UserOne="James",UserTwo="Stephen",MsgCount=2}
            };
 
             foreach (Chat t in text)
