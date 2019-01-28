@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -95,6 +96,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             return View(await _context.Templates.ToListAsync());
         }
 
@@ -147,7 +152,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 return NotFound();
             }
         }
-
+        [HttpPost]
         public async Task<IActionResult> Delete(String TemplateID)
         {
             Template deleted = await _context.Templates.FindAsync(int.Parse(TemplateID));
