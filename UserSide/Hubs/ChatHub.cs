@@ -16,6 +16,7 @@ namespace UserSide.Hubs
         //{
         //    return Clients.All.SendAsync("ReceiveMessage", user, message);
         //}
+
         public Task SendMessage(string message)
         {
             return Clients.All.SendAsync("ReceiveMessage", message);
@@ -26,10 +27,7 @@ namespace UserSide.Hubs
             return Clients.Caller.SendAsync("ReceiveMessage", message);
         }
 
-        public Task SendMessageToGroup(string message)
-        {
-            return Clients.Group("SignalR Users").SendAsync("ReceiveMessage", message);
-        }
+       
 
 
         #endregion
@@ -40,6 +38,7 @@ namespace UserSide.Hubs
         {
             return Clients.User(user).SendAsync("ReceiveMessage", message);
         }
+       
         #endregion
 
         #region ThrowHubException
@@ -64,5 +63,24 @@ namespace UserSide.Hubs
             await base.OnDisconnectedAsync(exception);
         }
         #endregion
+
+        public Task SendMessageToGroup(string groupName, string message)
+        {
+            return Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId}: {message}");
+        }
+
+        public async Task AddToGroup(string groupName)
+        {
+            await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
+
+            await Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId} has joined the group {groupName}.");
+        }
+
+        public async Task RemoveFromGroup(string groupName)
+        {
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, groupName);
+
+            await Clients.Group(groupName).SendAsync("Send", $"{Context.ConnectionId} has left the group {groupName}.");
+        }
     }
 }
