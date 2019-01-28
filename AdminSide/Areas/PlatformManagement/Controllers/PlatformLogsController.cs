@@ -41,6 +41,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public IActionResult Index(string Override)
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                ViewData["MissingVPC"] = "YES";
+            }
             if (string.IsNullOrEmpty(Override))
             {
                 ViewData["Mode"] = "Automatic";
@@ -80,6 +84,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index(string StreamID, string ViewMode)
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                ViewData["MissingVPC"] = "YES";
+            }
             if (StreamID == null)
             {
                 PlatformLogsParentViewModel model = new PlatformLogsParentViewModel

@@ -6,7 +6,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="alert alert-warning" role="alert">
-                            <i class="material-icons">info</i> There are currently no subnets created
+                            <i class="fas fa-info-circle"></i> There are currently no subnets created
                             <p class="mb-0">You will not be able to create Challenge Servers untill you create one now by clicking <a asp-action="Create" class="alert-link">HERE</a></p>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                                     @Html.DisplayFor(modelItem => subnet.IPv6CIDR)
                                 </td>
                                 <td>
-                                    @if (!subnet.ID.Equals(1) && !subnet.ID.Equals(2) && !subnet.ID.Equals(3))
+                                    @if (subnet.editable == true)
                                     {
                                         <form method="post">
                                             <input type="hidden" name="action" value="Modify" />
