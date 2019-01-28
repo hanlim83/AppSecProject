@@ -316,5 +316,9 @@
         $('#CWresults *').removeAttr("style");
             $('#CWEventsDisplay').removeAttr("style");
         });
+        var result = "@Convert.ToString(ViewData["MissingVPC"]).ToLower()";
+        if (result == "yes" || result == "fixing") {
+            $(".vpcUnAvail").addClass("disabled");
+        }
     </script>
 }

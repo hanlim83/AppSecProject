@@ -44,7 +44,7 @@
             <div class="form-group">
                 <label for="ServerName">Server Name:</label>
                 <input type="text" class="form-control" id="ServerName" name="ServerName" pattern="^[A-Za-z0-9 _-]*[A-Za-z0-9][A-Za-z0-9 _ -]*$" required>
-                <div class="invalid-feedback">A server needs a name</div>
+                <div class="invalid-feedback">A server needs a alphanumeric name</div>
             </div>
             <div class="form-group">
                 <label for="ServerWorkload">Server Workload</label>
@@ -142,22 +142,24 @@
         </div>
     </div>
 </div>
-<script>
-    (function () {
-        'use strict';
-        window.addEventListener('load', function () {
-            var forms = document.getElementsByClassName('needs-validation');
-            var validation = Array.prototype.filter.call(forms, function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-    document.getElementById("ServerWorkload").selectedIndex = -1;
-    document.getElementById("Subnet").selectedIndex = -1;
-</script>
+@section Scripts {
+    <script>
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+        document.getElementById("ServerWorkload").selectedIndex = -1;
+        document.getElementById("Subnet").selectedIndex = -1;
+    </script>
+}

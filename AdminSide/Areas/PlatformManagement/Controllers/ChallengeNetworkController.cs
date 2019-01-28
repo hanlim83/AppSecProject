@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Net;
-using System.Threading.Tasks;
-using AdminSide.Areas.PlatformManagement.Data;
+﻿using AdminSide.Areas.PlatformManagement.Data;
 using AdminSide.Areas.PlatformManagement.Models;
 using Amazon.EC2;
 using Amazon.EC2.Model;
@@ -12,6 +6,12 @@ using ASPJ_MVC.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using RouteTable = AdminSide.Areas.PlatformManagement.Models.RouteTable;
 using Subnet = AdminSide.Areas.PlatformManagement.Models.Subnet;
 
@@ -33,6 +33,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Index()
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
             {
                 RetrievedSubnets = await _context.Subnets.ToListAsync(),
@@ -51,12 +55,22 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 if (Deletesubnet == null)
                 {
                     TempData["Result"] = "Invaild Subnet!";
-                    return View(await _context.Subnets.ToListAsync());
+                    ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
+                    {
+                        RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                        RetrievedRoutes = await _context.Routes.ToListAsync()
+                    };
+                    return View(model);
                 }
                 else if (Deletesubnet.editable == false)
                 {
                     TempData["Result"] = "You cannot delete a default subnet!";
-                    return View(await _context.Subnets.ToListAsync());
+                    ChallengeNetworkParentViewModel model = new ChallengeNetworkParentViewModel
+                    {
+                        RetrievedSubnets = await _context.Subnets.ToListAsync(),
+                        RetrievedRoutes = await _context.Routes.ToListAsync()
+                    };
+                    return View(model);
                 }
                 else
                 {
@@ -317,6 +331,10 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
 
         public async Task<IActionResult> Create()
         {
+            if (_context.VPCs.ToList().Count == 0)
+            {
+                return RedirectToAction("", "Home", "");
+            }
             VPC vpc = await _context.VPCs.FindAsync(1);
             DescribeVpcsResponse response = await EC2Client.DescribeVpcsAsync(new DescribeVpcsRequest
             {
@@ -436,25 +454,37 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                                 break;
                             }
                             else
+                            {
                                 passed = true;
+                            }
                         }
                         if (passed == true)
+                        {
                             flag = true;
+                        }
                     }
                 }
                 if (ipv6CIDRstr[5].Equals("/56"))
                 {
                     if (ipv6Subnet < 9)
+                    {
                         subnet.IPv6CIDR = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + "0" + ipv6Subnet.ToString() + "::/64";
+                    }
                     else
+                    {
                         subnet.IPv6CIDR = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + Convert.ToInt32(ipv6Subnet).ToString() + "::/64";
+                    }
                 }
                 else
                 {
                     if (ipv6Subnet < 9)
+                    {
                         subnet.IPv6CIDR = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + "0" + ipv6Subnet.ToString() + "::" + ipv6CIDRstr[5];
+                    }
                     else
+                    {
                         subnet.IPv6CIDR = ipv6CIDRstr[0] + ":" + ipv6CIDRstr[1] + ":" + ipv6CIDRstr[2] + ":" + ipv6CIDRstr[3].Substring(0, 2) + Convert.ToInt32(ipv6Subnet).ToString() + "::" + ipv6CIDRstr[5];
+                    }
                 }
                 CreateSubnetRequest requestS = new CreateSubnetRequest()
                 {

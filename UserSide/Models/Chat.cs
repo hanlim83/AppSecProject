@@ -11,10 +11,13 @@ namespace UserSide.Models
     {
         [Key]
         public int ChatID { get; set; }
+        [Display(Name ="Message not read")]
         public int MsgCount { get; set; }
 
+        [Display(Name ="Chat with")]
         public string UserOne { get; set; }
         public string UserTwo { get; set; }
+        public ICollection<Message> Messages { get; set; }
         //public GroupChat GroupChat { get; set; }
         //public int GroupId { get; set; }
 

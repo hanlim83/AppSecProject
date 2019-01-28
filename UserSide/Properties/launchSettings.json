@@ -12,15 +12,15 @@
       "commandName": "IISExpress",
       "launchBrowser": true,
       "environmentVariables": {
-        "RDS_HOSTNAME": "aspjdevelopmentdb.cveglglrcyfg.ap-southeast-1.rds.amazonaws.com",
+        "RDS_HOSTNAME": "ectfproductiondb.cveglglrcyfg.ap-southeast-1.rds.amazonaws.com",
         "RDS_PORT": "1433",
         "AWS_REGION": "ap-southeast-1",
-        "RDS_USERNAME": "aspjUser",
+        "RDS_USERNAME": "appUser",
         "AWS_SECRET_ACCESS_KEY": "apaKbZa+/jGe4swJtXDMYcxhE0DJ/L5SYrxwBpTu",
         "SendGridUser": "ZZZ",
         "SendGridKey": "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",
         "AWS_ACCESS_KEY_ID": "AKIAJEHOWGBAD2HHT63Q",
-        "RDS_PASSWORD": "SnVwXA8Uu69ecXGX2wuj",
+        "RDS_PASSWORD": "!OfaG5Rs7Tg3P#^tE&es",
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },

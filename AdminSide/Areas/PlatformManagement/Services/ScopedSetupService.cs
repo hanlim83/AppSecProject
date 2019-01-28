@@ -166,6 +166,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         }
                     }
                 }
+                context.Database.OpenConnection();
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.VPCs ON");
                 DescribeVpcsResponse responseDescribeVPC = await ec2Client.DescribeVpcsAsync();
                 Flag = false;
                 foreach (var VPC in responseDescribeVPC.Vpcs)
@@ -188,6 +190,14 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 if (Flag == false)
                 {
                     _logger.LogInformation("VPC not found! Creating...");
+
+
+                    VPC existing = context.VPCs.Find(1);
+                    if (existing != null)
+                    {
+                        context.VPCs.Remove(existing);
+                        context.SaveChanges();
+                    }
                     CreateVpcResponse responseCreateVPC = await ec2Client.CreateVpcAsync(new CreateVpcRequest
                     {
                         CidrBlock = IPv4VMCIDR,
@@ -240,6 +250,24 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                         }
                     });
+                    if (responseDescribeSecurityGroups.SecurityGroups[0].IpPermissions.Count != 0)
+                    {
+                        RevokeSecurityGroupIngressRequest requestRevokeIngress = new RevokeSecurityGroupIngressRequest
+                        {
+                            GroupId = responseDescribeSecurityGroups.SecurityGroups[0].GroupId
+                        };
+                        requestRevokeIngress.IpPermissions = responseDescribeSecurityGroups.SecurityGroups[0].IpPermissions;
+                        await ec2Client.RevokeSecurityGroupIngressAsync(requestRevokeIngress);
+                    }
+                    if (responseDescribeSecurityGroups.SecurityGroups[0].IpPermissionsEgress.Count != 0)
+                    {
+                        RevokeSecurityGroupEgressRequest requestRevokeEgress = new RevokeSecurityGroupEgressRequest
+                        {
+                            GroupId = responseDescribeSecurityGroups.SecurityGroups[0].GroupId
+                        };
+                        requestRevokeEgress.IpPermissions = responseDescribeSecurityGroups.SecurityGroups[0].IpPermissionsEgress;
+                        await ec2Client.RevokeSecurityGroupEgressAsync(requestRevokeEgress);
+                    }
                     _logger.LogInformation("Setup Background Service Sleeping while IPv6 Assignment");
                     responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                     {
@@ -251,6 +279,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     await Task.Delay(TimeSpan.FromSeconds(10));
                     VPC newlyCreatedVPC = new VPC
                     {
+                        ID = 1,
                         AWSVPCReference = responseCreateVPC.Vpc.VpcId,
                         AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
                         type = VPCType.DefaultVM,
@@ -262,6 +291,12 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + PlatformVPCID + "'").ToList().Count() == 0)
                     {
                         _logger.LogInformation("Platform VPC not inside SQL Database!");
+                        existing = context.VPCs.Find(2);
+                        if (existing != null)
+                        {
+                            context.VPCs.Remove(existing);
+                            context.SaveChanges();
+                        }
                         responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                         {
                             Filters = new List<Filter>
@@ -292,6 +327,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         });
                         VPC newlyCreatedVPC2 = new VPC
                         {
+                            ID = 2,
                             AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
                             AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
                             type = VPCType.Platform,
@@ -301,12 +337,22 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         context.VPCs.Add(newlyCreatedVPC2);
                     }
                     await context.SaveChangesAsync();
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.VPCs OFF");
+
                 }
                 else
                 {
-                    if (!context.VPCs.Any() || context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + VMVPCID + "'").ToList().Count() == 0)
+                    if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + VMVPCID + "'").ToList().Count() == 0)
                     {
+
+
                         _logger.LogInformation("VM VPC already created but not inside SQL Database!");
+                        VPC existing = context.VPCs.Find(1);
+                        if (existing != null)
+                        {
+                            context.VPCs.Remove(existing);
+                            context.SaveChanges();
+                        }
                         responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                         {
                             Filters = new List<Filter>
@@ -337,6 +383,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         });
                         VPC newlyCreatedVPC = new VPC
                         {
+                            ID = 1,
                             AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
                             AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
                             type = VPCType.DefaultVM,
@@ -345,6 +392,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         };
                         context.VPCs.Add(newlyCreatedVPC);
                         context.SaveChanges();
+
+
                     }
                     else
                     {
@@ -353,7 +402,15 @@ namespace AdminSide.Areas.PlatformManagement.Services
 
                     if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + PlatformVPCID + "'").ToList().Count() == 0)
                     {
+
+
                         _logger.LogInformation("Platform VPC not inside SQL Database!");
+                        VPC existing = context.VPCs.Find(2);
+                        if (existing != null)
+                        {
+                            context.VPCs.Remove(existing);
+                            context.SaveChanges();
+                        }
                         responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                         {
                             Filters = new List<Filter>
@@ -384,6 +441,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         });
                         VPC newlyCreatedVPC = new VPC
                         {
+                            ID = 2,
                             AWSVPCReference = responseDescribeVPC.Vpcs[0].VpcId,
                             AWSVPCDefaultSecurityGroup = responseSecurityGroups.SecurityGroups[0].GroupId,
                             type = VPCType.Platform,
@@ -392,6 +450,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         };
                         context.VPCs.Add(newlyCreatedVPC);
                         context.SaveChanges();
+
+
                     }
                 }
                 VPC vpc = await context.VPCs.FindAsync(1);
@@ -427,7 +487,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             IPv6CIDR = responseCreateSubnet.Subnet.Ipv6CidrBlockAssociationSet[0].Ipv6CidrBlock,
                             SubnetSize = "254",
                             AWSVPCSubnetReference = responseCreateSubnet.Subnet.SubnetId,
-                            VPCID = vpc.ID
+                            VPCID = vpc.ID,
+                            ID = i + 1
                         };
                         if (i == 0)
                         {
@@ -518,7 +579,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     RouteTable RTIntranet = new RouteTable
                     {
                         AWSVPCRouteTableReference = AWSIntranet.RouteTableId,
-                        VPCID = vpc.ID
+                        VPCID = vpc.ID,
+                        ID = 1
                     };
                     await ec2Client.CreateTagsAsync(new CreateTagsRequest
                     {
@@ -583,7 +645,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     RouteTable RTInternet = new RouteTable
                     {
                         AWSVPCRouteTableReference = responseCreateRouteTable.RouteTable.RouteTableId,
-                        VPCID = vpc.ID
+                        VPCID = vpc.ID,
+                        ID = 2
                     };
                     context.RouteTables.Add(RTInternet);
                     await context.SaveChangesAsync();
@@ -676,7 +739,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     RouteTable RTExtranet = new RouteTable
                     {
                         AWSVPCRouteTableReference = responseCreateRouteTable.RouteTable.RouteTableId,
-                        VPCID = vpc.ID
+                        VPCID = vpc.ID,
+                        ID = 3
                     };
                     context.RouteTables.Add(RTExtranet);
                     AllocateAddressResponse responseAllocateAddress = await ec2Client.AllocateAddressAsync(new AllocateAddressRequest
@@ -806,7 +870,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             };
                             context.RouteTables.Add(newRT);
                             context.SaveChanges();
-                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = '" + RT.RouteTableId + "'").ToList();
+                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = {0}", RT.RouteTableId).ToList();
                             if (queryResult.Count() == 1)
                             {
                                 newRT = queryResult[0];
@@ -922,6 +986,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                                 RouteTableID = newRT.ID,
                                                 VPCID = vpc.ID
                                             };
+                                            if (!responseDescribeSubnets.Subnets[0].CidrBlock.Equals("172.30.2.0/24"))
+                                                newSubnet.editable = true;
                                             switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3, 3))
                                             {
                                                 case "/17":
@@ -1062,6 +1128,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                                 RouteTableID = newRT.ID,
                                                 VPCID = vpc.ID
                                             };
+                                            if (!responseDescribeSubnets.Subnets[0].CidrBlock.Equals("172.30.1.0/24"))
+                                                newSubnet.editable = true;
                                             switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3, 3))
                                             {
                                                 case "/17":
@@ -1202,6 +1270,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                                 RouteTableID = newRT.ID,
                                                 VPCID = vpc.ID
                                             };
+                                            if (!responseDescribeSubnets.Subnets[0].CidrBlock.Equals("172.30.0.0/24"))
+                                                newSubnet.editable = true;
                                             switch (responseDescribeSubnets.Subnets[0].CidrBlock.Substring(responseDescribeSubnets.Subnets[0].CidrBlock.Length - 3, 3))
                                             {
                                                 case "/17":
@@ -1262,6 +1332,8 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         _logger.LogInformation("Route Tables already created!");
                     }
                 }
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.VPCs OFF");
+                context.Database.CloseConnection();
                 if (!context.CloudWatchLogGroups.Any() && !context.CloudWatchLogStreams.Any())
                 {
                     _logger.LogInformation("Importing CloudWatch Data...");
