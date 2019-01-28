@@ -61,7 +61,7 @@
                         }
                         <td>
                             <form>
-                                <button type="submit" class="btn btn-primary" asp-action="TalkView">Chat</button>
+                                <button type="submit" class="btn btn-primary" asp-action="TalkView" asp-route-id="Model.ID">Chat</button>
                             </form>
                         </td>
                     }
@@ -81,7 +81,7 @@
                         }
                         <td>
                             <form asp-action="TalkView">
-                                <button type="submit" class="btn btn-primary" id="join-group">Chat</button>
+                                <button type="submit" class="btn btn-primary" asp-action="TalkView" asp-route-id="Model.ID">Chat</button>
                             </form>
                         </td>
                     }

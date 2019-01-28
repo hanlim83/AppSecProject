@@ -12,12 +12,11 @@ namespace UserSide.Models
         public int MsgId { get; set; }
     
         public string Receiver { get; set; }
+        public string Sender { get; internal set; }
 
         public string Messsage { get; set; }
 
         public int Count { get; set; }
-
-        public string Sender { get; set; }
 
         public Chat Chat { get; set; }
         public int ChatId { get; set; }

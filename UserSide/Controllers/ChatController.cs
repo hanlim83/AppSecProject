@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace UserSide.Controllers
 {
+    [Authorize]
     public class ChatController : Controller
     {
         //HUB
@@ -49,7 +50,7 @@ namespace UserSide.Controllers
         //}
 
 
-        [Authorize]
+        
         public async Task<IActionResult> Index(Chat chat)
         {
             // await _hubContext.Clients.All.SendAsync("Notify", $"Home page loaded at: {DateTime.Now}");
@@ -76,11 +77,15 @@ namespace UserSide.Controllers
 
         }
 
-        [Authorize]
-        public async Task<IActionResult> TalkView()
+        
+        public async Task<IActionResult> TalkView(int? id)
         {
+            ViewData["routeID"] = id;
             //ViewBag.Dude = chat.ChatID;
-            
+            var mess = await _context.Chats
+                .Include(m => m.Messages)
+                .FirstOrDefaultAsync(c => c.ChatID == id);
+            ViewBag.Mess = mess;
             return View(await _context.Messages.ToListAsync());
         }
 
@@ -95,6 +100,7 @@ namespace UserSide.Controllers
             return View(username);
         }
 
+        
         public IActionResult CreateChat()
         {
             //var contact = new UserChat<string>();
