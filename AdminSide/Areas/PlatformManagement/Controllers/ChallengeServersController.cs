@@ -567,6 +567,9 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                         selected.AWSEC2Reference
                 }
                 });
+                selected.State = State.Stopping;
+                _context.Servers.Update(selected);
+                _context.SaveChanges();
                 if (response.HttpStatusCode == HttpStatusCode.OK)
                 {
                     return View(selected);
@@ -702,14 +705,25 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     {
                         ModifyInstancePlacementResponse response = await EC2Client.ModifyInstancePlacementAsync(Prequest);
                     }
-                    await EC2Client.StartInstancesAsync(new StartInstancesRequest
+                    Backgroundqueue.QueueBackgroundWorkItem(async token =>
                     {
-                        InstanceIds = new List<string>
+                        _logger.LogInformation("Scheduled Server Start");
+                        await Task.Delay(TimeSpan.FromMinutes(1), token);
+                        try
+                        {
+                            await EC2Client.StartInstancesAsync(new StartInstancesRequest
+                            {
+                                InstanceIds = new List<string>
                         {
                             retrieved.AWSEC2Reference
                         }
+                            });
+                        } catch (AmazonEC2Exception)
+                        {       
+                        }
+                       
                     });
-                    TempData["Result"] = "Modification Sucessful!";
+                    TempData["Result"] = "Modification Sucessful! Server will restart automatically within a minute";
                     return RedirectToAction("");
                 }
                 catch (DbUpdateConcurrencyException)
