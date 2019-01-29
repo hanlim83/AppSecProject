@@ -35,7 +35,7 @@
                             }
                             @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] != 0 && (ViewData["CWCSState"].Equals("OK")))
                             {
-                            <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
+                                <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
                             }
                             @if (ViewData["CWPlatformState"].Equals("ALARM") || ViewData["CWELBState"].Equals("ALARM") && ViewData["CWCSState"].Equals("ALARM"))
                             {
@@ -143,7 +143,11 @@
                     <div class="card-deck" style="padding-bottom: 5%;">
                         <div class="card">
                             <h5 class="card-header">Platform Metric Alarms</h5>
-                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] == 0)
+                            {
+                                <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
+                            }
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] != 0 && (ViewData["CWCSState"].Equals("OK")))
                             {
                                 <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
                             }
@@ -168,13 +172,16 @@
                                 {
                                     <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
                                 }
-                                @if (ViewData["CWCSState"].Equals("OK"))
+                                @if ((int)ViewData["ServerTotalCount"] != 0)
                                 {
-                                    <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
-                                }
-                                @if (ViewData["CWCSState"].Equals("ALARM"))
-                                {
-                                    <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                    @if (ViewData["CWCSState"].Equals("OK"))
+                                    {
+                                        <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
+                                    }
+                                    @if (ViewData["CWCSState"].Equals("ALARM"))
+                                    {
+                                        <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                    }
                                 }
                                 <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
                             </div>
@@ -240,13 +247,19 @@
         {
             <div class="row">
                 <div class="col-lg-12" style="text-align: center; margin-top: 3%; margin-bottom: 5%;">
-                    @if (ViewData["ServerHealth"].Equals("OK") && ViewData["RouteHealth"].Equals("OK") && ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK") && ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
+                    @if (ViewData["ServerHealth"].Equals("OK") && ViewData["RouteHealth"].Equals("OK") && ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK") && ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] == 0)
                     {
                         <h3 class="page-header text-success">
                             <i class="far fa-thumbs-up" style="font-size: 62px"></i>&nbsp;&nbsp;&nbsp;All Looks Good!
                         </h3>
                     }
-                    @if (!ViewData["ServerHealth"].Equals("OK") || !ViewData["RouteHealth"].Equals("OK") || !ViewData["CWStatus"].Equals("OK") || !ViewData["EC2Status"].Equals("OK") || !ViewData["EBSStatus"].Equals("OK") || !ViewData["ELBStatus"].Equals("OK") || !ViewData["NATStatus"].Equals("OK") || !ViewData["RDSStatus"].Equals("OK") || !ViewData["R53Status"].Equals("OK") || !ViewData["SGStatus"].Equals("OK") || !ViewData["S3Status"].Equals("OK") || !ViewData["VPCStatus"].Equals("OK") || !ViewData["CWPlatformState"].Equals("OK") || !ViewData["CWELBState"].Equals("OK") || !ViewData["CWCSState"].Equals("OK"))
+                    @if (ViewData["ServerHealth"].Equals("OK") && ViewData["RouteHealth"].Equals("OK") && ViewData["CWStatus"].Equals("OK") && ViewData["EC2Status"].Equals("OK") && ViewData["EBSStatus"].Equals("OK") && ViewData["ELBStatus"].Equals("OK") && ViewData["NATStatus"].Equals("OK") && ViewData["RDSStatus"].Equals("OK") && ViewData["R53Status"].Equals("OK") && ViewData["SGStatus"].Equals("OK") && ViewData["S3Status"].Equals("OK") && ViewData["VPCStatus"].Equals("OK") && ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] != 0 && ViewData["CWCSState"].Equals("OK"))
+                    {
+                        <h3 class="page-header text-success">
+                            <i class="far fa-thumbs-up" style="font-size: 62px"></i>&nbsp;&nbsp;&nbsp;All Looks Good!
+                        </h3>
+                    }
+                    @if (!ViewData["ServerHealth"].Equals("OK") || !ViewData["RouteHealth"].Equals("OK") || !ViewData["CWStatus"].Equals("OK") || !ViewData["EC2Status"].Equals("OK") || !ViewData["EBSStatus"].Equals("OK") || !ViewData["ELBStatus"].Equals("OK") || !ViewData["NATStatus"].Equals("OK") || !ViewData["RDSStatus"].Equals("OK") || !ViewData["R53Status"].Equals("OK") || !ViewData["SGStatus"].Equals("OK") || !ViewData["S3Status"].Equals("OK") || !ViewData["VPCStatus"].Equals("OK") || !ViewData["CWPlatformState"].Equals("OK") || !ViewData["CWELBState"].Equals("OK") || ((int)ViewData["ServerTotalCount"] != 0 && !ViewData["CWCSState"].Equals("OK")))
                     {
                         <h3 class="page-header text-warning">
                             <i class="fas fa-exclamation-triangle" style="font-size: 62px"></i>&nbsp;&nbsp;&nbsp;Uh Oh! Something is not right...
@@ -287,36 +300,36 @@
                             {
                                 <h5 class="card-title text-warning">One or more Alarms has been triggered</h5>
                             }
-                                <div class="card-body">
-                                    @if (ViewData["CWPlatformState"].Equals("OK"))
+                            <div class="card-body">
+                                @if (ViewData["CWPlatformState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
+                                }
+                                @if (ViewData["CWPlatformState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("OK"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
+                                }
+                                @if (ViewData["CWELBState"].Equals("ALARM"))
+                                {
+                                    <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
+                                }
+                                @if ((int)ViewData["ServerTotalCount"] != 0)
+                                {
+                                    @if (ViewData["CWCSState"].Equals("OK"))
                                     {
-                                        <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
+                                        <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
                                     }
-                                    @if (ViewData["CWPlatformState"].Equals("ALARM"))
+                                    @if (ViewData["CWCSState"].Equals("ALARM"))
                                     {
-                                        <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
+                                        <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
                                     }
-                                    @if (ViewData["CWELBState"].Equals("OK"))
-                                    {
-                                        <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
-                                    }
-                                    @if (ViewData["CWELBState"].Equals("ALARM"))
-                                    {
-                                        <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
-                                    }
-                                    @if ((int)ViewData["ServerTotalCount"] != 0)
-                                    {
-                                        @if (ViewData["CWCSState"].Equals("OK"))
-                                        {
-                                            <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
-                                        }
-                                        @if (ViewData["CWCSState"].Equals("ALARM"))
-                                        {
-                                            <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
-                                        }
-                                    }
-                                    <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
-                                </div>
+                                }
+                                <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -400,11 +413,81 @@
         }
     </div>
 </div>
-@section Scripts{ 
+@section Scripts{
     <script>
         var result = "@Convert.ToString(ViewData["MissingVPC"]).ToLower()";
         if (result == "yes" || result == "fixing") {
             $(".vpcUnAvail").addClass("disabled");
+        }
+        var refresh_rate = 30;
+        var last_user_action = 0;
+        var lost_focus = true;
+        var focus_margin = 10;
+        var allow_refresh = true;
+
+        function keydown(evt) {
+            if (!evt) evt = event;
+            if (evt.keyCode == 192) {
+                toggle_on_off();
+            }
+        }
+
+        function toggle_on_off() {
+            if (can_i_refresh) {
+                allow_refresh = false;
+                console.log("Auto Refresh Off");
+            } else {
+                allow_refresh = true;
+                console.log("Auto Refresh On");
+            }
+        }
+
+        function reset() {
+            last_user_action = 0;
+            console.log("Reset");
+        }
+
+        function windowHasFocus() {
+            lost_focus = false;
+            console.log(" <~ Has Focus");
+        }
+
+        function windowLostFocus() {
+            lost_focus = true;
+            console.log(" <~ Lost Focus");
+        }
+
+        setInterval(function () {
+            last_user_action++;
+            refreshCheck();
+        }, 1000);
+
+        function can_i_refresh() {
+            if (last_user_action >= refresh_rate && lost_focus && allow_refresh) {
+                return true;
+            }
+            return false;
+        }
+
+        function refreshCheck() {
+            var focus = window.onfocus;
+
+            if (can_i_refresh()) {
+                window.location.reload();
+                reset();
+            } else {
+                console.log("Timer");
+            }
+
+        }
+        window.addEventListener("focus", windowHasFocus, false);
+        window.addEventListener("blur", windowLostFocus, false);
+        window.addEventListener("click", reset, false);
+        window.addEventListener("mousemove", reset, false);
+        window.addEventListener("keypress", reset, false);
+        window.onkeyup = keydown;
+        function modifyServerInput(ID) {
+            $('#modifyServerInput').val(ID);
         }
     </script>
 }
