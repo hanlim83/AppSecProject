@@ -51,7 +51,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             _logger = logger;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Boolean unFixable)
         {
             var CloudwatchFeed = await FeedReader.ReadAsync("https://status.aws.amazon.com/rss/cloudwatch-ap-southeast-1.rss");
             var CloudwatchFeed1 = CloudwatchFeed.Items.ElementAt(0);
@@ -278,6 +278,8 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             {
                 ViewData["MissingVPC"] = "YES";
             }
+            else if (unFixable == true)
+                ViewData["MissingVPC"] = "UNFIXABLE";
             else
             {
                 ViewData["MissingVPC"] = "NO";
@@ -373,13 +375,12 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                     {
                         await ScopedSetupService.DoWorkAsync();
                     });
-                    ViewData["MissingVPC"] = "FIXING";
-                    return await Index();
+                    return await Index(false);
                 }
                 catch (Exception)
                 {
                     _logger.LogInformation("Calling of Setup Background Task Failed!");
-                    return await Index();
+                    return await Index(true);
                 }
             }
         }

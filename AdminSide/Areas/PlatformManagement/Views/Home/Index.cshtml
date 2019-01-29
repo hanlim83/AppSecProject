@@ -29,11 +29,7 @@
                     <div class="card-deck" style="padding-bottom: 5%;">
                         <div class="card">
                             <h5 class="card-header">Platform Metric Alarms</h5>
-                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] == 0)
-                            {
-                                <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
-                            }
-                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] != 0 && (ViewData["CWCSState"].Equals("OK")))
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK"))
                             {
                                 <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
                             }
@@ -57,17 +53,6 @@
                                 @if (ViewData["CWELBState"].Equals("ALARM"))
                                 {
                                     <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
-                                }
-                                @if ((int)ViewData["ServerTotalCount"] != 0)
-                                {
-                                    @if (ViewData["CWCSState"].Equals("OK"))
-                                    {
-                                        <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
-                                    }
-                                    @if (ViewData["CWCSState"].Equals("ALARM"))
-                                    {
-                                        <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
-                                    }
                                 }
                                 <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
                             </div>
@@ -129,12 +114,13 @@
                 </div>
             </div>
         }
-        @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["MissingVPC"])) && ViewData["MissingVPC"].Equals("FIXING"))
+        @if (!String.IsNullOrEmpty(Convert.ToString(ViewData["MissingVPC"])) && ViewData["MissingVPC"].Equals("UNFIXABLE"))
         {
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="alert alert-warning" role="alert">
-                        Fix in progress, this page will automatically refresh and this alert will disappear when the fix is complete
+                    <div class="alert alert-danger" role="alert">
+                        <h4 class="alert-heading">Fix Failed!</h4>
+                        <p>Please rebuild the platform from scratch to restore functionality!</p>
                     </div>
                 </div>
             </div>
@@ -143,11 +129,7 @@
                     <div class="card-deck" style="padding-bottom: 5%;">
                         <div class="card">
                             <h5 class="card-header">Platform Metric Alarms</h5>
-                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] == 0)
-                            {
-                                <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
-                            }
-                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] != 0 && (ViewData["CWCSState"].Equals("OK")))
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK"))
                             {
                                 <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
                             }
@@ -171,17 +153,6 @@
                                 @if (ViewData["CWELBState"].Equals("ALARM"))
                                 {
                                     <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
-                                }
-                                @if ((int)ViewData["ServerTotalCount"] != 0)
-                                {
-                                    @if (ViewData["CWCSState"].Equals("OK"))
-                                    {
-                                        <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
-                                    }
-                                    @if (ViewData["CWCSState"].Equals("ALARM"))
-                                    {
-                                        <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
-                                    }
                                 }
                                 <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
                             </div>
@@ -416,15 +387,21 @@
 @section Scripts{
     <script>
         var result = "@Convert.ToString(ViewData["MissingVPC"]).ToLower()";
-        if (result == "yes" || result == "fixing") {
+        if (result == "yes" || result == "unfixable") {
             $(".vpcUnAvail").addClass("disabled");
+        } else {
+            window.addEventListener("focus", windowHasFocus, false);
+            window.addEventListener("blur", windowLostFocus, false);
+            window.addEventListener("click", reset, false);
+            window.addEventListener("mousemove", reset, false);
+            window.addEventListener("keypress", reset, false);
+            window.onkeyup = keydown;
+            var refresh_rate = 30;
+            var last_user_action = 0;
+            var lost_focus = true;
+            var focus_margin = 10;
+            var allow_refresh = true;
         }
-        var refresh_rate = 30;
-        var last_user_action = 0;
-        var lost_focus = true;
-        var focus_margin = 10;
-        var allow_refresh = true;
-
         function keydown(evt) {
             if (!evt) evt = event;
             if (evt.keyCode == 192) {
@@ -478,14 +455,7 @@
             } else {
                 console.log("Timer");
             }
-
         }
-        window.addEventListener("focus", windowHasFocus, false);
-        window.addEventListener("blur", windowLostFocus, false);
-        window.addEventListener("click", reset, false);
-        window.addEventListener("mousemove", reset, false);
-        window.addEventListener("keypress", reset, false);
-        window.onkeyup = keydown;
         function modifyServerInput(ID) {
             $('#modifyServerInput').val(ID);
         }
