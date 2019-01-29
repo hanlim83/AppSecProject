@@ -181,17 +181,10 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     {
                         PlatformVPCID = VPC.VpcId;
                     }
-
-                    if (Flag == true)
-                    {
-                        break;
-                    }
                 }
                 if (Flag == false)
                 {
                     _logger.LogInformation("VPC not found! Creating...");
-
-
                     VPC existing = context.VPCs.Find(1);
                     if (existing != null)
                     {
@@ -250,24 +243,6 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             }
                         }
                     });
-                    if (responseDescribeSecurityGroups.SecurityGroups[0].IpPermissions.Count != 0)
-                    {
-                        RevokeSecurityGroupIngressRequest requestRevokeIngress = new RevokeSecurityGroupIngressRequest
-                        {
-                            GroupId = responseDescribeSecurityGroups.SecurityGroups[0].GroupId
-                        };
-                        requestRevokeIngress.IpPermissions = responseDescribeSecurityGroups.SecurityGroups[0].IpPermissions;
-                        await ec2Client.RevokeSecurityGroupIngressAsync(requestRevokeIngress);
-                    }
-                    if (responseDescribeSecurityGroups.SecurityGroups[0].IpPermissionsEgress.Count != 0)
-                    {
-                        RevokeSecurityGroupEgressRequest requestRevokeEgress = new RevokeSecurityGroupEgressRequest
-                        {
-                            GroupId = responseDescribeSecurityGroups.SecurityGroups[0].GroupId
-                        };
-                        requestRevokeEgress.IpPermissions = responseDescribeSecurityGroups.SecurityGroups[0].IpPermissionsEgress;
-                        await ec2Client.RevokeSecurityGroupEgressAsync(requestRevokeEgress);
-                    }
                     _logger.LogInformation("Setup Background Service Sleeping while IPv6 Assignment");
                     responseDescribeVPC = await ec2Client.DescribeVpcsAsync(new DescribeVpcsRequest
                     {
@@ -337,15 +312,11 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         context.VPCs.Add(newlyCreatedVPC2);
                     }
                     await context.SaveChangesAsync();
-                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.VPCs OFF");
-
                 }
                 else
                 {
                     if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + VMVPCID + "'").ToList().Count() == 0)
                     {
-
-
                         _logger.LogInformation("VM VPC already created but not inside SQL Database!");
                         VPC existing = context.VPCs.Find(1);
                         if (existing != null)
@@ -392,18 +363,13 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         };
                         context.VPCs.Add(newlyCreatedVPC);
                         context.SaveChanges();
-
-
                     }
                     else
                     {
                         _logger.LogInformation("VPC already created!");
                     }
-
                     if (context.VPCs.FromSql("SELECT * FROM dbo.VPCs WHERE AWSVPCReference = '" + PlatformVPCID + "'").ToList().Count() == 0)
                     {
-
-
                         _logger.LogInformation("Platform VPC not inside SQL Database!");
                         VPC existing = context.VPCs.Find(2);
                         if (existing != null)
@@ -450,10 +416,9 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         };
                         context.VPCs.Add(newlyCreatedVPC);
                         context.SaveChanges();
-
-
                     }
                 }
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.VPCs OFF");
                 VPC vpc = await context.VPCs.FindAsync(1);
                 DescribeSubnetsResponse responseDescribeSubnets = await ec2Client.DescribeSubnetsAsync(new DescribeSubnetsRequest
                 {
@@ -469,6 +434,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         }
                     }
                 });
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnets ON");
                 if (responseDescribeSubnets.Subnets.Count == 0)
                 {
                     _logger.LogInformation("Default Subnets not found! Creating...");
@@ -565,6 +531,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         _logger.LogInformation("Subnets already created!");
                     }
                 }
+                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.Subnets OFF");
                 DescribeRouteTablesResponse responseDescribeRouteTable = await ec2Client.DescribeRouteTablesAsync(new DescribeRouteTablesRequest
                 {
                     Filters = new List<Filter>
@@ -574,6 +541,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 });
                 if (responseDescribeRouteTable.RouteTables.Count < 3)
                 {
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.RouteTables ON");
                     _logger.LogInformation("Default Route Tables not created! Creating...");
                     Amazon.EC2.Model.RouteTable AWSIntranet = responseDescribeRouteTable.RouteTables[0];
                     RouteTable RTIntranet = new RouteTable
@@ -850,6 +818,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                     context.Subnets.Update(subnet);
                     await context.SaveChangesAsync();
                     _logger.LogInformation("Linking Subnets to Route Tables (SQL) Completed!");
+                    context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.RouteTables OFF");
                 }
                 else
                 {
@@ -870,7 +839,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                             };
                             context.RouteTables.Add(newRT);
                             context.SaveChanges();
-                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = {0}", RT.RouteTableId).ToList();
+                            List<RouteTable> queryResult = context.RouteTables.FromSql("SELECT * FROM dbo.RouteTables WHERE AWSVPCRouteTableReference = {0}",RT.RouteTableId).ToList();
                             if (queryResult.Count() == 1)
                             {
                                 newRT = queryResult[0];
@@ -910,11 +879,11 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.Description = "Route To Internet (IPv4)";
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "Internet Gateway";
-                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                            if (r.State == RouteState.Active)
                                             {
                                                 newRoute.Status = Status.OK;
                                             }
-                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            else if (r.State == RouteState.Blackhole)
                                             {
                                                 newRoute.Status = Status.Blackhole;
                                             }
@@ -931,11 +900,11 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                             newRoute.Description = "Route To Internet (IPv6)";
                                             newRoute.RouteType = RouteType.Mandatory;
                                             newRoute.Destination = "Internet Gateway";
-                                            if (r.State == Amazon.EC2.RouteState.Active)
+                                            if (r.State == RouteState.Active)
                                             {
                                                 newRoute.Status = Status.OK;
                                             }
-                                            else if (r.State == Amazon.EC2.RouteState.Blackhole)
+                                            else if (r.State == RouteState.Blackhole)
                                             {
                                                 newRoute.Status = Status.Blackhole;
                                             }
@@ -1332,7 +1301,6 @@ namespace AdminSide.Areas.PlatformManagement.Services
                         _logger.LogInformation("Route Tables already created!");
                     }
                 }
-                context.Database.ExecuteSqlCommand("SET IDENTITY_INSERT dbo.VPCs OFF");
                 context.Database.CloseConnection();
                 if (!context.CloudWatchLogGroups.Any() && !context.CloudWatchLogStreams.Any())
                 {
@@ -1426,7 +1394,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                 newS.DisplayName = newS.Name;
                             }
 
-                            if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                            if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE") || !newG.Name.Contains("sns/ap-southeast-1/"))
                             {
                                 context.CloudWatchLogStreams.Add(newS);
                             }
@@ -1436,19 +1404,19 @@ namespace AdminSide.Areas.PlatformManagement.Services
                 }
                 _logger.LogInformation("Setup Background Service Completed!");
             }
-            catch (SqlException)
+            catch (SqlException e)
             {
-                _logger.LogInformation("Incorrect database schema used! Exiting...");
+                _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message + "\n" + e.StackTrace.ToLowerInvariant());
                 return;
             }
             catch (AmazonEC2Exception e)
             {
-                _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message);
+                _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message + "\n" + e.StackTrace.ToLowerInvariant());
                 return;
             }
             catch (Exception e)
             {
-                _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message);
+                _logger.LogInformation("Setup Background Service has encounted an error!\n" + e.Source + "\n" + e.Message + "\n" + e.StackTrace.ToLowerInvariant());
             }
         }
     }
