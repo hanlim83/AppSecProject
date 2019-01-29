@@ -179,13 +179,6 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                     {
                                         newS.DisplayName = "Network Flow Log For Platform Network Interface (" + newS.Name.Substring(0, newS.Name.Length - 4) + ")";
                                     }
-                                    else if (g.Name.Equals("RDSOSMetrics"))
-                                    {
-                                        if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
-                                        {
-                                            newS.DisplayName = "SQL Database CPU Usage";
-                                        }
-                                    }
                                     else if (g.Name.Equals("@aws@elasticbeanstalk@User-Side@IIS-Log"))
                                     {
                                         newS.DisplayName = "IIS Logs for User Side Web Server";
@@ -215,7 +208,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         newS.DisplayName = newS.Name;
                                     }
 
-                                    if (!newS.Name.Equals("db-74DSOXWDBQWHTVNTY7RFXWRZYE"))
+                                    if (!g.Name.Equals("RDSOSMetrics") || !g.Name.Contains("sns/ap-southeast-1/"))
                                     {
                                         context.CloudWatchLogStreams.Add(newS);
                                     }
