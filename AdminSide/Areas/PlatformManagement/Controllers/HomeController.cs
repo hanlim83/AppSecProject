@@ -239,7 +239,7 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
             Flag = false;
             foreach (MetricAlarm a in response.MetricAlarms)
             {
-                if (a.AlarmName.Contains("awsapplicationelb-app-") && a.StateValue == StateValue.ALARM)
+                if (a.AlarmName.Equals("eCTF Load Balancer HTTP 5XX Errors") && a.StateValue == StateValue.ALARM)
                 {
                     Flag = true;
                     break;
@@ -254,24 +254,26 @@ namespace AdminSide.Areas.PlatformManagement.Controllers
                 ViewData["CWELBState"] = "OK";
             }
 
-            Flag = false;
-            foreach (MetricAlarm a in response.MetricAlarms)
+            if (_context.Servers.Count() != 0)
             {
-                if (a.AlarmName.Contains("-eCTFVM-") && a.StateValue == StateValue.ALARM)
+                Flag = false;
+                foreach (MetricAlarm a in response.MetricAlarms)
                 {
-                    Flag = true;
-                    break;
+                    if (a.AlarmName.Contains("-eCTFVM-") && a.StateValue == StateValue.ALARM)
+                    {
+                        Flag = true;
+                        break;
+                    }
+                }
+                if (Flag == true)
+                {
+                    ViewData["CWCSState"] = "ALARM";
+                }
+                else
+                {
+                    ViewData["CWCSState"] = "OK";
                 }
             }
-            if (Flag == true)
-            {
-                ViewData["CWCSState"] = "ALARM";
-            }
-            else
-            {
-                ViewData["CWCSState"] = "OK";
-            }
-
             if (_context.VPCs.ToList().Count == 0)
             {
                 ViewData["MissingVPC"] = "YES";

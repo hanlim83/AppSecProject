@@ -29,9 +29,13 @@
                     <div class="card-deck" style="padding-bottom: 5%;">
                         <div class="card">
                             <h5 class="card-header">Platform Metric Alarms</h5>
-                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] == 0)
                             {
                                 <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
+                            }
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] != 0 && (ViewData["CWCSState"].Equals("OK")))
+                            {
+                            <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
                             }
                             @if (ViewData["CWPlatformState"].Equals("ALARM") || ViewData["CWELBState"].Equals("ALARM") && ViewData["CWCSState"].Equals("ALARM"))
                             {
@@ -54,13 +58,16 @@
                                 {
                                     <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
                                 }
-                                @if (ViewData["CWCSState"].Equals("OK"))
+                                @if ((int)ViewData["ServerTotalCount"] != 0)
                                 {
-                                    <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
-                                }
-                                @if (ViewData["CWCSState"].Equals("ALARM"))
-                                {
-                                    <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                    @if (ViewData["CWCSState"].Equals("OK"))
+                                    {
+                                        <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
+                                    }
+                                    @if (ViewData["CWCSState"].Equals("ALARM"))
+                                    {
+                                        <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                    }
                                 }
                                 <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
                             </div>
@@ -268,7 +275,11 @@
                         </div>
                         <div class="card">
                             <h5 class="card-header">Platform Metric Alarms</h5>
-                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && ViewData["CWCSState"].Equals("OK"))
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] == 0)
+                            {
+                                <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
+                            }
+                            @if (ViewData["CWPlatformState"].Equals("OK") && ViewData["CWELBState"].Equals("OK") && (int)ViewData["ServerTotalCount"] != 0 && (ViewData["CWCSState"].Equals("OK")))
                             {
                                 <h5 class="card-title text-success">No Alarms has been triggered yet</h5>
                             }
@@ -276,33 +287,36 @@
                             {
                                 <h5 class="card-title text-warning">One or more Alarms has been triggered</h5>
                             }
-                            <div class="card-body">
-                                @if (ViewData["CWPlatformState"].Equals("OK"))
-                                {
-                                    <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
-                                }
-                                @if (ViewData["CWPlatformState"].Equals("ALARM"))
-                                {
-                                    <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
-                                }
-                                @if (ViewData["CWELBState"].Equals("OK"))
-                                {
-                                    <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
-                                }
-                                @if (ViewData["CWELBState"].Equals("ALARM"))
-                                {
-                                    <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
-                                }
-                                @if (ViewData["CWCSState"].Equals("OK"))
-                                {
-                                    <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
-                                }
-                                @if (ViewData["CWCSState"].Equals("ALARM"))
-                                {
-                                    <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
-                                }
-                                <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
-                            </div>
+                                <div class="card-body">
+                                    @if (ViewData["CWPlatformState"].Equals("OK"))
+                                    {
+                                        <p class="card-text">Platform Servers: All Platform Servers are Functioning Properly</p>
+                                    }
+                                    @if (ViewData["CWPlatformState"].Equals("ALARM"))
+                                    {
+                                        <p class="card-text">Platform Servers: One or more Platform Servers is/are facing issues and recovery is underway</p>
+                                    }
+                                    @if (ViewData["CWELBState"].Equals("OK"))
+                                    {
+                                        <p class="card-text">Platform Load Balancer: All web requests to/from the platform are served properly</p>
+                                    }
+                                    @if (ViewData["CWELBState"].Equals("ALARM"))
+                                    {
+                                        <p class="card-text">Platform Load Balancer: Some web requests to/from the platform are served improperly</p>
+                                    }
+                                    @if ((int)ViewData["ServerTotalCount"] != 0)
+                                    {
+                                        @if (ViewData["CWCSState"].Equals("OK"))
+                                        {
+                                            <p class="card-text">Challenge Servers: All Challenge Servers are Functioning Properly</p>
+                                        }
+                                        @if (ViewData["CWCSState"].Equals("ALARM"))
+                                        {
+                                            <p class="card-text">Challenge Servers: One or more Challenge Servers is/are facing issues and recovery is underway</p>
+                                        }
+                                    }
+                                    <a asp-action="ManageNotification" class="btn btn-primary">Manage Alarm Notifications</a>
+                                </div>
                         </div>
                     </div>
                 </div>
