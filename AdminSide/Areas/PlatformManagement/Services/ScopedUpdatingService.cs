@@ -208,7 +208,7 @@ namespace AdminSide.Areas.PlatformManagement.Services
                                         newS.DisplayName = newS.Name;
                                     }
 
-                                    if (!g.Name.Equals("RDSOSMetrics") || !g.Name.Contains("sns/ap-southeast-1/"))
+                                    if (!g.Name.Equals("RDSOSMetrics") || !g.Name.Contains("sns"))
                                     {
                                         context.CloudWatchLogStreams.Add(newS);
                                     }
