@@ -1,4 +1,4 @@
-# ASPJ
+# AppSecProject
 A Project for Application Security & Project (ITP292) Module 
 ## Team Members
 * [Evelyn Lim](https://github.com/elxwy)
